@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini Coder - Feature Demo</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+      }
+      .feature-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .feature-title {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #fff;
+      }
+      .feature-description {
+        margin-bottom: 20px;
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+      .demo-section {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 15px;
+      }
+      .language-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .language-btn {
+        padding: 8px 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .language-btn.active {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+      .modify-demo {
+        background: rgba(255, 152, 0, 0.1);
+        border: 1px solid rgba(255, 152, 0, 0.3);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+      .modify-btn {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .modify-btn:hover {
+        background: #e68900;
+        transform: translateY(-2px);
+      }
+      .success-message {
+        color: #4caf50;
+        background: rgba(76, 175, 80, 0.1);
+        padding: 10px;
+        border-radius: 6px;
+        margin-top: 10px;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🚀 Mini Coder - New Features Demo ✨</h1>
+        <p>Language Selector + App Modification Features</p>
+      </div>
+
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-title">🌍 Language Selector</div>
+          <div class="feature-description">
+            Users can now select their preferred language for the entire UI. All
+            menus, buttons, and messages will be displayed in the chosen
+            language.
+          </div>
+          <div class="demo-section">
+            <h4>Demo:</h4>
+            <div class="language-selector">
+              <button class="language-btn active" onclick="setLanguage('en')">
+                🇺🇸 English
+              </button>
+              <button class="language-btn" onclick="setLanguage('de')">
+                🇩🇪 Deutsch
+              </button>
+            </div>
+            <div id="language-demo">
+              <p id="demo-text">UI Language: <strong>English</strong></p>
+              <p id="demo-button-text">
+                Button Text: <strong>Create App</strong>
+              </p>
+              <p id="demo-placeholder">
+                Placeholder: <strong>Tell me what to build! 🎯</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🔧 App Modification</div>
+          <div class="feature-description">
+            After creating an app, users can now modify it with follow-up
+            commands. The system sends both the original app and the
+            modification request to OpenAI for intelligent updates.
+          </div>
+          <div class="demo-section">
+            <h4>How it works:</h4>
+            <ol>
+              <li>Create an app: "Create a calculator"</li>
+              <li>Click "Modify This App" button</li>
+              <li>Enter modification: "Change background to blue"</li>
+              <li>System combines original + modification request</li>
+              <li>OpenAI generates updated app</li>
+            </ol>
+            <div class="modify-demo">
+              <h4>Example Modification Process:</h4>
+              <p><strong>Original:</strong> "Create a calculator"</p>
+              <p><strong>Modification:</strong> "Change background to blue"</p>
+              <p>
+                <strong>Combined Prompt:</strong> "Create a calculator. Current
+                app requirements. Now modify it: Change background to blue"
+              </p>
+              <button class="modify-btn" onclick="showModifySuccess()">
+                🔧 Modify This App
+              </button>
+              <div
+                id="modify-success"
+                class="success-message"
+                style="display: none"
+              >
+                ✅ App modified successfully! Background changed to blue.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-card" style="margin-top: 30px">
+        <div class="feature-title">🎯 Technical Implementation</div>
+        <div class="feature-description">
+          <h4>Language Selector:</h4>
+          <ul>
+            <li>Dropdown in header with flag emojis</li>
+            <li>Translation system with <code>t(key)</code> helper method</li>
+            <li>Reactive UI updates when language changes</li>
+            <li>Supports English and German initially</li>
+          </ul>
+
+          <h4>App Modification:</h4>
+          <ul>
+            <li>New "Modify This App" button in preview actions</li>
+            <li>Modal dialog for modification commands</li>
+            <li>Smart prompt combining: original + modification</li>
+            <li>Updates current app preview with modified version</li>
+            <li>Proper error handling and loading states</li>
+          </ul>
+
+          <h4>Key Features:</h4>
+          <ul>
+            <li>✅ Language selector with flag emojis</li>
+            <li>✅ Complete translation system</li>
+            <li>✅ Modify app button with modal dialog</li>
+            <li>✅ Smart prompt combination for modifications</li>
+            <li>✅ Proper loading states and error handling</li>
+            <li>✅ Responsive design for all screen sizes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const translations = {
+        en: {
+          createApp: "Create App",
+          tellMeWhat: "Tell me what to build! 🎯",
+          language: "English",
+        },
+        de: {
+          createApp: "App erstellen",
+          tellMeWhat: "Sag mir, was ich bauen soll! 🎯",
+          language: "Deutsch",
+        },
+      };
+
+      function setLanguage(lang) {
+        // Update active button
+        document.querySelectorAll(".language-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Update demo text
+        const translation = translations[lang];
+        document.getElementById(
+          "demo-text"
+        ).innerHTML = `UI Language: <strong>${translation.language}</strong>`;
+        document.getElementById(
+          "demo-button-text"
+        ).innerHTML = `Button Text: <strong>${translation.createApp}</strong>`;
+        document.getElementById(
+          "demo-placeholder"
+        ).innerHTML = `Placeholder: <strong>${translation.tellMeWhat}</strong>`;
+      }
+
+      function showModifySuccess() {
+        document.getElementById("modify-success").style.display = "block";
+        setTimeout(() => {
+          document.getElementById("modify-success").style.display = "none";
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

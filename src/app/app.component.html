@@ -1,0 +1,439 @@
+<div class="app-container">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">
+        <span class="emoji">🚀</span>
+        {{ t("appTitle") }}
+        <span class="emoji">✨</span>
+      </h1>
+      <p class="app-subtitle">{{ t("appSubtitle") }}</p>
+    </div>
+
+    <div class="header-actions">
+      <!-- Language Selector -->
+      <div class="language-selector">
+        <select
+          [(ngModel)]="selectedLanguage"
+          (change)="changeLanguage(selectedLanguage)"
+          class="language-select"
+        >
+          <option *ngFor="let lang of availableLanguages" [value]="lang.code">
+            {{ lang.flag }} {{ lang.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Toolbox Button -->
+      <button
+        class="toolbox-btn"
+        (click)="toggleToolbox()"
+        [class.active]="showToolbox"
+      >
+        <span class="emoji">🧰</span>
+        {{ t("myToolbox") }} ({{ savedProjects.length }})
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Input Section -->
+    <div class="input-section">
+      <div class="input-container">
+        <div class="input-header">
+          <h2>{{ t("tellMeWhat") }}</h2>
+          <div class="header-actions">
+            <button class="example-btn" (click)="setExampleCommand()">
+              <span class="emoji">💡</span>
+              {{ t("tryExample") }}
+            </button>
+            <button
+              class="example-btn"
+              (click)="testStaticPreview()"
+              style="background: #9c27b0"
+            >
+              <span class="emoji">🔧</span>
+              Test Preview
+            </button>
+            <button
+              class="example-btn"
+              (click)="testBlobUrl()"
+              style="background: #ff9800"
+            >
+              <span class="emoji">🔗</span>
+              Test Blob URL
+            </button>
+            <button
+              class="voice-btn"
+              (click)="startVoiceInput()"
+              [disabled]="!voiceSupported || isListening"
+              [class.listening]="isListening"
+              *ngIf="voiceSupported"
+            >
+              <span class="emoji" *ngIf="!isListening">🎤</span>
+              <span class="pulse" *ngIf="isListening">🔴</span>
+              {{ isListening ? t("listening") : t("voiceInput") }}
+            </button>
+          </div>
+        </div>
+
+        <div class="input-wrapper">
+          <div class="input-with-voice">
+            <textarea
+              [(ngModel)]="userCommand"
+              [placeholder]="t('placeholderText')"
+              class="command-input"
+              rows="3"
+              [disabled]="isProcessing"
+            ></textarea>
+            <button
+              class="voice-btn-small"
+              (click)="startVoiceInput()"
+              [disabled]="!voiceSupported || isListening"
+              [class.listening]="isListening"
+              *ngIf="voiceSupported"
+              type="button"
+            >
+              <span class="emoji" *ngIf="!isListening">🎤</span>
+              <span class="pulse" *ngIf="isListening">🔴</span>
+            </button>
+          </div>
+
+          <button
+            class="run-btn"
+            (click)="processCommand()"
+            [disabled]="isProcessing || !userCommand.trim()"
+          >
+            <span class="emoji" *ngIf="!isProcessing">🔥</span>
+            <span class="spinner" *ngIf="isProcessing"></span>
+            {{ isProcessing ? t("creating") : t("createApp") }}
+          </button>
+        </div>
+
+        <!-- Language Detection -->
+        <div class="language-info" *ngIf="currentApp">
+          <span class="emoji">🌍</span>
+          {{ t("language") }}:
+          {{ currentApp.detectedLanguage === "de" ? "German" : "English" }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Debug Info Panel -->
+    <div
+      class="debug-panel"
+      *ngIf="currentApp"
+      style="
+        background: #f0f0f0;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 12px;
+      "
+    >
+      <h4>Debug Information</h4>
+      <p><strong>Preview URL:</strong> {{ previewUrl }}</p>
+      <p><strong>Safe Preview URL:</strong> {{ safePreviewUrl }}</p>
+      <p><strong>Preview HTML Length:</strong> {{ previewHtml.length }}</p>
+      <p><strong>Has DOCTYPE:</strong> {{ previewHtml.includes("DOCTYPE") }}</p>
+      <p>
+        <strong>Has Script Tags:</strong> {{ previewHtml.includes("script") }}
+      </p>
+      <p>
+        <strong>Has Style Tags:</strong> {{ previewHtml.includes("style") }}
+      </p>
+      <p><strong>Project Name:</strong> {{ currentApp.projectName }}</p>
+      <p><strong>Language:</strong> {{ currentApp.detectedLanguage }}</p>
+    </div>
+
+    <!-- Error/Success Display -->
+    <div
+      class="error-message"
+      [class.success]="errorMessage.startsWith('✅')"
+      *ngIf="errorMessage"
+    >
+      <span class="emoji">{{ errorMessage.startsWith("✅") ? "" : "❌" }}</span>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Preview Section -->
+    <div class="preview-section" *ngIf="currentApp">
+      <div class="preview-header">
+        <h3>
+          <span class="emoji">📱</span>
+          {{ t("livePreview") }}
+        </h3>
+        <div class="preview-actions">
+          <button class="action-btn modify" (click)="showBuildChoiceModal()">
+            <span class="emoji">🔧</span>
+            {{ t("modifyApp") }}
+          </button>
+          <button class="action-btn save" (click)="saveToToolbox()">
+            <span class="emoji">💾</span>
+            {{ t("saveToToolbox") }}
+          </button>
+          <button class="action-btn clear" (click)="clearPreview()">
+            <span class="emoji">🗑️</span>
+            {{ t("clear") }}
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-container">
+        <iframe
+          [src]="safePreviewUrl"
+          class="preview-frame"
+          title="Generated App Preview"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-presentation allow-downloads"
+          (load)="onIframeLoad($event)"
+          (error)="onIframeError($event)"
+        >
+        </iframe>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isProcessing">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <p>Creating your awesome app...</p>
+        <p class="loading-subtext">This might take a few seconds ⏳</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toolbox Sidebar -->
+  <div class="toolbox-sidebar" [class.open]="showToolbox">
+    <div class="toolbox-header">
+      <h3>
+        <span class="emoji">🧰</span>
+        {{ t("myToolbox") }}
+      </h3>
+      <button class="close-btn" (click)="toggleToolbox()">×</button>
+    </div>
+
+    <div class="toolbox-content">
+      <div class="empty-state" *ngIf="savedProjects.length === 0">
+        <span class="emoji">📦</span>
+        <p>{{ t("noProjects") }}</p>
+        <p class="empty-subtext">
+          {{ t("noProjectsSubtext") }}
+        </p>
+      </div>
+
+      <div class="project-list" *ngIf="savedProjects.length > 0">
+        <div
+          class="project-item"
+          *ngFor="let project of savedProjects"
+          [class.selected]="selectedProject?.id === project.id"
+        >
+          <div class="project-info" (click)="loadProject(project)">
+            <h4 class="project-name">{{ project.name }}</h4>
+            <p class="project-command">{{ project.command }}</p>
+            <div class="project-meta">
+              <span
+                class="language-badge"
+                [class.german]="project.language === 'de'"
+              >
+                {{ project.language === "de" ? "DE" : "EN" }}
+              </span>
+              <span class="project-date">{{
+                project.createdAt | date : "short"
+              }}</span>
+            </div>
+          </div>
+
+          <button
+            class="delete-btn"
+            (click)="deleteProject(project)"
+            title="Delete project"
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Dialog -->
+  <div class="modal-overlay" *ngIf="showSaveDialog" (click)="cancelSave()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>
+        <span class="emoji">💾</span>
+        {{ t("saveToToolboxTitle") }}
+      </h3>
+
+      <div class="modal-body">
+        <label for="projectName">{{ t("projectName") }}</label>
+        <input
+          id="projectName"
+          [(ngModel)]="saveProjectName"
+          type="text"
+          class="project-name-input"
+          placeholder="Enter project name"
+          maxlength="50"
+          (keyup.enter)="confirmSave()"
+        />
+
+        <div class="modal-info">
+          <p>
+            <strong>{{ t("command") }}</strong> {{ userCommand }}
+          </p>
+          <p>
+            <strong>{{ t("language") }}:</strong>
+            {{ currentApp?.detectedLanguage === "de" ? "German" : "English" }}
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="cancelSave()">
+          {{ t("cancel") }}
+        </button>
+        <button
+          class="btn-primary"
+          (click)="confirmSave()"
+          [disabled]="!saveProjectName.trim()"
+        >
+          <span class="emoji">💾</span>
+          {{ t("save") }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Build Choice Dialog -->
+  <div
+    class="modal-overlay"
+    *ngIf="showBuildChoiceDialog"
+    (click)="cancelBuildChoice()"
+  >
+    <div
+      class="modal-content build-choice-modal"
+      (click)="$event.stopPropagation()"
+    >
+      <h3>
+        <span class="emoji">🤔</span>
+        {{ t("buildChoice") }}
+      </h3>
+
+      <div class="modal-body">
+        <p>{{ t("buildChoiceText") }}</p>
+        <div class="choice-buttons">
+          <button
+            class="choice-btn modify-choice"
+            (click)="chooseModifyExisting()"
+          >
+            <span class="emoji">🔧</span>
+            <div class="choice-content">
+              <h4>{{ t("modifyExisting") }}</h4>
+              <p>{{ t("modifyPlaceholder") }}</p>
+            </div>
+          </button>
+          <button
+            class="choice-btn rebuild-choice"
+            (click)="chooseRebuildFromScratch()"
+          >
+            <span class="emoji">🚀</span>
+            <div class="choice-content">
+              <h4>{{ t("rebuildFromScratch") }}</h4>
+              <p>{{ t("placeholderText") }}</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="cancelBuildChoice()">
+          {{ t("cancel") }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modify App Dialog -->
+  <div
+    class="modal-overlay"
+    *ngIf="showModifyDialog"
+    (click)="cancelModifyApp()"
+  >
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>
+        <span class="emoji">{{ isRebuilding ? "🚀" : "🔧" }}</span>
+        {{ isRebuilding ? t("rebuildApp") : t("modifyApp") }}
+      </h3>
+
+      <div class="modal-body">
+        <label for="modifyCommand">{{
+          isRebuilding ? t("placeholderText") : t("modifyPlaceholder")
+        }}</label>
+        <div class="input-with-voice">
+          <textarea
+            id="modifyCommand"
+            [(ngModel)]="modifyCommand"
+            class="modify-command-input"
+            [placeholder]="
+              isRebuilding ? t('placeholderText') : t('modifyPlaceholder')
+            "
+            rows="3"
+            maxlength="200"
+            [disabled]="isModifying"
+          ></textarea>
+          <button
+            class="voice-btn-small"
+            (click)="startVoiceInputForModify()"
+            [disabled]="!voiceSupported || isListening"
+            [class.listening]="isListening"
+            *ngIf="voiceSupported"
+            type="button"
+          >
+            <span class="emoji" *ngIf="!isListening">🎤</span>
+            <span class="pulse" *ngIf="isListening">🔴</span>
+          </button>
+        </div>
+
+        <div class="modal-info">
+          <p>
+            <strong>{{ t("command") }}</strong> {{ userCommand }}
+          </p>
+          <p>
+            <strong>{{ t("language") }}:</strong>
+            {{ currentApp?.detectedLanguage === "de" ? "German" : "English" }}
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button
+          class="btn-secondary"
+          (click)="cancelModifyApp()"
+          [disabled]="isModifying"
+        >
+          {{ t("cancel") }}
+        </button>
+        <button
+          class="btn-primary"
+          (click)="processModifyCommand()"
+          [disabled]="!modifyCommand.trim() || isModifying"
+        >
+          <span class="emoji" *ngIf="!isModifying">{{
+            isRebuilding ? "🚀" : "🔧"
+          }}</span>
+          <span class="spinner" *ngIf="isModifying"></span>
+          {{
+            isModifying
+              ? t("creating")
+              : isRebuilding
+              ? t("rebuildApp")
+              : t("modifyApp")
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay for toolbox -->
+  <div class="overlay" *ngIf="showToolbox" (click)="toggleToolbox()"></div>
+</div>

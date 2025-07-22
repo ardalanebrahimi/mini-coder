@@ -113,56 +113,15 @@ export class PromptProcessorService {
    * @returns Formatted prompt for OpenAI
    */
   private createOpenAIPrompt(command: string, language: string): string {
-    const instructions =
-      language === "de"
-        ? "Du bist ein Experte für die Erstellung von FUNKTIONALEN Mini-Web-Apps für Kinder. Erstelle eine vollständige, voll funktionsfähige HTML-Seite mit eingebettetem CSS und JavaScript basierend auf dem folgenden Befehl. Die App MUSS vollständig funktionieren und interaktiv sein. Antworte NUR mit dem HTML-Code, keine Erklärungen."
-        : "You are an expert at creating FUNCTIONAL mini web apps for kids. Create a complete, fully working HTML page with embedded CSS and JavaScript based on the following command. The app MUST be fully functional and interactive. Reply ONLY with the HTML code, no explanations.";
-
-    return `${instructions}
-
-CRITICAL REQUIREMENTS:
-- Create a complete HTML document with <!DOCTYPE html>, <html>, <head>, and <body>
-- Include ALL CSS in <style> tags in the head section
-- Include ALL JavaScript in <script> tags before closing body tag
-- The app MUST be fully functional and interactive - all buttons, inputs, and features must work
-- Add proper event listeners and JavaScript functions for ALL interactive elements
-- Use clear variable names and well-structured JavaScript code
-- Make it colorful, fun, and kid-friendly with emojis and animations
-- Use large, touch-friendly buttons (min 50px height)
-- Add visual feedback for user interactions (hover effects, click animations)
-- Include clear instructions or labels for the user
-- Make it responsive and mobile-friendly
-- Add fun sound effects using Web Audio API if appropriate
-- Use modern HTML5 and CSS3 features
-- Test all functionality - buttons must do what they're supposed to do
-- For calculators: implement all basic operations (+, -, *, /, =, clear)
-- For games: implement complete game logic with scoring
-- For quizzes: implement question flow and scoring system
-- For tools: implement all advertised functionality
-
-EXAMPLE STRUCTURE:
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App</title>
-    <style>
-        /* Complete CSS styling here */
-    </style>
-</head>
-<body>
-    <!-- Complete HTML structure here -->
-    <script>
-        // Complete JavaScript functionality here
-        // All event listeners and functions
-    </script>
-</body>
-</html>
-
-Command: "${command}"
-
-Create a COMPLETE, FUNCTIONAL mini app now:`;
+    // Use a single prompt template and append the command with language info
+    const langLabel = language === "de" ? "German" : "English";
+    return (
+      environment.openAIFixInstructions +
+      "\n\ncommand in " +
+      langLabel +
+      ": " +
+      command
+    );
   }
 
   /**
@@ -181,8 +140,7 @@ Create a COMPLETE, FUNCTIONAL mini app now:`;
       messages: [
         {
           role: "system",
-          content:
-            "You are an expert web developer that creates FULLY FUNCTIONAL mini web applications for children. You MUST respond with complete, working HTML code that includes all necessary CSS and JavaScript. Every button, input, and interactive element MUST work perfectly. Focus on creating engaging, functional apps that kids will love to use. Always include proper event handlers and complete functionality.",
+          content: environment.mainPrompt,
         },
         {
           role: "user",

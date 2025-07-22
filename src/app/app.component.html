@@ -49,6 +49,7 @@
               {{ t("tryExample") }}
             </button>
             <button
+              *ngIf="false"
               class="example-btn"
               (click)="testStaticPreview()"
               style="background: #9c27b0"
@@ -57,6 +58,7 @@
               Test Preview
             </button>
             <button
+              *ngIf="false"
               class="example-btn"
               (click)="testBlobUrl()"
               style="background: #ff9800"
@@ -110,42 +112,7 @@
             {{ isProcessing ? t("creating") : t("createApp") }}
           </button>
         </div>
-
-        <!-- Language Detection -->
-        <div class="language-info" *ngIf="currentApp">
-          <span class="emoji">🌍</span>
-          {{ t("language") }}:
-          {{ currentApp.detectedLanguage === "de" ? "German" : "English" }}
-        </div>
       </div>
-    </div>
-
-    <!-- Debug Info Panel -->
-    <div
-      class="debug-panel"
-      *ngIf="currentApp"
-      style="
-        background: #f0f0f0;
-        padding: 15px;
-        margin: 10px 0;
-        border-radius: 8px;
-        font-family: monospace;
-        font-size: 12px;
-      "
-    >
-      <h4>Debug Information</h4>
-      <p><strong>Preview URL:</strong> {{ previewUrl }}</p>
-      <p><strong>Safe Preview URL:</strong> {{ safePreviewUrl }}</p>
-      <p><strong>Preview HTML Length:</strong> {{ previewHtml.length }}</p>
-      <p><strong>Has DOCTYPE:</strong> {{ previewHtml.includes("DOCTYPE") }}</p>
-      <p>
-        <strong>Has Script Tags:</strong> {{ previewHtml.includes("script") }}
-      </p>
-      <p>
-        <strong>Has Style Tags:</strong> {{ previewHtml.includes("style") }}
-      </p>
-      <p><strong>Project Name:</strong> {{ currentApp.projectName }}</p>
-      <p><strong>Language:</strong> {{ currentApp.detectedLanguage }}</p>
     </div>
 
     <!-- Error/Success Display -->

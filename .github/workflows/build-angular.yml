@@ -30,12 +30,38 @@ jobs:
         run: |
           cp src/environments/environment.template.ts src/environments/environment.ts
           cp src/environments/environment.prod.template.ts src/environments/environment.prod.ts
-          sed -i 's/YOUR_OPENAI_API_KEY_HERE/${{ secrets.OPENAI_API_KEY }}/g' src/environments/environment.ts
-          sed -i 's/YOUR_OPENAI_API_KEY_HERE/${{ secrets.OPENAI_API_KEY }}/g' src/environments/environment.prod.ts
-          sed -i 's/YOUR_MAIN_PROMPT_HERE/${{ secrets.MAIN_PROMPT }}/g' src/environments/environment.ts
-          sed -i 's/YOUR_MAIN_PROMPT_HERE/${{ secrets.MAIN_PROMPT }}/g' src/environments/environment.prod.ts
-          sed -i 's/YOUR_OPENAI_FIX_INSTRUCTIONS_HERE/${{ secrets.OPENAI_FIX_INSTRUCTIONS }}/g' src/environments/environment.ts
-          sed -i 's/YOUR_OPENAI_FIX_INSTRUCTIONS_HERE/${{ secrets.OPENAI_FIX_INSTRUCTIONS }}/g' src/environments/environment.prod.ts
+        
+      - name: Replace environment variables
+        run: |
+          # Create temporary files with the secret values
+          echo '${{ secrets.OPENAI_API_KEY }}' > /tmp/api_key.txt
+          echo '${{ secrets.MAIN_PROMPT }}' > /tmp/main_prompt.txt
+          echo '${{ secrets.OPENAI_FIX_INSTRUCTIONS }}' > /tmp/fix_instructions.txt
+          
+          # Use node to replace the placeholders properly
+          node -e "
+          const fs = require('fs');
+          const apiKey = fs.readFileSync('/tmp/api_key.txt', 'utf8').trim();
+          const mainPrompt = fs.readFileSync('/tmp/main_prompt.txt', 'utf8').trim();
+          const fixInstructions = fs.readFileSync('/tmp/fix_instructions.txt', 'utf8').trim();
+          
+          // Process environment.ts
+          let envContent = fs.readFileSync('src/environments/environment.ts', 'utf8');
+          envContent = envContent.replace('YOUR_OPENAI_API_KEY_HERE', apiKey);
+          envContent = envContent.replace('YOUR_MAIN_PROMPT_HERE', mainPrompt);
+          envContent = envContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', fixInstructions);
+          fs.writeFileSync('src/environments/environment.ts', envContent);
+          
+          // Process environment.prod.ts
+          let prodContent = fs.readFileSync('src/environments/environment.prod.ts', 'utf8');
+          prodContent = prodContent.replace('YOUR_OPENAI_API_KEY_HERE', apiKey);
+          prodContent = prodContent.replace('YOUR_MAIN_PROMPT_HERE', mainPrompt);
+          prodContent = prodContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', fixInstructions);
+          fs.writeFileSync('src/environments/environment.prod.ts', prodContent);
+          "
+          
+          # Clean up temporary files
+          rm /tmp/api_key.txt /tmp/main_prompt.txt /tmp/fix_instructions.txt
 
       - name: Build Angular app for production
         run: npm run build

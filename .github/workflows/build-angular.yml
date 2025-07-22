@@ -1,14 +1,18 @@
-name: Build Angular App
+name: Build and Deploy Angular App
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    
+    # Add permissions for GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -29,11 +33,17 @@ jobs:
           sed -i 's/YOUR_OPENAI_API_KEY_HERE/${{ secrets.OPENAI_API_KEY }}/g' src/environments/environment.ts
           sed -i 's/YOUR_OPENAI_API_KEY_HERE/${{ secrets.OPENAI_API_KEY }}/g' src/environments/environment.prod.ts
 
-      - name: Build Angular app
+      - name: Build Angular app for production
         run: npm run build
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v2
         with:
-          name: dist-mini-coder
           path: dist/mini-coder
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

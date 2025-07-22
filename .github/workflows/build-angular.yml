@@ -44,18 +44,28 @@ jobs:
           const mainPrompt = process.env.MAIN_PROMPT || '';
           const fixInstructions = process.env.OPENAI_FIX_INSTRUCTIONS || '';
           
+          // Escape strings for JavaScript
+          function escapeJs(str) {
+            return str.replace(/\\\\/g, '\\\\\\\\')
+                     .replace(/'/g, \"\\\\'\" )
+                     .replace(/\"/g, '\\\\\"')
+                     .replace(/\\n/g, '\\\\n')
+                     .replace(/\\r/g, '\\\\r')
+                     .replace(/\\t/g, '\\\\t');
+          }
+          
           // Process environment.ts
           let envContent = fs.readFileSync('src/environments/environment.ts', 'utf8');
-          envContent = envContent.replace('YOUR_OPENAI_API_KEY_HERE', apiKey);
-          envContent = envContent.replace('YOUR_MAIN_PROMPT_HERE', mainPrompt);
-          envContent = envContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', fixInstructions);
+          envContent = envContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeJs(apiKey));
+          envContent = envContent.replace('YOUR_MAIN_PROMPT_HERE', escapeJs(mainPrompt));
+          envContent = envContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeJs(fixInstructions));
           fs.writeFileSync('src/environments/environment.ts', envContent);
           
           // Process environment.prod.ts
           let prodContent = fs.readFileSync('src/environments/environment.prod.ts', 'utf8');
-          prodContent = prodContent.replace('YOUR_OPENAI_API_KEY_HERE', apiKey);
-          prodContent = prodContent.replace('YOUR_MAIN_PROMPT_HERE', mainPrompt);
-          prodContent = prodContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', fixInstructions);
+          prodContent = prodContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeJs(apiKey));
+          prodContent = prodContent.replace('YOUR_MAIN_PROMPT_HERE', escapeJs(mainPrompt));
+          prodContent = prodContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeJs(fixInstructions));
           fs.writeFileSync('src/environments/environment.prod.ts', prodContent);
           "
 

@@ -32,18 +32,17 @@ jobs:
           cp src/environments/environment.prod.template.ts src/environments/environment.prod.ts
         
       - name: Replace environment variables
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          MAIN_PROMPT: ${{ secrets.MAIN_PROMPT }}
+          OPENAI_FIX_INSTRUCTIONS: ${{ secrets.OPENAI_FIX_INSTRUCTIONS }}
         run: |
-          # Create temporary files with the secret values
-          echo '${{ secrets.OPENAI_API_KEY }}' > /tmp/api_key.txt
-          echo '${{ secrets.MAIN_PROMPT }}' > /tmp/main_prompt.txt
-          echo '${{ secrets.OPENAI_FIX_INSTRUCTIONS }}' > /tmp/fix_instructions.txt
-          
           # Use node to replace the placeholders properly
           node -e "
           const fs = require('fs');
-          const apiKey = fs.readFileSync('/tmp/api_key.txt', 'utf8').trim();
-          const mainPrompt = fs.readFileSync('/tmp/main_prompt.txt', 'utf8').trim();
-          const fixInstructions = fs.readFileSync('/tmp/fix_instructions.txt', 'utf8').trim();
+          const apiKey = process.env.OPENAI_API_KEY || '';
+          const mainPrompt = process.env.MAIN_PROMPT || '';
+          const fixInstructions = process.env.OPENAI_FIX_INSTRUCTIONS || '';
           
           // Process environment.ts
           let envContent = fs.readFileSync('src/environments/environment.ts', 'utf8');
@@ -59,9 +58,6 @@ jobs:
           prodContent = prodContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', fixInstructions);
           fs.writeFileSync('src/environments/environment.prod.ts', prodContent);
           "
-          
-          # Clean up temporary files
-          rm /tmp/api_key.txt /tmp/main_prompt.txt /tmp/fix_instructions.txt
 
       - name: Build Angular app for production
         run: npm run build

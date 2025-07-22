@@ -44,28 +44,25 @@ jobs:
           const mainPrompt = process.env.MAIN_PROMPT || '';
           const fixInstructions = process.env.OPENAI_FIX_INSTRUCTIONS || '';
           
-          // Escape strings for JavaScript
-          function escapeJs(str) {
+          // Escape template literal content (handle backticks and dollar signs)
+          function escapeTemplateLiteral(str) {
             return str.replace(/\\\\/g, '\\\\\\\\')
-                     .replace(/'/g, \"\\\\'\" )
-                     .replace(/\"/g, '\\\\\"')
-                     .replace(/\\n/g, '\\\\n')
-                     .replace(/\\r/g, '\\\\r')
-                     .replace(/\\t/g, '\\\\t');
+                     .replace(/\`/g, '\\\\\`')
+                     .replace(/\\\$/g, '\\\\\\\$');
           }
           
           // Process environment.ts
           let envContent = fs.readFileSync('src/environments/environment.ts', 'utf8');
-          envContent = envContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeJs(apiKey));
-          envContent = envContent.replace('YOUR_MAIN_PROMPT_HERE', escapeJs(mainPrompt));
-          envContent = envContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeJs(fixInstructions));
+          envContent = envContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeTemplateLiteral(apiKey));
+          envContent = envContent.replace('YOUR_MAIN_PROMPT_HERE', escapeTemplateLiteral(mainPrompt));
+          envContent = envContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeTemplateLiteral(fixInstructions));
           fs.writeFileSync('src/environments/environment.ts', envContent);
           
           // Process environment.prod.ts
           let prodContent = fs.readFileSync('src/environments/environment.prod.ts', 'utf8');
-          prodContent = prodContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeJs(apiKey));
-          prodContent = prodContent.replace('YOUR_MAIN_PROMPT_HERE', escapeJs(mainPrompt));
-          prodContent = prodContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeJs(fixInstructions));
+          prodContent = prodContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeTemplateLiteral(apiKey));
+          prodContent = prodContent.replace('YOUR_MAIN_PROMPT_HERE', escapeTemplateLiteral(mainPrompt));
+          prodContent = prodContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeTemplateLiteral(fixInstructions));
           fs.writeFileSync('src/environments/environment.prod.ts', prodContent);
           "
 

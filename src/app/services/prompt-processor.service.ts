@@ -6,7 +6,7 @@ import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
 // Language detection using franc-min
 import { franc } from "franc-min";
-import { environment } from "src/environments/environment";
+import { environment } from "../../environments/environment";
 
 export interface ProcessedCommand {
   detectedLanguage: string;

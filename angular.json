@@ -30,7 +30,7 @@
           },
           "configurations": {
             "production": {
-              "baseHref": "/mini-coder/",
+              "baseHref": "/",
               "budgets": [
                 {
                   "type": "initial",

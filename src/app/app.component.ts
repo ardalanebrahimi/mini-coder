@@ -7,11 +7,12 @@ import {
   ProcessedCommand,
 } from "./services/prompt-processor.service";
 import { StorageService, SavedProject } from "./services/storage.service";
+import { ToolboxProjectItemComponent } from "./toolbox-project-item/toolbox-project-item.component";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ToolboxProjectItemComponent],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })

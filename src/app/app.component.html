@@ -191,35 +191,13 @@
       </div>
 
       <div class="project-list" *ngIf="savedProjects.length > 0">
-        <div
-          class="project-item"
+        <app-toolbox-project-item
           *ngFor="let project of savedProjects"
-          [class.selected]="selectedProject?.id === project.id"
-        >
-          <div class="project-info" (click)="loadProject(project)">
-            <h4 class="project-name">{{ project.name }}</h4>
-            <p class="project-command">{{ project.command }}</p>
-            <div class="project-meta">
-              <span
-                class="language-badge"
-                [class.german]="project.language === 'de'"
-              >
-                {{ project.language === "de" ? "DE" : "EN" }}
-              </span>
-              <span class="project-date">{{
-                project.createdAt | date : "short"
-              }}</span>
-            </div>
-          </div>
-
-          <button
-            class="delete-btn"
-            (click)="deleteProject(project)"
-            title="Delete project"
-          >
-            🗑️
-          </button>
-        </div>
+          [project]="project"
+          [isSelected]="selectedProject?.id === project.id"
+          (projectClick)="loadProject($event)"
+          (deleteClick)="deleteProject($event)"
+        ></app-toolbox-project-item>
       </div>
     </div>
   </div>

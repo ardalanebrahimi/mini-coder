@@ -1,0 +1,20 @@
+<div class="project-item" [class.selected]="isSelected">
+  <div class="project-info" (click)="onProjectClick()">
+    <h4 class="project-name">{{ project.name }}</h4>
+    <p class="project-command">{{ project.command }}</p>
+    <div class="project-meta">
+      <span class="language-badge" [class.german]="project.language === 'de'">
+        {{ project.language === "de" ? "DE" : "EN" }}
+      </span>
+      <span class="project-date">{{ project.createdAt | date : "short" }}</span>
+    </div>
+  </div>
+
+  <button
+    class="delete-btn"
+    (click)="onDeleteClick($event)"
+    title="Delete project"
+  >
+    🗑️
+  </button>
+</div>

@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { ProcessedCommand } from './prompt-processor.service';
+import { Injectable } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { ProcessedCommand } from "./prompt-processor.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class TestPreviewService {
-
   constructor(private sanitizer: DomSanitizer) {}
 
   /**

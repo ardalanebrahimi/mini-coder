@@ -691,7 +691,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentApp = testResult;
     this.previewHtml = testResult.generatedCode;
     // Try data URL instead of blob URL for testing
-    const dataUrl = this.testPreviewService.getDataUrl(testResult.generatedCode);
+    const dataUrl = this.testPreviewService.getDataUrl(
+      testResult.generatedCode
+    );
     this.previewUrl = dataUrl;
     this.safePreviewUrl =
       this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
@@ -709,7 +711,9 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   testBlobUrl(): void {
     const testResult = this.testPreviewService.generateBlobTestPreview();
-    const blobUrl = this.testPreviewService.createBlobUrl(testResult.generatedCode);
+    const blobUrl = this.testPreviewService.createBlobUrl(
+      testResult.generatedCode
+    );
     console.log("Test blob URL created:", blobUrl);
 
     // Try to open the blob URL in a new window for testing

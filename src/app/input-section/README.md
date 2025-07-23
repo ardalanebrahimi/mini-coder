@@ -5,11 +5,13 @@ This component handles the user input section of the Mini Coder application usin
 ## Architecture
 
 ### **Services Used:**
+
 - **`CommandInputService`** - Manages input state (command text, processing status, voice status)
 - **`CommandActionsService`** - Handles user actions and business logic
 - **`TranslationService`** - Provides internationalization support
 
 ### **Benefits of Service-Based Approach:**
+
 - ✅ **Loose coupling** - Component doesn't directly depend on parent
 - ✅ **Better testability** - Services can be easily mocked
 - ✅ **Reusability** - Component can be used anywhere without complex bindings
@@ -44,7 +46,12 @@ User actions are handled through `CommandActionsService`:
 
 ```typescript
 interface CommandAction {
-  type: 'PROCESS_COMMAND' | 'SET_EXAMPLE' | 'START_VOICE' | 'TEST_STATIC' | 'TEST_BLOB';
+  type:
+    | "PROCESS_COMMAND"
+    | "SET_EXAMPLE"
+    | "START_VOICE"
+    | "TEST_STATIC"
+    | "TEST_BLOB";
   payload?: any;
 }
 ```

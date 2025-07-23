@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
 
 export interface CommandInputState {
   userCommand: string;
@@ -9,14 +9,14 @@ export interface CommandInputState {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class CommandInputService {
   private stateSubject = new BehaviorSubject<CommandInputState>({
-    userCommand: '',
+    userCommand: "",
     isProcessing: false,
     voiceSupported: false,
-    isListening: false
+    isListening: false,
   });
 
   public state$ = this.stateSubject.asObservable();
@@ -42,15 +42,15 @@ export class CommandInputService {
   }
 
   clearCommand(): void {
-    this.updateState({ userCommand: '' });
+    this.updateState({ userCommand: "" });
   }
 
   reset(): void {
     this.stateSubject.next({
-      userCommand: '',
+      userCommand: "",
       isProcessing: false,
       voiceSupported: this.currentState.voiceSupported, // Keep voice support status
-      isListening: false
+      isListening: false,
     });
   }
 
@@ -58,7 +58,7 @@ export class CommandInputService {
     const currentState = this.stateSubject.value;
     this.stateSubject.next({
       ...currentState,
-      ...partialState
+      ...partialState,
     });
   }
 }

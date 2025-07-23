@@ -14,7 +14,10 @@ import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
 import { CommandInputService } from "./services/command-input.service";
-import { CommandActionsService, CommandAction } from "./services/command-actions.service";
+import {
+  CommandActionsService,
+  CommandAction,
+} from "./services/command-actions.service";
 
 @Component({
   selector: "app-root",
@@ -406,19 +409,19 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   private handleCommandAction(action: CommandAction): void {
     switch (action.type) {
-      case 'PROCESS_COMMAND':
+      case "PROCESS_COMMAND":
         this.processCommand();
         break;
-      case 'SET_EXAMPLE':
+      case "SET_EXAMPLE":
         this.setExampleCommand();
         break;
-      case 'START_VOICE':
+      case "START_VOICE":
         this.startVoiceInput();
         break;
-      case 'TEST_STATIC':
+      case "TEST_STATIC":
         this.testStaticPreview();
         break;
-      case 'TEST_BLOB':
+      case "TEST_BLOB":
         this.testBlobUrl();
         break;
     }

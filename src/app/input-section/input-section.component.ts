@@ -1,26 +1,29 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
-import { TranslationService } from '../services/translation.service';
-import { CommandInputService, CommandInputState } from '../services/command-input.service';
-import { CommandActionsService } from '../services/command-actions.service';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { Subject, takeUntil } from "rxjs";
+import { TranslationService } from "../services/translation.service";
+import {
+  CommandInputService,
+  CommandInputState,
+} from "../services/command-input.service";
+import { CommandActionsService } from "../services/command-actions.service";
 
 @Component({
-  selector: 'app-input-section',
+  selector: "app-input-section",
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './input-section.component.html',
-  styleUrls: ['./input-section.component.scss']
+  templateUrl: "./input-section.component.html",
+  styleUrls: ["./input-section.component.scss"],
 })
 export class InputSectionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  
+
   state: CommandInputState = {
-    userCommand: '',
+    userCommand: "",
     isProcessing: false,
     voiceSupported: false,
-    isListening: false
+    isListening: false,
   };
 
   constructor(
@@ -33,7 +36,7 @@ export class InputSectionComponent implements OnInit, OnDestroy {
     // Subscribe to state changes
     this.commandInputService.state$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
+      .subscribe((state) => {
         this.state = state;
       });
   }

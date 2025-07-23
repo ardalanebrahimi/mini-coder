@@ -20,9 +20,6 @@
       <app-toolbox-project-item
         *ngFor="let project of savedProjects"
         [project]="project"
-        [isSelected]="selectedProject?.id === project.id"
-        (projectClick)="onProjectLoad($event)"
-        (deleteClick)="onProjectDelete($event)"
       ></app-toolbox-project-item>
     </div>
   </div>

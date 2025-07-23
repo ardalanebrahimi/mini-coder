@@ -1,3 +1,4 @@
+y
 <div class="app-container">
   <!-- Header -->
   <header class="app-header">
@@ -14,8 +15,8 @@
       <!-- Language Selector -->
       <div class="language-selector">
         <select
-          [(ngModel)]="selectedLanguage"
-          (change)="changeLanguage(selectedLanguage)"
+          [ngModel]="selectedLanguage"
+          (ngModelChange)="changeLanguage($event)"
           class="language-select"
         >
           <option *ngFor="let lang of availableLanguages" [value]="lang.code">
@@ -31,7 +32,7 @@
         [class.active]="showToolbox"
       >
         <span class="emoji">🧰</span>
-        {{ t("myToolbox") }} ({{ savedProjects.length }})
+        {{ t("myToolbox") }} ({{ savedProjectsCount }})
       </button>
     </div>
   </header>
@@ -172,16 +173,7 @@
   </main>
 
   <!-- Toolbox Component -->
-  <app-toolbox
-    [isOpen]="showToolbox"
-    [savedProjects]="savedProjects"
-    [selectedProject]="selectedProject"
-    [translations]="translations"
-    [selectedLanguage]="selectedLanguage"
-    (closeToolbox)="toggleToolbox()"
-    (loadProject)="loadProject($event)"
-    (deleteProject)="deleteProject($event)"
-  ></app-toolbox>
+  <app-toolbox></app-toolbox>
 
   <!-- Save Dialog -->
   <div class="modal-overlay" *ngIf="showSaveDialog" (click)="cancelSave()">

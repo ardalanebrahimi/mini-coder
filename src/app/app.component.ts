@@ -2,12 +2,15 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
+import { Subject, takeUntil } from "rxjs";
 import {
   PromptProcessorService,
   ProcessedCommand,
 } from "./services/prompt-processor.service";
 import { StorageService, SavedProject } from "./services/storage.service";
 import { ToolboxComponent } from "./toolbox/toolbox.component";
+import { ToolboxService } from "./services/toolbox.service";
+import { TranslationService } from "./services/translation.service";
 
 @Component({
   selector: "app-root",
@@ -17,6 +20,8 @@ import { ToolboxComponent } from "./toolbox/toolbox.component";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   title = "Mini Coder";
 
   // Input and processing state
@@ -30,15 +35,9 @@ export class AppComponent implements OnInit, OnDestroy {
   previewUrl = ""; // For blob URL
   safePreviewUrl: any = null; // For sanitized blob URL
 
-  // Saved projects
-  savedProjects: SavedProject[] = [];
-  selectedProject: SavedProject | null = null;
-
   // UI state
-  showToolbox = false;
   showSaveDialog = false;
   saveProjectName = "";
-  selectedLanguage = "en"; // Default to English
 
   // Modify app feature
   showModifyDialog = false;
@@ -55,110 +54,40 @@ export class AppComponent implements OnInit, OnDestroy {
   showBuildChoiceDialog = false;
   pendingModifyCommand = "";
 
-  // Available languages
-  availableLanguages = [
-    { code: "en", name: "English", flag: "🇺🇸" },
-    { code: "de", name: "Deutsch", flag: "🇩🇪" },
-  ];
-
-  // Translations
-  translations = {
-    en: {
-      appTitle: "Mini Coder",
-      appSubtitle: "Create awesome mini apps with just words!",
-      tellMeWhat: "Tell me what to build! 🎯",
-      tryExample: "Try Example",
-      createApp: "Create App",
-      creating: "Creating...",
-      livePreview: "Live Preview",
-      saveToToolbox: "Save to Toolbox",
-      clear: "Clear",
-      myToolbox: "My Toolbox",
-      noProjects: "No saved projects yet!",
-      noProjectsSubtext: "Create and save your first app to get started.",
-      saveToToolboxTitle: "Save to Toolbox",
-      projectName: "Project Name:",
-      command: "Command:",
-      language: "Language:",
-      cancel: "Cancel",
-      save: "Save",
-      placeholderText:
-        'Be specific! Examples: "Create a working calculator with all basic operations" or "Make an interactive quiz about animals"',
-      modifyApp: "Modify This App",
-      modifyPlaceholder:
-        'What would you like to change? e.g., "Change background to blue" or "Add 5 more colors"',
-      rebuildApp: "Rebuild from Scratch",
-      voiceInput: "Voice Input",
-      listening: "Listening...",
-      clickToSpeak: "Click to speak",
-      voiceNotSupported: "Voice input not supported in this browser",
-      buildChoice: "How would you like to proceed?",
-      buildChoiceText:
-        "You can either modify the current app or rebuild completely from scratch.",
-      modifyExisting: "Modify Current App",
-      rebuildFromScratch: "Rebuild from Scratch",
-    },
-    de: {
-      appTitle: "Mini Coder",
-      appSubtitle: "Erstelle großartige Mini-Apps nur mit Worten!",
-      tellMeWhat: "Sag mir, was ich bauen soll! 🎯",
-      tryExample: "Beispiel testen",
-      createApp: "App erstellen",
-      creating: "Erstelle...",
-      livePreview: "Live-Vorschau",
-      saveToToolbox: "In Werkzeugkasten speichern",
-      clear: "Löschen",
-      myToolbox: "Mein Werkzeugkasten",
-      noProjects: "Noch keine gespeicherten Projekte!",
-      noProjectsSubtext:
-        "Erstelle und speichere deine erste App, um loszulegen.",
-      saveToToolboxTitle: "In Werkzeugkasten speichern",
-      projectName: "Projektname:",
-      command: "Befehl:",
-      language: "Sprache:",
-      cancel: "Abbrechen",
-      save: "Speichern",
-      placeholderText:
-        'Sei spezifisch! Beispiele: "Erstelle einen funktionierenden Taschenrechner mit allen Grundrechenarten" oder "Mache ein interaktives Quiz über Tiere"',
-      modifyApp: "Diese App ändern",
-      modifyPlaceholder:
-        'Was möchtest du ändern? z.B. "Hintergrund zu blau ändern" oder "5 weitere Farben hinzufügen"',
-      rebuildApp: "Neu von Grund auf erstellen",
-      voiceInput: "Spracheingabe",
-      listening: "Höre zu...",
-      clickToSpeak: "Klicken zum Sprechen",
-      voiceNotSupported:
-        "Spracheingabe wird in diesem Browser nicht unterstützt",
-      buildChoice: "Wie möchtest du fortfahren?",
-      buildChoiceText:
-        "Du kannst entweder die aktuelle App ändern oder komplett neu von Grund auf erstellen.",
-      modifyExisting: "Aktuelle App ändern",
-      rebuildFromScratch: "Neu von Grund auf erstellen",
-    },
-  };
-
   constructor(
     private promptProcessor: PromptProcessorService,
     private storageService: StorageService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private toolboxService: ToolboxService,
+    private translationService: TranslationService
   ) {}
 
   /**
    * Get translation for current language
    */
   t(key: string): string {
-    const translations =
-      this.translations[
-        this.selectedLanguage as keyof typeof this.translations
-      ];
-    return (translations as any)[key] || key;
+    return this.translationService.t(key);
+  }
+
+  /**
+   * Get available languages
+   */
+  get availableLanguages() {
+    return this.translationService.getAvailableLanguages();
+  }
+
+  /**
+   * Get current selected language
+   */
+  get selectedLanguage(): string {
+    return this.translationService.getCurrentLanguage();
   }
 
   /**
    * Change UI language
    */
   changeLanguage(languageCode: string): void {
-    this.selectedLanguage = languageCode;
+    this.translationService.setLanguage(languageCode);
 
     // Update speech recognition language if supported
     if (this.voiceSupported && this.speechRecognition) {
@@ -410,6 +339,40 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadSavedProjects();
     this.initializeVoiceRecognition();
+    this.setupServiceSubscriptions();
+  }
+
+  /**
+   * Setup subscriptions to service events
+   */
+  private setupServiceSubscriptions(): void {
+    // Handle project load events
+    this.toolboxService.projectLoad$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((project) => {
+        if (project) {
+          this.loadProjectFromService(project);
+        }
+      });
+
+    // Handle project delete events
+    this.toolboxService.projectDelete$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((project) => {
+        if (project) {
+          this.deleteProjectFromService(project);
+        }
+      });
+
+    // Update speech recognition language when language changes
+    this.translationService.selectedLanguage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((languageCode) => {
+        if (this.voiceSupported && this.speechRecognition) {
+          this.speechRecognition.lang =
+            languageCode === "de" ? "de-DE" : "en-US";
+        }
+      });
   }
 
   /**
@@ -537,7 +500,9 @@ export class AppComponent implements OnInit, OnDestroy {
         code: this.currentApp.generatedCode,
       });
 
-      this.savedProjects.push(savedProject);
+      // Update the toolbox service with the new project
+      this.toolboxService.addProject(savedProject);
+
       this.showSaveDialog = false;
       this.saveProjectName = "";
       this.errorMessage = "";
@@ -551,19 +516,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cancel save dialog
+   * Load a saved project (called by service)
    */
-  cancelSave(): void {
-    this.showSaveDialog = false;
-    this.saveProjectName = "";
-    this.errorMessage = "";
-  }
-
-  /**
-   * Load a saved project
-   */
-  loadProject(project: SavedProject): void {
-    this.selectedProject = project;
+  private loadProjectFromService(project: SavedProject): void {
     this.userCommand = project.command;
     this.previewHtml = project.code;
     // Create blob URL for iframe
@@ -580,33 +535,67 @@ export class AppComponent implements OnInit, OnDestroy {
       sanitizedCode: this.sanitizer.bypassSecurityTrustHtml(project.code),
       projectName: project.name,
     };
-    this.showToolbox = false;
+
+    // Close toolbox
+    this.toolboxService.close();
 
     console.log("Loaded project:", project.name);
     console.log("Preview HTML length:", this.previewHtml.length);
   }
 
   /**
-   * Delete a saved project
+   * Delete a saved project (called by service)
    */
-  deleteProject(project: SavedProject): void {
+  private deleteProjectFromService(project: SavedProject): void {
     if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
       this.storageService.deleteProject(project.id);
-      this.loadSavedProjects();
+      this.toolboxService.removeProject(project.id);
 
       // Clear preview if deleted project was selected
-      if (this.selectedProject?.id === project.id) {
-        this.selectedProject = null;
+      const selectedProject = this.toolboxService.getSelectedProject();
+      if (selectedProject?.id === project.id) {
         this.clearPreview();
       }
     }
+  }
+
+  // Legacy methods that now delegate to service
+  loadProject(project: SavedProject): void {
+    this.toolboxService.loadProject(project);
+  }
+
+  deleteProject(project: SavedProject): void {
+    this.toolboxService.deleteProject(project);
   }
 
   /**
    * Toggle toolbox visibility
    */
   toggleToolbox(): void {
-    this.showToolbox = !this.showToolbox;
+    this.toolboxService.toggle();
+  }
+
+  /**
+   * Get toolbox button state
+   */
+  get showToolbox(): boolean {
+    return this.toolboxService.isOpen();
+  }
+
+  /**
+   * Get saved projects count for header
+   */
+  get savedProjectsCount(): number {
+    return this.toolboxService.getSavedProjects().length;
+  }
+
+  /**
+   * Cancel save dialog
+   */
+  cancelSave(): void {
+    this.showSaveDialog = false;
+    this.saveProjectName = "";
+    this.errorMessage = "";
   }
 
   /**
@@ -622,15 +611,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.previewUrl = "";
     this.safePreviewUrl = null;
     this.userCommand = "";
-    this.selectedProject = null;
+    this.toolboxService.setSelectedProject(null);
     this.errorMessage = "";
   }
 
   /**
-   * Load saved projects from storage
+   * Load saved projects from storage and update service
    */
   private loadSavedProjects(): void {
-    this.savedProjects = this.storageService.getAllProjects();
+    const projects = this.storageService.getAllProjects();
+    this.toolboxService.setSavedProjects(projects);
   }
 
   /**
@@ -1074,6 +1064,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
     // Clean up blob URL to prevent memory leaks
     if (this.previewUrl) {
       URL.revokeObjectURL(this.previewUrl);

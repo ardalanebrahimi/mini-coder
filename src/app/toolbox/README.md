@@ -50,6 +50,7 @@ This component represents the entire toolbox sidebar that was extracted from the
 ## Styling
 
 The component includes comprehensive SCSS styling that was extracted from the main app component:
+
 - Slide-in animation from the right
 - Fixed positioning and z-index management
 - Responsive breakpoints for mobile devices

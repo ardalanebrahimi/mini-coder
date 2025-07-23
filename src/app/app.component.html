@@ -104,54 +104,8 @@ y
   <!-- Save Dialog Component -->
   <app-save-dialog></app-save-dialog>
 
-  <!-- Build Choice Dialog -->
-  <div
-    class="modal-overlay"
-    *ngIf="showBuildChoiceDialog"
-    (click)="cancelBuildChoice()"
-  >
-    <div
-      class="modal-content build-choice-modal"
-      (click)="$event.stopPropagation()"
-    >
-      <h3>
-        <span class="emoji">🤔</span>
-        {{ t("buildChoice") }}
-      </h3>
-
-      <div class="modal-body">
-        <p>{{ t("buildChoiceText") }}</p>
-        <div class="choice-buttons">
-          <button
-            class="choice-btn modify-choice"
-            (click)="chooseModifyExisting()"
-          >
-            <span class="emoji">🔧</span>
-            <div class="choice-content">
-              <h4>{{ t("modifyExisting") }}</h4>
-              <p>{{ t("modifyPlaceholder") }}</p>
-            </div>
-          </button>
-          <button
-            class="choice-btn rebuild-choice"
-            (click)="chooseRebuildFromScratch()"
-          >
-            <span class="emoji">🚀</span>
-            <div class="choice-content">
-              <h4>{{ t("rebuildFromScratch") }}</h4>
-              <p>{{ t("placeholderText") }}</p>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-secondary" (click)="cancelBuildChoice()">
-          {{ t("cancel") }}
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- Build Choice Dialog Component -->
+  <app-build-choice-dialog></app-build-choice-dialog>
 
   <!-- Modify App Dialog -->
   <div

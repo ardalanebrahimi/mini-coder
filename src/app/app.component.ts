@@ -11,11 +11,16 @@ import { StorageService, SavedProject } from "./services/storage.service";
 import { ToolboxComponent } from "./toolbox/toolbox.component";
 import { InputSectionComponent } from "./input-section/input-section.component";
 import { SaveDialogComponent } from "./save-dialog/save-dialog.component";
+import { BuildChoiceDialogComponent } from "./build-choice-dialog/build-choice-dialog.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
 import { CommandInputService } from "./services/command-input.service";
 import { SaveDialogService } from "./services/save-dialog.service";
+import {
+  BuildChoiceDialogService,
+  BuildChoiceType,
+} from "./services/build-choice-dialog.service";
 import {
   CommandActionsService,
   CommandAction,
@@ -30,6 +35,7 @@ import {
     ToolboxComponent,
     InputSectionComponent,
     SaveDialogComponent,
+    BuildChoiceDialogComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -64,8 +70,7 @@ export class AppComponent implements OnInit, OnDestroy {
   voiceSupported = false;
 
   // Rebuild vs modify choice
-  showBuildChoiceDialog = false;
-  pendingModifyCommand = "";
+  // UI state - removed build choice dialog related properties
 
   constructor(
     private promptProcessor: PromptProcessorService,
@@ -76,7 +81,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private testPreviewService: TestPreviewService,
     private commandInputService: CommandInputService,
     private commandActionsService: CommandActionsService,
-    private saveDialogService: SaveDialogService
+    private saveDialogService: SaveDialogService,
+    private buildChoiceDialogService: BuildChoiceDialogService
   ) {}
 
   /**
@@ -315,33 +321,8 @@ export class AppComponent implements OnInit, OnDestroy {
    * Show build choice dialog (modify vs rebuild)
    */
   showBuildChoiceModal(): void {
-    this.showBuildChoiceDialog = true;
-    this.pendingModifyCommand = "";
+    this.buildChoiceDialogService.openDialog();
     this.errorMessage = "";
-  }
-
-  /**
-   * Cancel build choice dialog
-   */
-  cancelBuildChoice(): void {
-    this.showBuildChoiceDialog = false;
-    this.pendingModifyCommand = "";
-  }
-
-  /**
-   * Choose to modify existing app
-   */
-  chooseModifyExisting(): void {
-    this.showBuildChoiceDialog = false;
-    this.showModifyAppDialog();
-  }
-
-  /**
-   * Choose to rebuild from scratch
-   */
-  chooseRebuildFromScratch(): void {
-    this.showBuildChoiceDialog = false;
-    this.showRebuildDialog();
   }
 
   /**
@@ -364,6 +345,19 @@ export class AppComponent implements OnInit, OnDestroy {
     document.addEventListener("saveSuccess", (event: any) => {
       this.showSuccessMessage(event.detail.message);
     });
+
+    // Listen for build choice results
+    this.buildChoiceDialogService.choice$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          if (result.choice === BuildChoiceType.MODIFY_EXISTING) {
+            this.showModifyAppDialog();
+          } else if (result.choice === BuildChoiceType.REBUILD_FROM_SCRATCH) {
+            this.showRebuildDialog();
+          }
+        }
+      });
   }
 
   /**

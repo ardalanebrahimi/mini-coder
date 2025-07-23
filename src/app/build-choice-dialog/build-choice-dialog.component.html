@@ -1,0 +1,44 @@
+<!-- Build Choice Dialog -->
+<div class="modal-overlay" *ngIf="showDialog" (click)="onOverlayClick()">
+  <div
+    class="modal-content build-choice-modal"
+    (click)="onContentClick($event)"
+  >
+    <h3>
+      <span class="emoji">🤔</span>
+      {{ t("buildChoice") }}
+    </h3>
+
+    <div class="modal-body">
+      <p>{{ t("buildChoiceText") }}</p>
+      <div class="choice-buttons">
+        <button
+          class="choice-btn modify-choice"
+          (click)="chooseModifyExisting()"
+        >
+          <span class="emoji">🔧</span>
+          <div class="choice-content">
+            <h4>{{ t("modifyExisting") }}</h4>
+            <p>{{ t("modifyPlaceholder") }}</p>
+          </div>
+        </button>
+        <button
+          class="choice-btn rebuild-choice"
+          (click)="chooseRebuildFromScratch()"
+        >
+          <span class="emoji">🚀</span>
+          <div class="choice-content">
+            <h4>{{ t("rebuildFromScratch") }}</h4>
+            <p>{{ t("placeholderText") }}</p>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="cancelChoice()">
+        {{ t("cancel") }}
+      </button>
+    </div>
+  </div>
+</div>

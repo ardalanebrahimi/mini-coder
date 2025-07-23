@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { ProcessedCommand } from './prompt-processor.service';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import { ProcessedCommand } from "./prompt-processor.service";
 
 export interface SaveDialogData {
   currentApp: ProcessedCommand;
@@ -8,7 +8,7 @@ export interface SaveDialogData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class SaveDialogService {
   private showDialogSubject = new BehaviorSubject<boolean>(false);

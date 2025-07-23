@@ -30,7 +30,11 @@
         </p>
         <p>
           <strong>{{ t("language") }}:</strong>
-          {{ dialogData.currentApp.detectedLanguage === "de" ? "German" : "English" }}
+          {{
+            dialogData.currentApp.detectedLanguage === "de"
+              ? "German"
+              : "English"
+          }}
         </p>
       </div>
     </div>

@@ -19,8 +19,8 @@ The component is controlled entirely through the `SaveDialogService`:
 ```typescript
 // Open the save dialog
 this.saveDialogService.openDialog({
-  currentApp: this.currentApp,  // Must contain projectName
-  userCommand: this.userCommand
+  currentApp: this.currentApp, // Must contain projectName
+  userCommand: this.userCommand,
 });
 
 // Close the dialog
@@ -30,6 +30,7 @@ this.saveDialogService.closeDialog();
 ## Behavior
 
 When the dialog opens:
+
 1. **Project name field** is automatically populated with `currentApp.projectName`
 2. User can modify the suggested name or use it as-is
 3. Validation ensures the name is not empty
@@ -48,7 +49,7 @@ When the dialog opens:
 The component emits a custom `saveSuccess` event when a project is saved successfully:
 
 ```typescript
-document.addEventListener('saveSuccess', (event: any) => {
+document.addEventListener("saveSuccess", (event: any) => {
   console.log(event.detail.message);
 });
 ```

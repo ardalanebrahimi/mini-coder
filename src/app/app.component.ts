@@ -24,7 +24,13 @@ import {
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [CommonModule, FormsModule, ToolboxComponent, InputSectionComponent, SaveDialogComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ToolboxComponent,
+    InputSectionComponent,
+    SaveDialogComponent,
+  ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
@@ -353,9 +359,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.loadSavedProjects();
     this.initializeVoiceRecognition();
     this.setupServiceSubscriptions();
-    
+
     // Listen for save success events from the save dialog component
-    document.addEventListener('saveSuccess', (event: any) => {
+    document.addEventListener("saveSuccess", (event: any) => {
       this.showSuccessMessage(event.detail.message);
     });
   }
@@ -530,7 +536,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.saveDialogService.openDialog({
       currentApp: this.currentApp,
-      userCommand: this.userCommand
+      userCommand: this.userCommand,
     });
   }
 

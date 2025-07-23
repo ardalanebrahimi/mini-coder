@@ -1,26 +1,29 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
-import { SaveDialogService, SaveDialogData } from '../services/save-dialog.service';
-import { StorageService } from '../services/storage.service';
-import { ToolboxService } from '../services/toolbox.service';
-import { TranslationService } from '../services/translation.service';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { Subject, takeUntil } from "rxjs";
+import {
+  SaveDialogService,
+  SaveDialogData,
+} from "../services/save-dialog.service";
+import { StorageService } from "../services/storage.service";
+import { ToolboxService } from "../services/toolbox.service";
+import { TranslationService } from "../services/translation.service";
 
 @Component({
-  selector: 'app-save-dialog',
+  selector: "app-save-dialog",
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './save-dialog.component.html',
-  styleUrls: ['./save-dialog.component.scss']
+  templateUrl: "./save-dialog.component.html",
+  styleUrls: ["./save-dialog.component.scss"],
 })
 export class SaveDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   showDialog = false;
   dialogData: SaveDialogData | null = null;
-  projectName = '';
-  errorMessage = '';
+  projectName = "";
+  errorMessage = "";
 
   constructor(
     private saveDialogService: SaveDialogService,
@@ -33,7 +36,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
     // Subscribe to dialog visibility
     this.saveDialogService.showDialog$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(show => {
+      .subscribe((show) => {
         this.showDialog = show;
         if (!show) {
           this.resetForm();
@@ -43,7 +46,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
     // Subscribe to dialog data
     this.saveDialogService.dialogData$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
+      .subscribe((data) => {
         this.dialogData = data;
         // Pre-populate project name if available
         if (data?.currentApp?.projectName) {
@@ -97,12 +100,13 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
    */
   confirmSave(): void {
     if (!this.projectName.trim()) {
-      this.errorMessage = this.t('projectNameRequired') || 'Please enter a project name!';
+      this.errorMessage =
+        this.t("projectNameRequired") || "Please enter a project name!";
       return;
     }
 
     if (!this.dialogData?.currentApp) {
-      this.errorMessage = 'No app to save!';
+      this.errorMessage = "No app to save!";
       return;
     }
 
@@ -128,8 +132,8 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
       // Show success message through toolbox service or emit an event
       this.showSuccessMessage(`Saved "${uniqueName}" to your toolbox!`);
     } catch (error) {
-      this.errorMessage = 'Failed to save project. Please try again.';
-      console.error('Error saving project:', error);
+      this.errorMessage = "Failed to save project. Please try again.";
+      console.error("Error saving project:", error);
     }
   }
 
@@ -137,8 +141,8 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
    * Reset form data
    */
   private resetForm(): void {
-    this.projectName = '';
-    this.errorMessage = '';
+    this.projectName = "";
+    this.errorMessage = "";
   }
 
   /**
@@ -147,9 +151,9 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   private showSuccessMessage(message: string): void {
     // For now, we'll emit a custom event that the parent can listen to
     // In a real app, you might use a toast service or notification service
-    const event = new CustomEvent('saveSuccess', { 
+    const event = new CustomEvent("saveSuccess", {
       detail: { message },
-      bubbles: true 
+      bubbles: true,
     });
     document.dispatchEvent(event);
   }

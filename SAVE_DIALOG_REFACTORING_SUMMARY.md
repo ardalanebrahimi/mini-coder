@@ -3,23 +3,27 @@
 ## What was changed
 
 ### 1. Created SaveDialogService
+
 - **File**: `src/app/services/save-dialog.service.ts`
 - **Purpose**: Manages save dialog state and data using RxJS BehaviorSubjects
 - **Methods**: `openDialog()`, `closeDialog()`, `isDialogOpen()`, `getCurrentDialogData()`
 
 ### 2. Created SaveDialogComponent
-- **Files**: 
+
+- **Files**:
   - `src/app/save-dialog/save-dialog.component.ts`
   - `src/app/save-dialog/save-dialog.component.html`
   - `src/app/save-dialog/save-dialog.component.scss`
 - **Features**: Standalone component, reactive to service state, proper error handling
 
 ### 3. Created Shared Modal Styles
+
 - **File**: `src/app/shared/modal-styles.scss`
 - **Purpose**: Centralized modal styles shared between components
 - **Benefits**: Eliminates duplication, ensures consistency, easier maintenance
 
 ### 4. Updated AppComponent
+
 - **Removed properties**: `showSaveDialog`, `saveProjectName`
 - **Removed methods**: `confirmSave()`, `cancelSave()`
 - **Updated method**: `saveToToolbox()` now uses the service
@@ -28,10 +32,12 @@
 - **Updated styles**: Now imports shared modal styles
 
 ### 5. Updated Templates
+
 - **Removed**: Save dialog HTML from `app.component.html`
 - **Added**: `<app-save-dialog></app-save-dialog>` component tag
 
 ### 6. Refactored Styles
+
 - **Created**: Shared modal styles in `src/app/shared/modal-styles.scss`
 - **Updated**: Both components now import shared styles
 - **Kept**: Component-specific styles in their respective files
@@ -71,7 +77,7 @@ src/app/
 // To open the save dialog
 this.saveDialogService.openDialog({
   currentApp: this.currentApp,
-  userCommand: this.userCommand
+  userCommand: this.userCommand,
 });
 
 // To close the dialog

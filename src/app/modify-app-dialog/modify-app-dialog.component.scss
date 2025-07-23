@@ -1,0 +1,120 @@
+// Import shared modal styles
+@import "../shared/modal-styles.scss";
+
+// Modify App Dialog specific styles
+.modify-command-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f5f5f5;
+  }
+}
+
+.input-with-voice {
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+
+  .modify-command-input {
+    flex: 1;
+  }
+}
+
+.voice-btn-small {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background: #45a049;
+    transform: translateY(-1px);
+  }
+
+  &.listening {
+    background: #f44336;
+    animation: pulse 1s infinite;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.error-message {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  color: #c33;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.pulse {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

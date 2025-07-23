@@ -12,6 +12,7 @@ import { ToolboxComponent } from "./toolbox/toolbox.component";
 import { InputSectionComponent } from "./input-section/input-section.component";
 import { SaveDialogComponent } from "./save-dialog/save-dialog.component";
 import { BuildChoiceDialogComponent } from "./build-choice-dialog/build-choice-dialog.component";
+import { ModifyAppDialogComponent } from "./modify-app-dialog/modify-app-dialog.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
@@ -21,6 +22,10 @@ import {
   BuildChoiceDialogService,
   BuildChoiceType,
 } from "./services/build-choice-dialog.service";
+import {
+  ModifyAppDialogService,
+  ModifyMode,
+} from "./services/modify-app-dialog.service";
 import {
   CommandActionsService,
   CommandAction,
@@ -36,6 +41,7 @@ import {
     InputSectionComponent,
     SaveDialogComponent,
     BuildChoiceDialogComponent,
+    ModifyAppDialogComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -59,10 +65,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // UI state - removed save dialog related properties
 
   // Modify app feature
-  showModifyDialog = false;
-  modifyCommand = "";
   isModifying = false;
-  isRebuilding = false;
 
   // Voice input feature
   isListening = false;
@@ -82,7 +85,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private commandInputService: CommandInputService,
     private commandActionsService: CommandActionsService,
     private saveDialogService: SaveDialogService,
-    private buildChoiceDialogService: BuildChoiceDialogService
+    private buildChoiceDialogService: BuildChoiceDialogService,
+    private modifyAppDialogService: ModifyAppDialogService
   ) {}
 
   /**
@@ -124,32 +128,22 @@ export class AppComponent implements OnInit, OnDestroy {
    * Show modify app dialog
    */
   showModifyAppDialog(): void {
-    this.showModifyDialog = true;
-    this.modifyCommand = "";
-    this.errorMessage = "";
-    this.isRebuilding = false;
+    this.modifyAppDialogService.openModifyDialog(
+      this.currentApp,
+      this.userCommand
+    );
   }
 
   /**
-   * Cancel modify app dialog
+   * Process modify/rebuild command with given parameters
    */
-  cancelModifyApp(): void {
-    this.showModifyDialog = false;
-    this.modifyCommand = "";
-    this.errorMessage = "";
-    this.isRebuilding = false;
-  }
-
-  /**
-   * Process modify command to update current app
-   */
-  processModifyCommand(): void {
-    if (!this.modifyCommand.trim()) {
+  processModifyCommandWithParams(command: string, isRebuilding: boolean): void {
+    if (!command.trim()) {
       this.errorMessage = this.t("modifyPlaceholder");
       return;
     }
 
-    if (!this.currentApp && !this.isRebuilding) {
+    if (!this.currentApp && !isRebuilding) {
       this.errorMessage = "No app to modify!";
       return;
     }
@@ -157,13 +151,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isModifying = true;
     this.errorMessage = "";
 
-    console.log("Processing modify command:", this.modifyCommand);
-    console.log("Is rebuilding:", this.isRebuilding);
+    console.log("Processing modify command:", command);
+    console.log("Is rebuilding:", isRebuilding);
 
     // Choose prompt based on whether we're rebuilding or modifying
-    const prompt = this.isRebuilding
-      ? this.modifyCommand // For rebuild, use the command directly
-      : `${this.userCommand}\n\nCurrent app requirements. Now modify it: ${this.modifyCommand}`; // For modify, combine with original
+    const prompt = isRebuilding
+      ? command // For rebuild, use the command directly
+      : `${this.userCommand}\n\nCurrent app requirements. Now modify it: ${command}`; // For modify, combine with original
 
     this.promptProcessor.processCommand(prompt).subscribe({
       next: (result: ProcessedCommand) => {
@@ -174,8 +168,8 @@ export class AppComponent implements OnInit, OnDestroy {
         this.previewHtml = result.generatedCode;
 
         // If rebuilding, update the original command too
-        if (this.isRebuilding) {
-          this.userCommand = this.modifyCommand;
+        if (isRebuilding) {
+          this.userCommand = command;
         }
 
         // Create new blob URL for modified app
@@ -185,12 +179,9 @@ export class AppComponent implements OnInit, OnDestroy {
         );
 
         this.isModifying = false;
-        this.showModifyDialog = false;
-        this.modifyCommand = "";
-        this.isRebuilding = false;
 
         // Show success message
-        const successMessage = this.isRebuilding
+        const successMessage = isRebuilding
           ? `${this.t("rebuildApp")} successful!`
           : `${this.t("modifyApp")} successful!`;
         this.showSuccessMessage(successMessage);
@@ -281,32 +272,6 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Start voice input for modify command
    */
-  startVoiceInputForModify(): void {
-    if (!this.voiceSupported || !this.speechRecognition) {
-      this.errorMessage = this.t("voiceNotSupported");
-      return;
-    }
-
-    // Update language before starting
-    this.speechRecognition.lang =
-      this.selectedLanguage === "de" ? "de-DE" : "en-US";
-
-    // Temporarily update the result handler for modify command
-    this.speechRecognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      console.log("Voice input for modify received:", transcript);
-      this.modifyCommand = transcript;
-      this.isListening = false;
-    };
-
-    try {
-      this.speechRecognition.start();
-      this.errorMessage = "";
-    } catch (error) {
-      console.error("Error starting voice recognition:", error);
-      this.errorMessage = this.t("voiceNotSupported");
-    }
-  }
 
   /**
    * Stop voice input
@@ -329,11 +294,10 @@ export class AppComponent implements OnInit, OnDestroy {
    * Show rebuild dialog
    */
   showRebuildDialog(): void {
-    this.showModifyDialog = true;
-    this.modifyCommand = "";
-    this.errorMessage = "";
-    // Set a flag to indicate we're rebuilding, not modifying
-    this.isRebuilding = true;
+    this.modifyAppDialogService.openRebuildDialog(
+      this.currentApp,
+      this.userCommand
+    );
   }
 
   ngOnInit(): void {
@@ -356,6 +320,18 @@ export class AppComponent implements OnInit, OnDestroy {
           } else if (result.choice === BuildChoiceType.REBUILD_FROM_SCRATCH) {
             this.showRebuildDialog();
           }
+        }
+      });
+
+    // Listen for modify app dialog results
+    this.modifyAppDialogService.result$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.processModifyCommandWithParams(
+            result.command,
+            result.mode === ModifyMode.REBUILD
+          );
         }
       });
   }

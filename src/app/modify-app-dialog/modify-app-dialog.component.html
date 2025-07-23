@@ -1,0 +1,74 @@
+<!-- Modify App Dialog -->
+<div class="modal-overlay" *ngIf="showDialog" (click)="onOverlayClick()">
+  <div class="modal-content" (click)="onContentClick($event)">
+    <h3>
+      <span class="emoji">{{ getDialogEmoji() }}</span>
+      {{ getDialogTitle() }}
+    </h3>
+
+    <div class="modal-body">
+      <label for="modifyCommand">{{ getLabelText() }}</label>
+      <div class="input-with-voice">
+        <textarea
+          id="modifyCommand"
+          [(ngModel)]="modifyCommand"
+          class="modify-command-input"
+          [placeholder]="getPlaceholderText()"
+          rows="3"
+          maxlength="200"
+          [disabled]="isProcessing"
+        ></textarea>
+        <button
+          class="voice-btn-small"
+          (click)="startVoiceInput()"
+          [disabled]="!voiceSupported || isListening"
+          [class.listening]="isListening"
+          *ngIf="voiceSupported"
+          type="button"
+        >
+          <span class="emoji" *ngIf="!isListening">🎤</span>
+          <span class="pulse" *ngIf="isListening">🔴</span>
+        </button>
+      </div>
+
+      <!-- Error message -->
+      <div class="error-message" *ngIf="errorMessage">
+        <span class="emoji">❌</span>
+        {{ errorMessage }}
+      </div>
+
+      <div class="modal-info" *ngIf="dialogData">
+        <p>
+          <strong>{{ t("command") }}:</strong> {{ dialogData.userCommand }}
+        </p>
+        <p>
+          <strong>{{ t("language") }}:</strong>
+          {{
+            dialogData.currentApp?.detectedLanguage === "de"
+              ? "German"
+              : "English"
+          }}
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button
+        class="btn-secondary"
+        (click)="cancelModify()"
+        [disabled]="isProcessing"
+      >
+        {{ t("cancel") }}
+      </button>
+      <button
+        class="btn-primary"
+        (click)="processCommand()"
+        [disabled]="!modifyCommand.trim() || isProcessing"
+      >
+        <span class="emoji" *ngIf="!isProcessing">{{ getDialogEmoji() }}</span>
+        <span class="spinner" *ngIf="isProcessing"></span>
+        {{ getSubmitButtonText() }}
+      </button>
+    </div>
+  </div>
+</div>

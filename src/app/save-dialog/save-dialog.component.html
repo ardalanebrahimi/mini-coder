@@ -1,0 +1,52 @@
+<!-- Save Dialog -->
+<div class="modal-overlay" *ngIf="showDialog" (click)="onOverlayClick()">
+  <div class="modal-content" (click)="onContentClick($event)">
+    <h3>
+      <span class="emoji">💾</span>
+      {{ t("saveToToolboxTitle") }}
+    </h3>
+
+    <div class="modal-body">
+      <label for="projectName">{{ t("projectName") }}</label>
+      <input
+        id="projectName"
+        [(ngModel)]="projectName"
+        type="text"
+        class="project-name-input"
+        placeholder="Enter project name"
+        maxlength="50"
+        (keyup.enter)="onEnterKey()"
+      />
+
+      <!-- Error message -->
+      <div class="error-message" *ngIf="errorMessage">
+        <span class="emoji">❌</span>
+        {{ errorMessage }}
+      </div>
+
+      <div class="modal-info" *ngIf="dialogData">
+        <p>
+          <strong>{{ t("command") }}:</strong> {{ dialogData.userCommand }}
+        </p>
+        <p>
+          <strong>{{ t("language") }}:</strong>
+          {{ dialogData.currentApp.detectedLanguage === "de" ? "German" : "English" }}
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="cancelSave()">
+        {{ t("cancel") }}
+      </button>
+      <button
+        class="btn-primary"
+        (click)="confirmSave()"
+        [disabled]="!projectName.trim()"
+      >
+        <span class="emoji">💾</span>
+        {{ t("save") }}
+      </button>
+    </div>
+  </div>
+</div>

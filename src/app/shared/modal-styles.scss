@@ -1,0 +1,122 @@
+// Shared Modal Styles
+// These styles are used by multiple components that have modal dialogs
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+
+  h3 {
+    margin: 0 0 1.5rem;
+    color: #333;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.modal-body {
+  margin-bottom: 2rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.modal-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+
+  p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #666;
+    word-wrap: break-word;
+  }
+
+  strong {
+    color: #333;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background: #5a6fd8;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn-secondary {
+  background: #e0e0e0;
+  color: #333;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-weight: 600;
+
+  &:hover {
+    background: #d0d0d0;
+    transform: translateY(-1px);
+  }
+}
+
+.emoji {
+  font-style: normal;
+}

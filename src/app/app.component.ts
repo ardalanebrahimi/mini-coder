@@ -10,10 +10,12 @@ import {
 import { StorageService, SavedProject } from "./services/storage.service";
 import { ToolboxComponent } from "./toolbox/toolbox.component";
 import { InputSectionComponent } from "./input-section/input-section.component";
+import { SaveDialogComponent } from "./save-dialog/save-dialog.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
 import { CommandInputService } from "./services/command-input.service";
+import { SaveDialogService } from "./services/save-dialog.service";
 import {
   CommandActionsService,
   CommandAction,
@@ -22,7 +24,7 @@ import {
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [CommonModule, FormsModule, ToolboxComponent, InputSectionComponent],
+  imports: [CommonModule, FormsModule, ToolboxComponent, InputSectionComponent, SaveDialogComponent],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
@@ -42,9 +44,7 @@ export class AppComponent implements OnInit, OnDestroy {
   previewUrl = ""; // For blob URL
   safePreviewUrl: any = null; // For sanitized blob URL
 
-  // UI state
-  showSaveDialog = false;
-  saveProjectName = "";
+  // UI state - removed save dialog related properties
 
   // Modify app feature
   showModifyDialog = false;
@@ -69,7 +69,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private translationService: TranslationService,
     private testPreviewService: TestPreviewService,
     private commandInputService: CommandInputService,
-    private commandActionsService: CommandActionsService
+    private commandActionsService: CommandActionsService,
+    private saveDialogService: SaveDialogService
   ) {}
 
   /**
@@ -352,6 +353,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.loadSavedProjects();
     this.initializeVoiceRecognition();
     this.setupServiceSubscriptions();
+    
+    // Listen for save success events from the save dialog component
+    document.addEventListener('saveSuccess', (event: any) => {
+      this.showSuccessMessage(event.detail.message);
+    });
   }
 
   /**
@@ -471,7 +477,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.safePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
           this.previewUrl
         );
-        this.saveProjectName = result.projectName;
         this.commandInputService.setProcessing(false);
 
         // Show success message
@@ -523,49 +528,10 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showSaveDialog = true;
-  }
-
-  /**
-   * Confirm save with custom name
-   */
-  confirmSave(): void {
-    if (!this.saveProjectName.trim()) {
-      this.errorMessage = "Please enter a project name!";
-      return;
-    }
-
-    if (!this.currentApp) {
-      this.errorMessage = "No app to save!";
-      return;
-    }
-
-    try {
-      // Generate unique name if needed
-      const uniqueName = this.storageService.generateUniqueProjectName(
-        this.saveProjectName
-      );
-
-      const savedProject = this.storageService.saveProject({
-        name: uniqueName,
-        command: this.userCommand,
-        language: this.currentApp.detectedLanguage,
-        code: this.currentApp.generatedCode,
-      });
-
-      // Update the toolbox service with the new project
-      this.toolboxService.addProject(savedProject);
-
-      this.showSaveDialog = false;
-      this.saveProjectName = "";
-      this.errorMessage = "";
-
-      // Show success message
-      this.showSuccessMessage(`Saved "${uniqueName}" to your toolbox!`);
-    } catch (error) {
-      this.errorMessage = "Failed to save project. Please try again.";
-      console.error("Error saving project:", error);
-    }
+    this.saveDialogService.openDialog({
+      currentApp: this.currentApp,
+      userCommand: this.userCommand
+    });
   }
 
   /**
@@ -640,15 +606,6 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   get savedProjectsCount(): number {
     return this.toolboxService.getSavedProjects().length;
-  }
-
-  /**
-   * Cancel save dialog
-   */
-  cancelSave(): void {
-    this.showSaveDialog = false;
-    this.saveProjectName = "";
-    this.errorMessage = "";
   }
 
   /**
@@ -749,7 +706,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.safePreviewUrl =
       this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
     this.userCommand = "Test static HTML preview";
-    this.saveProjectName = testResult.projectName;
 
     console.log("Test static preview set");
     console.log("Preview URL:", this.previewUrl);

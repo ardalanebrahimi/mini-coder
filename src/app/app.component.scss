@@ -12,6 +12,9 @@ $white: #ffffff;
 $shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 $border-radius: 12px;
 
+// Import shared modal styles
+@import 'shared/modal-styles.scss';
+
 // Mixins
 @mixin button-base {
   border: none;
@@ -327,64 +330,8 @@ body {
   animation: spin 1s linear infinite;
 }
 
-// Modal
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 1rem;
-}
-
-.modal-content {
-  background: $white;
-  border-radius: $border-radius;
-  padding: 2rem;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-
-  h3 {
-    margin: 0 0 1.5rem;
-    color: $text-dark;
-    font-size: 1.3rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-}
-
-.modal-body {
-  margin-bottom: 2rem;
-
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: $text-dark;
-  }
-}
-
-.project-name-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e0e0e0;
-  border-radius: $border-radius;
-  font-family: inherit;
-  font-size: 1rem;
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  }
-}
+// Component-specific modal styles
+// These styles are specific to the app component's modals
 
 .modify-command-input {
   width: 100%;
@@ -406,54 +353,6 @@ body {
     opacity: 0.6;
     cursor: not-allowed;
     background: #f5f5f5;
-  }
-}
-
-.modal-info {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: $background-light;
-  border-radius: $border-radius;
-
-  p {
-    margin: 0.5rem 0;
-    font-size: 0.9rem;
-    color: $text-light;
-    word-wrap: break-word;
-  }
-}
-
-.modal-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-  }
-}
-
-.btn-primary {
-  @include button-base;
-  background: $primary-color;
-  color: $white;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-
-  &:hover {
-    background: darken($primary-color, 10%);
-  }
-}
-
-.btn-secondary {
-  @include button-base;
-  background: #e0e0e0;
-  color: $text-dark;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-
-  &:hover {
-    background: #d0d0d0;
   }
 }
 

@@ -290,19 +290,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Start voice input for modify command
-   */
-
-  /**
-   * Stop voice input
-   */
-  stopVoiceInput(): void {
-    if (this.speechRecognition && this.isListening) {
-      this.speechRecognition.stop();
-    }
-  }
-
-  /**
    * Show build choice dialog (modify vs rebuild)
    */
   showBuildChoiceModal(): void {

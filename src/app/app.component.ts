@@ -9,14 +9,17 @@ import {
 } from "./services/prompt-processor.service";
 import { StorageService, SavedProject } from "./services/storage.service";
 import { ToolboxComponent } from "./toolbox/toolbox.component";
+import { InputSectionComponent } from "./input-section/input-section.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
+import { CommandInputService } from "./services/command-input.service";
+import { CommandActionsService, CommandAction } from "./services/command-actions.service";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [CommonModule, FormsModule, ToolboxComponent],
+  imports: [CommonModule, FormsModule, ToolboxComponent, InputSectionComponent],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
@@ -61,7 +64,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private toolboxService: ToolboxService,
     private translationService: TranslationService,
-    private testPreviewService: TestPreviewService
+    private testPreviewService: TestPreviewService,
+    private commandInputService: CommandInputService,
+    private commandActionsService: CommandActionsService
   ) {}
 
   /**
@@ -196,6 +201,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     if (SpeechRecognition) {
       this.voiceSupported = true;
+      this.commandInputService.setVoiceSupported(true);
       this.speechRecognition = new SpeechRecognition();
       this.speechRecognition.continuous = false;
       this.speechRecognition.interimResults = false;
@@ -206,29 +212,30 @@ export class AppComponent implements OnInit, OnDestroy {
         this.selectedLanguage === "de" ? "de-DE" : "en-US";
 
       this.speechRecognition.onstart = () => {
-        this.isListening = true;
+        this.commandInputService.setListening(true);
         console.log("Voice recognition started");
       };
 
       this.speechRecognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         console.log("Voice input received:", transcript);
-        this.userCommand = transcript;
-        this.isListening = false;
+        this.commandInputService.updateUserCommand(transcript);
+        this.commandInputService.setListening(false);
       };
 
       this.speechRecognition.onerror = (event: any) => {
         console.error("Voice recognition error:", event.error);
-        this.isListening = false;
+        this.commandInputService.setListening(false);
         this.errorMessage = this.t("voiceNotSupported");
       };
 
       this.speechRecognition.onend = () => {
-        this.isListening = false;
+        this.commandInputService.setListening(false);
         console.log("Voice recognition ended");
       };
     } else {
       this.voiceSupported = false;
+      this.commandInputService.setVoiceSupported(false);
       console.log("Speech recognition not supported");
     }
   }
@@ -366,6 +373,23 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       });
 
+    // Handle command input state changes
+    this.commandInputService.state$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state) => {
+        this.userCommand = state.userCommand;
+        this.isProcessing = state.isProcessing;
+        this.isListening = state.isListening;
+        this.voiceSupported = state.voiceSupported;
+      });
+
+    // Handle command actions
+    this.commandActionsService.actions$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((action: CommandAction) => {
+        this.handleCommandAction(action);
+      });
+
     // Update speech recognition language when language changes
     this.translationService.selectedLanguage$
       .pipe(takeUntil(this.destroy$))
@@ -378,32 +402,56 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle command actions from the input section
+   */
+  private handleCommandAction(action: CommandAction): void {
+    switch (action.type) {
+      case 'PROCESS_COMMAND':
+        this.processCommand();
+        break;
+      case 'SET_EXAMPLE':
+        this.setExampleCommand();
+        break;
+      case 'START_VOICE':
+        this.startVoiceInput();
+        break;
+      case 'TEST_STATIC':
+        this.testStaticPreview();
+        break;
+      case 'TEST_BLOB':
+        this.testBlobUrl();
+        break;
+    }
+  }
+
+  /**
    * Process user command and generate mini app
    */
   processCommand(): void {
-    if (!this.userCommand.trim()) {
+    const currentCommand = this.commandInputService.currentState.userCommand;
+    if (!currentCommand.trim()) {
       this.errorMessage = "Please enter a command!";
       return;
     }
 
-    this.isProcessing = true;
+    this.commandInputService.setProcessing(true);
     this.errorMessage = "";
     this.currentApp = null;
 
-    console.log("Processing command:", this.userCommand);
+    console.log("Processing command:", currentCommand);
 
     // For debugging: bypass OpenAI and use static HTML
     if (
-      this.userCommand.toLowerCase().includes("test") ||
-      this.userCommand.toLowerCase().includes("debug")
+      currentCommand.toLowerCase().includes("test") ||
+      currentCommand.toLowerCase().includes("debug")
     ) {
       console.log("Using test mode - bypassing OpenAI");
       this.testStaticPreview();
-      this.isProcessing = false;
+      this.commandInputService.setProcessing(false);
       return;
     }
 
-    this.promptProcessor.processCommand(this.userCommand).subscribe({
+    this.promptProcessor.processCommand(currentCommand).subscribe({
       next: (result: ProcessedCommand) => {
         console.log("Generated app result:", result);
         console.log(
@@ -421,7 +469,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.previewUrl
         );
         this.saveProjectName = result.projectName;
-        this.isProcessing = false;
+        this.commandInputService.setProcessing(false);
 
         // Show success message
         this.showSuccessMessage(
@@ -453,7 +501,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.errorMessage =
           error.message ||
           "Failed to generate app. Please try again with a more specific command.";
-        this.isProcessing = false;
+        this.commandInputService.setProcessing(false);
         console.error("Error processing command:", error);
 
         // For debugging: show the error but also create a test preview
@@ -677,7 +725,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * Set example command
    */
   setExampleCommand(): void {
-    this.userCommand = this.getRandomExample();
+    this.commandInputService.updateUserCommand(this.getRandomExample());
   }
 
   /**

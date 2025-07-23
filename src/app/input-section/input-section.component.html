@@ -1,0 +1,77 @@
+<!-- Input Section -->
+<div class="input-section">
+  <div class="input-container">
+    <div class="input-header">
+      <h2>{{ t("tellMeWhat") }}</h2>
+      <div class="header-actions">
+        <button class="example-btn" (click)="onSetExampleCommand()">
+          <span class="emoji">💡</span>
+          {{ t("tryExample") }}
+        </button>
+        <button
+          *ngIf="false"
+          class="example-btn"
+          (click)="onTestStaticPreview()"
+          style="background: #9c27b0"
+        >
+          <span class="emoji">🔧</span>
+          Test Preview
+        </button>
+        <button
+          *ngIf="false"
+          class="example-btn"
+          (click)="onTestBlobUrl()"
+          style="background: #ff9800"
+        >
+          <span class="emoji">🔗</span>
+          Test Blob URL
+        </button>
+        <button
+          class="voice-btn"
+          (click)="onStartVoiceInput()"
+          [disabled]="!state.voiceSupported || state.isListening"
+          [class.listening]="state.isListening"
+          *ngIf="state.voiceSupported"
+        >
+          <span class="emoji" *ngIf="!state.isListening">🎤</span>
+          <span class="pulse" *ngIf="state.isListening">🔴</span>
+          {{ state.isListening ? t("listening") : t("voiceInput") }}
+        </button>
+      </div>
+    </div>
+
+    <div class="input-wrapper">
+      <div class="input-with-voice">
+        <textarea
+          [ngModel]="state.userCommand"
+          (ngModelChange)="onUserCommandChange($event)"
+          [placeholder]="t('placeholderText')"
+          class="command-input"
+          rows="3"
+          [disabled]="state.isProcessing"
+        ></textarea>
+        <button
+          class="voice-btn-small"
+          (click)="onStartVoiceInput()"
+          [disabled]="!state.voiceSupported || state.isListening"
+          [class.listening]="state.isListening"
+          *ngIf="state.voiceSupported"
+          type="button"
+        >
+          <span class="emoji" *ngIf="!state.isListening">🎤</span>
+          <span class="pulse" *ngIf="state.isListening">🔴</span>
+        </button>
+      </div>
+
+      <button
+        class="run-btn"
+        (click)="onProcessCommand()"
+        [disabled]="state.isProcessing || !state.userCommand.trim()"
+      >
+        <span class="emoji" *ngIf="!state.isProcessing">🔥</span>
+        <span class="spinner" *ngIf="state.isProcessing"></span>
+        {{ state.isProcessing ? t("creating") : t("createApp") }}
+      </button>
+    </div>
+  </div>
+</div>

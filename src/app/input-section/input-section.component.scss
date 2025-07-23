@@ -1,0 +1,241 @@
+// Variables
+$primary-color: #667eea;
+$secondary-color: #764ba2;
+$accent-color: #ff6b6b;
+$success-color: #4caf50;
+$warning-color: #ff9800;
+$error-color: #f44336;
+$text-dark: #333;
+$text-light: #666;
+$background-light: #f8f9fa;
+$white: #ffffff;
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+$border-radius: 12px;
+
+// Mixins
+@mixin button-base {
+  border: none;
+  border-radius: $border-radius;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.emoji {
+  font-size: 1.2em;
+}
+
+// Input section
+.input-section {
+  margin-bottom: 2rem;
+}
+
+.input-container {
+  background: $white;
+  border-radius: $border-radius;
+  padding: 2rem;
+  box-shadow: $shadow;
+}
+
+.input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  h2 {
+    margin: 0;
+    color: $text-dark;
+    font-size: 1.5rem;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.example-btn {
+  @include button-base;
+  background: $warning-color;
+  color: $white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: darken($warning-color, 10%);
+  }
+}
+
+.input-wrapper {
+  gap: 1rem;
+  align-items: flex-end;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.input-with-voice {
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+
+  .command-input {
+    flex: 1;
+  }
+}
+
+.command-input {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: $border-radius;
+  font-family: inherit;
+  font-size: 1.15rem;
+  resize: vertical;
+  min-height: 120px;
+  height: 120px;
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.5;
+  background: #fff;
+  margin-bottom: 0.5rem;
+
+  &:focus {
+    border-color: $primary-color;
+    outline: none;
+    background: #f8f9fa;
+  }
+}
+
+.run-btn {
+  @include button-base;
+  background: $accent-color;
+  color: $white;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  min-width: 150px;
+  justify-content: center;
+
+  &:hover {
+    background: darken($accent-color, 10%);
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid $white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+// Voice Input Styles
+.voice-btn {
+  @include button-base;
+  background: #4caf50;
+  color: $white;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  border: 2px solid transparent;
+
+  &:hover {
+    background: darken(#4caf50, 10%);
+  }
+
+  &.listening {
+    background: #f44336;
+    animation: pulse 1s infinite;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+.voice-btn-small {
+  @include button-base;
+  background: #4caf50;
+  color: $white;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  border: 2px solid transparent;
+  min-width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+
+  &:hover {
+    background: darken(#4caf50, 10%);
+  }
+
+  &.listening {
+    background: #f44336;
+    animation: pulse 1s infinite;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+// Animations
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse {
+  animation: pulse 1s infinite;
+}

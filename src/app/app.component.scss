@@ -164,111 +164,6 @@ body {
   width: 100%;
 }
 
-// Input section
-.input-section {
-  margin-bottom: 2rem;
-}
-
-.input-container {
-  background: $white;
-  border-radius: $border-radius;
-  padding: 2rem;
-  box-shadow: $shadow;
-}
-
-.input-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-
-  h2 {
-    margin: 0;
-    color: $text-dark;
-    font-size: 1.5rem;
-  }
-}
-
-.example-btn {
-  @include button-base;
-  background: $warning-color;
-  color: $white;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-
-  &:hover {
-    background: darken($warning-color, 10%);
-  }
-}
-
-.input-wrapper {
-  gap: 1rem;
-  align-items: flex-end;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-.command-input {
-  flex: 1;
-  padding: 1rem;
-  border: 2px solid #e0e0e0;
-  border-radius: $border-radius;
-  font-family: inherit;
-  font-size: 1.15rem;
-  resize: vertical;
-  min-height: 120px;
-  height: 120px;
-  width: 100%;
-  box-sizing: border-box;
-  line-height: 1.5;
-  background: #fff;
-  margin-bottom: 0.5rem;
-
-  &:focus {
-    border-color: $primary-color;
-    outline: none;
-    background: #f8f9fa;
-  }
-}
-
-.run-btn {
-  @include button-base;
-  background: $accent-color;
-  color: $white;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  min-width: 150px;
-  justify-content: center;
-
-  &:hover {
-    background: darken($accent-color, 10%);
-  }
-
-  .spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid $white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 // Error and success messages
 .error-message {
   padding: 1rem;
@@ -412,6 +307,24 @@ body {
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 2rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid $white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 // Modal

@@ -53,40 +53,7 @@ y
     </div>
 
     <!-- Preview Section -->
-    <div class="preview-section" *ngIf="currentApp">
-      <div class="preview-header">
-        <h3>
-          <span class="emoji">📱</span>
-          {{ t("livePreview") }}
-        </h3>
-        <div class="preview-actions">
-          <button class="action-btn modify" (click)="showBuildChoiceModal()">
-            <span class="emoji">🔧</span>
-            {{ t("modifyApp") }}
-          </button>
-          <button class="action-btn save" (click)="saveToToolbox()">
-            <span class="emoji">💾</span>
-            {{ t("saveToToolbox") }}
-          </button>
-          <button class="action-btn clear" (click)="clearPreview()">
-            <span class="emoji">🗑️</span>
-            {{ t("clear") }}
-          </button>
-        </div>
-      </div>
-
-      <div class="preview-container">
-        <iframe
-          [src]="safePreviewUrl"
-          class="preview-frame"
-          title="Generated App Preview"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-presentation allow-downloads"
-          (load)="onIframeLoad($event)"
-          (error)="onIframeError($event)"
-        >
-        </iframe>
-      </div>
-    </div>
+    <app-preview-section *ngIf="currentApp"></app-preview-section>
 
     <!-- Loading State -->
     <div class="loading-state" *ngIf="isProcessing">

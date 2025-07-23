@@ -13,6 +13,7 @@ import { InputSectionComponent } from "./input-section/input-section.component";
 import { SaveDialogComponent } from "./save-dialog/save-dialog.component";
 import { BuildChoiceDialogComponent } from "./build-choice-dialog/build-choice-dialog.component";
 import { ModifyAppDialogComponent } from "./modify-app-dialog/modify-app-dialog.component";
+import { PreviewSectionComponent } from "./preview-section/preview-section.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
@@ -30,6 +31,7 @@ import {
   CommandActionsService,
   CommandAction,
 } from "./services/command-actions.service";
+import { PreviewSectionService } from "./services/preview-section.service";
 
 @Component({
   selector: "app-root",
@@ -42,6 +44,7 @@ import {
     SaveDialogComponent,
     BuildChoiceDialogComponent,
     ModifyAppDialogComponent,
+    PreviewSectionComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -86,7 +89,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private commandActionsService: CommandActionsService,
     private saveDialogService: SaveDialogService,
     private buildChoiceDialogService: BuildChoiceDialogService,
-    private modifyAppDialogService: ModifyAppDialogService
+    private modifyAppDialogService: ModifyAppDialogService,
+    private previewSectionService: PreviewSectionService
   ) {}
 
   /**
@@ -122,6 +126,19 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     console.log("Changed language to:", languageCode);
+  }
+
+  /**
+   * Update preview service with current data
+   */
+  private updatePreviewService(): void {
+    this.previewSectionService.updatePreviewData({
+      currentApp: this.currentApp,
+      previewHtml: this.previewHtml,
+      previewUrl: this.previewUrl,
+      safePreviewUrl: this.safePreviewUrl,
+      userCommand: this.userCommand,
+    });
   }
 
   /**
@@ -179,6 +196,9 @@ export class AppComponent implements OnInit, OnDestroy {
         );
 
         this.isModifying = false;
+
+        // Update preview service
+        this.updatePreviewService();
 
         // Show success message
         const successMessage = isRebuilding
@@ -334,6 +354,26 @@ export class AppComponent implements OnInit, OnDestroy {
           );
         }
       });
+
+    // Listen for preview section actions
+    this.previewSectionService.action$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((action) => {
+        if (action) {
+          switch (action.action) {
+            case "modify":
+              this.showBuildChoiceModal();
+              break;
+            case "save":
+              this.saveToToolbox();
+              break;
+            case "clear":
+              this.clearPreview();
+              break;
+          }
+          this.previewSectionService.resetAction();
+        }
+      });
   }
 
   /**
@@ -455,6 +495,9 @@ export class AppComponent implements OnInit, OnDestroy {
         );
         this.commandInputService.setProcessing(false);
 
+        // Update preview service
+        this.updatePreviewService();
+
         // Show success message
         this.showSuccessMessage(
           `Created "${result.projectName}" successfully!`
@@ -531,6 +574,9 @@ export class AppComponent implements OnInit, OnDestroy {
       projectName: project.name,
     };
 
+    // Update preview service
+    this.updatePreviewService();
+
     // Close toolbox
     this.toolboxService.close();
 
@@ -588,15 +634,15 @@ export class AppComponent implements OnInit, OnDestroy {
    * Clear current preview
    */
   clearPreview(): void {
-    // Revoke old blob URL to prevent memory leaks
-    if (this.previewUrl) {
-      URL.revokeObjectURL(this.previewUrl);
-    }
+    // Clear preview service (this will handle URL revocation)
+    this.previewSectionService.clearPreviewData();
+
+    // Clear local properties
     this.currentApp = null;
     this.previewHtml = "";
     this.previewUrl = "";
     this.safePreviewUrl = null;
-    this.userCommand = "";
+    this.commandInputService.updateUserCommand("");
     this.toolboxService.setSelectedProject(null);
     this.errorMessage = "";
   }
@@ -683,6 +729,9 @@ export class AppComponent implements OnInit, OnDestroy {
       this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
     this.userCommand = "Test static HTML preview";
 
+    // Update preview service
+    this.updatePreviewService();
+
     console.log("Test static preview set");
     console.log("Preview URL:", this.previewUrl);
     console.log("Safe Preview URL:", this.safePreviewUrl);
@@ -701,63 +750,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Try to open the blob URL in a new window for testing
     window.open(blobUrl, "_blank");
-  }
-
-  /**
-   * Handle iframe load event for debugging
-   */
-  onIframeLoad(event: any): void {
-    console.log("Iframe loaded successfully");
-    console.log("Event:", event);
-    console.log("Event target:", event.target);
-    console.log("Event target src:", event.target.src);
-    console.log("Event target sandbox:", event.target.sandbox);
-
-    const iframe = event.target;
-    try {
-      const iframeDocument =
-        iframe.contentDocument || iframe.contentWindow?.document;
-      if (iframeDocument) {
-        console.log("Iframe document accessible");
-        console.log("Iframe document title:", iframeDocument.title);
-        console.log("Iframe document URL:", iframeDocument.URL);
-        console.log("Iframe document readyState:", iframeDocument.readyState);
-        console.log(
-          "Iframe document body innerHTML length:",
-          iframeDocument.body?.innerHTML?.length || 0
-        );
-        console.log(
-          "Iframe document has script tags:",
-          iframeDocument.querySelectorAll("script").length
-        );
-        console.log(
-          "Iframe document has style tags:",
-          iframeDocument.querySelectorAll("style").length
-        );
-        console.log(
-          "Iframe document body preview:",
-          iframeDocument.body?.innerHTML?.substring(0, 200) || "No body content"
-        );
-      } else {
-        console.log("Iframe document not accessible");
-      }
-    } catch (error) {
-      console.log(
-        "Cannot access iframe content (security restrictions):",
-        error
-      );
-    }
-  }
-
-  /**
-   * Handle iframe error event
-   */
-  onIframeError(event: any): void {
-    console.error("Iframe error:", event);
-    console.error("Iframe error event target:", event.target);
-    console.error("Iframe error event type:", event.type);
-    this.errorMessage =
-      "Failed to load app preview. Check console for details.";
   }
 
   /**

@@ -1,0 +1,89 @@
+@import "../shared/variables.scss";
+@import "../shared/modal-styles.scss";
+
+// Preview section
+.preview-section {
+  background: $white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  overflow: hidden;
+}
+
+.preview-header {
+  padding: 1.5rem;
+  background: $background-light;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  h3 {
+    margin: 0;
+    color: $text-dark;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.preview-actions {
+  display: flex;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.action-btn {
+  @include button-base;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+
+  &.modify {
+    background: $warning-color;
+    color: $white;
+
+    &:hover {
+      background: darken($warning-color, 10%);
+    }
+  }
+
+  &.save {
+    background: $success-color;
+    color: $white;
+
+    &:hover {
+      background: darken($success-color, 10%);
+    }
+  }
+
+  &.clear {
+    background: #e0e0e0;
+    color: $text-dark;
+
+    &:hover {
+      background: #d0d0d0;
+    }
+  }
+}
+
+.preview-container {
+  height: 600px;
+  position: relative;
+
+  @media (max-width: 768px) {
+    height: 400px;
+  }
+}
+
+.preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: $white;
+}

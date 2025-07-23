@@ -171,36 +171,17 @@
     </div>
   </main>
 
-  <!-- Toolbox Sidebar -->
-  <div class="toolbox-sidebar" [class.open]="showToolbox">
-    <div class="toolbox-header">
-      <h3>
-        <span class="emoji">🧰</span>
-        {{ t("myToolbox") }}
-      </h3>
-      <button class="close-btn" (click)="toggleToolbox()">×</button>
-    </div>
-
-    <div class="toolbox-content">
-      <div class="empty-state" *ngIf="savedProjects.length === 0">
-        <span class="emoji">📦</span>
-        <p>{{ t("noProjects") }}</p>
-        <p class="empty-subtext">
-          {{ t("noProjectsSubtext") }}
-        </p>
-      </div>
-
-      <div class="project-list" *ngIf="savedProjects.length > 0">
-        <app-toolbox-project-item
-          *ngFor="let project of savedProjects"
-          [project]="project"
-          [isSelected]="selectedProject?.id === project.id"
-          (projectClick)="loadProject($event)"
-          (deleteClick)="deleteProject($event)"
-        ></app-toolbox-project-item>
-      </div>
-    </div>
-  </div>
+  <!-- Toolbox Component -->
+  <app-toolbox
+    [isOpen]="showToolbox"
+    [savedProjects]="savedProjects"
+    [selectedProject]="selectedProject"
+    [translations]="translations"
+    [selectedLanguage]="selectedLanguage"
+    (closeToolbox)="toggleToolbox()"
+    (loadProject)="loadProject($event)"
+    (deleteProject)="deleteProject($event)"
+  ></app-toolbox>
 
   <!-- Save Dialog -->
   <div class="modal-overlay" *ngIf="showSaveDialog" (click)="cancelSave()">

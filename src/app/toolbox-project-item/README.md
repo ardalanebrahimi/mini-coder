@@ -2,6 +2,14 @@
 
 This component represents a single project item in the toolbox sidebar. It was extracted from the main app component to improve code organization and reusability.
 
+## Component Hierarchy
+
+```
+AppComponent
+└── ToolboxComponent
+    └── ToolboxProjectItemComponent (multiple instances)
+```
+
 ## Features
 
 - Displays project information (name, command, language, date)

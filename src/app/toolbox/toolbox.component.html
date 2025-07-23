@@ -1,0 +1,29 @@
+<div class="toolbox-sidebar" [class.open]="isOpen">
+  <div class="toolbox-header">
+    <h3>
+      <span class="emoji">🧰</span>
+      {{ t("myToolbox") }}
+    </h3>
+    <button class="close-btn" (click)="onCloseClick()">×</button>
+  </div>
+
+  <div class="toolbox-content">
+    <div class="empty-state" *ngIf="savedProjects.length === 0">
+      <span class="emoji">📦</span>
+      <p>{{ t("noProjects") }}</p>
+      <p class="empty-subtext">
+        {{ t("noProjectsSubtext") }}
+      </p>
+    </div>
+
+    <div class="project-list" *ngIf="savedProjects.length > 0">
+      <app-toolbox-project-item
+        *ngFor="let project of savedProjects"
+        [project]="project"
+        [isSelected]="selectedProject?.id === project.id"
+        (projectClick)="onProjectLoad($event)"
+        (deleteClick)="onProjectDelete($event)"
+      ></app-toolbox-project-item>
+    </div>
+  </div>
+</div>

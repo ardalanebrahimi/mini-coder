@@ -26,10 +26,23 @@ steps:
       npm run build
     displayName: "npm install and build backend"
 
-  - task: ArchiveFiles@2
-    displayName: "Archive backend files"
+  - task: CopyFiles@2
+    displayName: 'Copy deployment files'
     inputs:
-      rootFolderOrFile: "backend"
+      SourceFolder: 'backend'
+      Contents: |
+        dist/**
+        node_modules/**
+        package.json
+        package-lock.json
+        prisma/**
+        .env.example
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/backend-deploy'
+
+  - task: ArchiveFiles@2
+    displayName: "Archive backend deployment files"
+    inputs:
+      rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/backend-deploy"
       includeRootFolder: false
       archiveType: "zip"
       archiveFile: "$(Build.ArtifactStagingDirectory)/backend-$(Build.BuildId).zip"

@@ -130,6 +130,81 @@ const options = {
             },
           },
         },
+        Project: {
+          type: "object",
+          required: ["name", "language", "code"],
+          properties: {
+            id: {
+              type: "integer",
+              description: "The auto-generated id of the project",
+            },
+            userId: {
+              type: "integer",
+              description: "The id of the project owner",
+            },
+            name: {
+              type: "string",
+              description: "The project name",
+            },
+            command: {
+              type: "string",
+              description: "Command to run the project",
+            },
+            language: {
+              type: "string",
+              description: "Programming language",
+            },
+            code: {
+              type: "string",
+              description: "Project source code",
+            },
+            isPublished: {
+              type: "boolean",
+              description: "Whether the project is published publicly",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "The date the project was created",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "The date the project was last updated",
+            },
+          },
+        },
+        ProjectList: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "The auto-generated id of the project",
+            },
+            name: {
+              type: "string",
+              description: "The project name",
+            },
+            language: {
+              type: "string",
+              description: "Programming language",
+            },
+            isPublished: {
+              type: "boolean",
+              description: "Whether the project is published publicly",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "The date the project was created",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "The date the project was last updated",
+            },
+          },
+        },
         Error: {
           type: "object",
           properties: {

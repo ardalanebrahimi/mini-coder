@@ -19,7 +19,8 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  posts Post[]
+  posts    Post[]
+  projects Project[]
 
   @@map("users")
 }
@@ -35,4 +36,20 @@ model Post {
   updatedAt DateTime @updatedAt
 
   @@map("posts")
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  command     String?
+  language    String
+  code        String   @db.Text
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("projects")
+  @@index([userId])
 }

@@ -11,6 +11,7 @@ import userRoutes from "./routes/userRoutes";
 import postRoutes from "./routes/postRoutes";
 import tokenRoutes from "./routes/tokenRoutes";
 import promptRoutes from "./routes/promptRoutes";
+import projectRoutes from "./routes/projectRoutes";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/tokens", tokenRoutes);
 app.use("/api/v1/prompts", promptRoutes);
+app.use("/api/v1/projects", projectRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {

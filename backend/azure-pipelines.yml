@@ -28,16 +28,17 @@ steps:
     displayName: "Install dependencies, build, and generate Prisma client"
 
   - task: CopyFiles@2
-    displayName: 'Copy deployment files'
+    displayName: "Copy deployment files"
     inputs:
-      SourceFolder: 'backend'
+      SourceFolder: "backend"
       Contents: |
         dist/**
         prisma/**
         package.json
         package-lock.json
         .env.example
-      TargetFolder: '$(Build.ArtifactStagingDirectory)/backend-deploy'
+        web.config
+      TargetFolder: "$(Build.ArtifactStagingDirectory)/backend-deploy"
 
   - task: ArchiveFiles@2
     displayName: "Archive backend deployment files"

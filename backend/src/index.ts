@@ -30,6 +30,15 @@ app.use(express.urlencoded({ extended: true }));
 // Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
+// Debug route to check if swagger is working
+app.get("/debug/swagger", (_req, res) => {
+  res.json({
+    message: "Swagger config loaded",
+    hasSpecs: !!specs,
+    specsType: typeof specs,
+  });
+});
+
 // Health check
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });

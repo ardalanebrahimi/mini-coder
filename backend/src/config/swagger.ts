@@ -15,8 +15,14 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${process.env["PORT"] || 3001}`,
-        description: "Development server",
+        url:
+          process.env["NODE_ENV"] === "production"
+            ? "https://minicoder-service-g2hxegcxerase6c0.germanywestcentral-01.azurewebsites.net"
+            : `http://localhost:${process.env["PORT"] || 3001}`,
+        description:
+          process.env["NODE_ENV"] === "production"
+            ? "Production server"
+            : "Development server",
       },
     ],
     tags: [

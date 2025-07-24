@@ -1,5 +1,13 @@
 name: Build and Deploy Angular App
 
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - backend/*
+
 on:
   push:
     branches: [main]
@@ -30,7 +38,7 @@ jobs:
         run: |
           cp src/environments/environment.template.ts src/environments/environment.ts
           cp src/environments/environment.prod.template.ts src/environments/environment.prod.ts
-        
+
       - name: Replace environment variables
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -43,21 +51,21 @@ jobs:
           const apiKey = process.env.OPENAI_API_KEY || '';
           const mainPrompt = process.env.MAIN_PROMPT || '';
           const fixInstructions = process.env.OPENAI_FIX_INSTRUCTIONS || '';
-          
+
           // Escape template literal content (handle backticks and dollar signs)
           function escapeTemplateLiteral(str) {
             return str.replace(/\\\\/g, '\\\\\\\\')
                      .replace(/\`/g, '\\\\\`')
                      .replace(/\\\$/g, '\\\\\\\$');
           }
-          
+
           // Process environment.ts
           let envContent = fs.readFileSync('src/environments/environment.ts', 'utf8');
           envContent = envContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeTemplateLiteral(apiKey));
           envContent = envContent.replace('YOUR_MAIN_PROMPT_HERE', escapeTemplateLiteral(mainPrompt));
           envContent = envContent.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeTemplateLiteral(fixInstructions));
           fs.writeFileSync('src/environments/environment.ts', envContent);
-          
+
           // Process environment.prod.ts
           let prodContent = fs.readFileSync('src/environments/environment.prod.ts', 'utf8');
           prodContent = prodContent.replace('YOUR_OPENAI_API_KEY_HERE', escapeTemplateLiteral(apiKey));

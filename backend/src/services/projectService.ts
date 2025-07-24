@@ -26,24 +26,33 @@ export class ProjectService {
     id: number,
     userId: number
   ): Promise<ProjectResponse | null> {
-    return await prisma.project.findFirst({
+    const project = await prisma.project.findFirst({
       where: {
         id,
         userId, // Ensure user can only access their own projects
       },
     });
+    if (!project) return null;
+    return {
+      ...project,
+      command: project.command ?? "",
+    };
   }
 
   async createProject(
     userId: number,
     data: CreateProjectDto
   ): Promise<ProjectResponse> {
-    return await prisma.project.create({
+    const project = await prisma.project.create({
       data: {
         ...data,
         userId,
       },
     });
+    return {
+      ...project,
+      command: project.command ?? "",
+    };
   }
 
   async updateProject(
@@ -57,10 +66,14 @@ export class ProjectService {
       return null;
     }
 
-    return await prisma.project.update({
+    const updatedProject = await prisma.project.update({
       where: { id },
       data,
     });
+    return {
+      ...updatedProject,
+      command: updatedProject.command ?? "",
+    };
   }
 
   async deleteProject(id: number, userId: number): Promise<boolean> {

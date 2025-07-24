@@ -100,11 +100,9 @@ export const generateCode = asyncHandler(
     }
 
     if (prompt.length > 4000) {
-      return res
-        .status(400)
-        .json({
-          error: "Prompt is too long. Maximum 4000 characters allowed.",
-        });
+      return res.status(400).json({
+        error: "Prompt is too long. Maximum 4000 characters allowed.",
+      });
     }
 
     if (
@@ -148,7 +146,7 @@ export const generateCode = asyncHandler(
       const result = await aiService.generateCode(aiRequest);
 
       // Return the generated code along with metadata
-      res.json({
+      return res.json({
         ...result,
         tokensRemaining: req.user.tokens, // This was already decremented by middleware
         metadata: {
@@ -197,7 +195,7 @@ export const generateCode = asyncHandler(
         });
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         error: "Unknown error occurred during code generation",
         code: "UNKNOWN_ERROR",
       });
@@ -237,10 +235,12 @@ export const getAvailableModels = asyncHandler(
 
     try {
       const models = await aiService.getAvailableModels();
-      res.json({ models });
+      return res.json({ models });
     } catch (error) {
       console.error("Failed to fetch available models:", error);
-      res.status(500).json({ error: "Failed to fetch available models" });
+      return res
+        .status(500)
+        .json({ error: "Failed to fetch available models" });
     }
   }
 );
@@ -279,13 +279,13 @@ export const checkAIHealth = asyncHandler(
       const isValid = await aiService.validateApiKey();
 
       if (isValid) {
-        res.json({
+        return res.json({
           status: "healthy",
           apiKeyValid: true,
           timestamp: new Date().toISOString(),
         });
       } else {
-        res.status(500).json({
+        return res.status(500).json({
           status: "unhealthy",
           apiKeyValid: false,
           error: "Invalid or missing OpenAI API key",
@@ -293,7 +293,7 @@ export const checkAIHealth = asyncHandler(
         });
       }
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         status: "unhealthy",
         apiKeyValid: false,
         error: "Failed to validate AI service",

@@ -20,10 +20,12 @@ const userService = new UserService();
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
-  const users = await userService.getAllUsers();
-  res.json(users);
-});
+export const getAllUsers = asyncHandler(
+  async (_req: Request, res: Response) => {
+    const users = await userService.getAllUsers();
+    return res.json(users);
+  }
+);
 
 /**
  * @swagger
@@ -56,7 +58,7 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json({ error: "User not found" });
   }
 
-  res.json(user);
+  return res.json(user);
 });
 
 /**
@@ -102,8 +104,10 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
       .json({ error: "User with this email already exists" });
   }
 
-  const user = await userService.createUser({ email, name });
-  res.status(201).json(user);
+  // For demonstration, set a default password hash (replace with real hash logic in production)
+  const passwordHash = "";
+  const user = await userService.createUser({ email, passwordHash, name });
+  return res.status(201).json(user);
 });
 
 /**
@@ -150,7 +154,7 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const user = await userService.updateUser(id, { email, name });
-  res.json(user);
+  return res.json(user);
 });
 
 /**
@@ -181,5 +185,5 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   await userService.deleteUser(id);
-  res.json({ message: "User deleted successfully" });
+  return res.json({ message: "User deleted successfully" });
 });

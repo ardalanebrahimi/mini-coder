@@ -36,7 +36,7 @@ export const getTokenBalanceController = asyncHandler(
 
     const tokens = await getTokenBalance(req.user.id);
 
-    res.json({
+    return res.json({
       tokens,
       userId: req.user.id,
     });
@@ -99,7 +99,7 @@ export const addTokensController = asyncHandler(
     // For now, we'll allow users to add tokens to their own account
     const updatedUser = await addTokens(req.user.id, tokens);
 
-    res.json({
+    return res.json({
       message: `Successfully added ${tokens} tokens`,
       user: updatedUser,
     });
@@ -136,7 +136,7 @@ export const getTokenUsageController = asyncHandler(
     }
 
     // Placeholder for future token usage analytics
-    res.json({
+    return res.json({
       message: "Token usage analytics coming soon",
       feature: "future-implementation",
     });

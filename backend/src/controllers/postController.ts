@@ -20,10 +20,12 @@ const postService = new PostService();
  *               items:
  *                 $ref: '#/components/schemas/Post'
  */
-export const getAllPosts = asyncHandler(async (req: Request, res: Response) => {
-  const posts = await postService.getAllPosts();
-  res.json(posts);
-});
+export const getAllPosts = asyncHandler(
+  async (_req: Request, res: Response) => {
+    const posts = await postService.getAllPosts();
+    return res.json(posts);
+  }
+);
 
 /**
  * @swagger
@@ -56,7 +58,7 @@ export const getPostById = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json({ error: "Post not found" });
   }
 
-  res.json(post);
+  return res.json(post);
 });
 
 /**
@@ -98,7 +100,7 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const post = await postService.createPost({ title, content, authorId });
-  res.status(201).json(post);
+  return res.status(201).json(post);
 });
 
 /**
@@ -147,7 +149,7 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const post = await postService.updatePost(id, { title, content, published });
-  res.json(post);
+  return res.json(post);
 });
 
 /**
@@ -178,5 +180,5 @@ export const deletePost = asyncHandler(async (req: Request, res: Response) => {
   }
 
   await postService.deletePost(id);
-  res.json({ message: "Post deleted successfully" });
+  return res.json({ message: "Post deleted successfully" });
 });

@@ -54,7 +54,7 @@ export const getAllProjects = asyncHandler(
 
     const total = await projectService.getUserProjectCount(req.user.id);
 
-    res.json({
+    return res.json({
       projects,
       total,
     });
@@ -105,7 +105,7 @@ export const getProjectById = asyncHandler(
       return res.status(404).json({ error: "Project not found" });
     }
 
-    res.json(project);
+    return res.json(project);
   }
 );
 
@@ -191,7 +191,7 @@ export const createProject = asyncHandler(
       isPublished: Boolean(isPublished),
     });
 
-    res.status(201).json(project);
+    return res.status(201).json(project);
   }
 );
 
@@ -305,7 +305,7 @@ export const updateProject = asyncHandler(
       return res.status(404).json({ error: "Project not found" });
     }
 
-    res.json(project);
+    return res.json(project);
   }
 );
 
@@ -356,7 +356,7 @@ export const deleteProject = asyncHandler(
       return res.status(404).json({ error: "Project not found" });
     }
 
-    res.json({ message: "Project deleted successfully" });
+    return res.json({ message: "Project deleted successfully" });
   }
 );
 
@@ -380,8 +380,8 @@ export const deleteProject = asyncHandler(
  *                     $ref: '#/components/schemas/ProjectList'
  */
 export const getPublishedProjects = asyncHandler(
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (_req: AuthenticatedRequest, res: Response) => {
     const projects = await projectService.getPublishedProjects();
-    res.json({ projects });
+    return res.json({ projects });
   }
 );

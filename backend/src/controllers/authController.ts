@@ -76,7 +76,7 @@ export const register = asyncHandler(
 
     try {
       const result = await authService.register({ email, password, name });
-      res.status(201).json(result);
+      return res.status(201).json(result);
     } catch (error) {
       if (
         error instanceof Error &&
@@ -142,7 +142,7 @@ export const login = asyncHandler(
 
     try {
       const result = await authService.login({ email, password });
-      res.json(result);
+      return res.json(result);
     } catch (error) {
       if (
         error instanceof Error &&
@@ -189,6 +189,6 @@ export const getCurrentUser = asyncHandler(
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(user);
+    return res.json(user);
   }
 );

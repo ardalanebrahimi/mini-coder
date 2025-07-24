@@ -79,7 +79,7 @@ export const generatePrompt = asyncHandler(
         generatedPrompt = `Standard prompt: "${input}" - Please respond to this request thoughtfully.`;
     }
 
-    res.json({
+    return res.json({
       prompt: generatedPrompt,
       tokensUsed,
       tokensRemaining: req.user?.tokens || 0,
@@ -152,7 +152,7 @@ export const previewPrompt = asyncHandler(
     const cost = 1; // Basic cost for prompt generation
     const userTokens = req.user?.tokens || 0;
 
-    res.json({
+    return res.json({
       preview: `This will generate a ${type} prompt based on: "${input.substring(
         0,
         50

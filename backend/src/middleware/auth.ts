@@ -6,7 +6,7 @@ export interface AuthenticatedRequest extends Request {
   user?: {
     id: number;
     email: string;
-    name?: string;
+    name?: string | null;
     tokens: number;
   };
 }
@@ -75,5 +75,7 @@ export const generateToken = (userId: number, email: string): string => {
     throw new Error("JWT_SECRET environment variable is required");
   }
 
-  return jwt.sign({ userId, email } as JwtPayload, jwtSecret, { expiresIn });
+  return jwt.sign({ userId, email } as JwtPayload, jwtSecret, {
+    expiresIn,
+  } as jwt.SignOptions);
 };

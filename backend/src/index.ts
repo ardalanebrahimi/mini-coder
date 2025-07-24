@@ -19,7 +19,7 @@ import { validateOpenAIConfig } from "./config/openai";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env["PORT"] || 3001;
 
 // Middleware
 app.use(helmet());
@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Health check
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
@@ -51,7 +51,7 @@ app.use("/ai", aiRoutes);
 app.use("/admin", adminRoutes);
 
 // 404 handler
-app.use("*", (req, res) => {
+app.use("*", (_req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 

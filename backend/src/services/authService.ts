@@ -47,7 +47,7 @@ export class AuthService {
       data: {
         email,
         passwordHash,
-        name,
+        name: name ?? null,
         tokens: 100,
       },
       select: {
@@ -62,7 +62,12 @@ export class AuthService {
     const token = generateToken(user.id, user.email);
 
     return {
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name ?? "",
+        tokens: user.tokens,
+      },
       token,
     };
   }
@@ -93,7 +98,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
+        name: user.name ?? "",
         tokens: user.tokens,
       },
       token,
@@ -110,6 +115,7 @@ export class AuthService {
         tokens: true,
         createdAt: true,
         updatedAt: true,
+        passwordHash: true,
       },
     });
   }
@@ -125,6 +131,7 @@ export class AuthService {
         tokens: true,
         createdAt: true,
         updatedAt: true,
+        passwordHash: true,
       },
     });
   }

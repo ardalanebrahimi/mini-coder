@@ -1,16 +1,10 @@
 name: Build and Deploy Angular App
 
-trigger:
-  branches:
-    include:
-      - main
-  paths:
-    include:
-      - backend/*
-
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "backend/**"
 
 jobs:
   build-and-deploy:

@@ -19,6 +19,36 @@ const options = {
         description: "Development server",
       },
     ],
+    tags: [
+      {
+        name: "Authentication",
+        description: "User authentication and authorization",
+      },
+      {
+        name: "Users",
+        description: "User management operations",
+      },
+      {
+        name: "Posts",
+        description: "Post management operations",
+      },
+      {
+        name: "Tokens",
+        description: "Token balance and management",
+      },
+      {
+        name: "Projects",
+        description: "Project CRUD operations",
+      },
+      {
+        name: "AI",
+        description: "AI code generation services",
+      },
+      {
+        name: "Admin",
+        description: "Administrative operations (admin only)",
+      },
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {

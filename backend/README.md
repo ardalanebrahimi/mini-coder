@@ -108,16 +108,37 @@ Once the server is running, visit `http://localhost:3001/api-docs` to view the i
 
 ## API Endpoints
 
-### Users
+### Authentication
+- `POST /auth/register` - Register a new user
+- `POST /auth/login` - Login user
+- `GET /auth/profile` - Get user profile (protected)
 
+### Token Management
+- `GET /api/v1/tokens/balance` - Get user's token balance (protected)
+- `POST /api/v1/tokens/add` - Add tokens to user account (protected)
+
+### Projects
+- `GET /api/v1/projects` - List user's projects (protected)
+- `POST /api/v1/projects` - Create new project (protected)
+- `GET /api/v1/projects/:id` - Get specific project (protected)
+- `PUT /api/v1/projects/:id` - Update project (protected)
+- `DELETE /api/v1/projects/:id` - Delete project (protected)
+- `GET /api/v1/projects/search` - Search projects (protected)
+
+### AI Code Generation
+- `GET /ai/health` - Check AI service health (protected)
+- `GET /ai/models` - List available AI models (protected)
+- `POST /ai/generate` - Generate code using AI (protected, costs 1 token)
+
+### Admin (Admin Only)
+- `GET /admin` - Get admin dashboard statistics (admin only)
+
+### Legacy Endpoints (Users & Posts)
 - `GET /api/v1/users` - Get all users
 - `GET /api/v1/users/:id` - Get user by ID
 - `POST /api/v1/users` - Create new user
 - `PUT /api/v1/users/:id` - Update user
 - `DELETE /api/v1/users/:id` - Delete user
-
-### Posts
-
 - `GET /api/v1/posts` - Get all posts
 - `GET /api/v1/posts/:id` - Get post by ID
 - `POST /api/v1/posts` - Create new post
@@ -125,7 +146,6 @@ Once the server is running, visit `http://localhost:3001/api-docs` to view the i
 - `DELETE /api/v1/posts/:id` - Delete post
 
 ### Health Check
-
 - `GET /health` - Application health status
 
 ## Database Schema
@@ -157,7 +177,9 @@ The application includes two main entities:
 | `NODE_ENV`     | Environment mode             | `development` |
 | `PORT`         | Server port                  | `3001`        |
 | `DATABASE_URL` | PostgreSQL connection string | Required      |
-| `JWT_SECRET`   | JWT signing secret           | Optional      |
+| `JWT_SECRET`   | JWT signing secret           | Required      |
+| `OPENAI_API_KEY` | OpenAI API key for AI features | Optional    |
+| `ADMIN_EMAIL`  | Admin user email for admin access | Optional  |
 | `API_VERSION`  | API version                  | `v1`          |
 
 ## Tech Stack
@@ -167,9 +189,36 @@ The application includes two main entities:
 - **Language:** TypeScript
 - **Database:** PostgreSQL
 - **ORM:** Prisma
+- **Authentication:** JWT with bcrypt
+- **AI Integration:** OpenAI API
 - **Documentation:** Swagger/OpenAPI
-- **Security:** Helmet, CORS
+- **Security:** Helmet, CORS, input validation
 - **Development:** ts-node-dev
+
+## Testing
+
+Use the provided demo scripts to test different features:
+
+```bash
+# Test authentication system
+demo-auth.bat
+
+# Test project management
+demo-projects.bat
+
+# Test AI code generation
+demo-ai.bat
+
+# Test admin functionality
+demo-admin.bat
+```
+
+**Note for Admin Testing:**
+Set the `ADMIN_EMAIL` environment variable to match your admin user:
+```bash
+set ADMIN_EMAIL=admin@example.com  # Windows
+export ADMIN_EMAIL=admin@example.com  # Linux/Mac
+```
 
 ## Contributing
 

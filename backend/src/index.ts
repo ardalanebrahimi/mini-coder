@@ -13,6 +13,7 @@ import tokenRoutes from "./routes/tokenRoutes";
 import promptRoutes from "./routes/promptRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import aiRoutes from "./routes/aiRoutes";
+import adminRoutes from "./routes/adminRoutes";
 import { validateOpenAIConfig } from "./config/openai";
 
 dotenv.config();
@@ -47,6 +48,7 @@ app.use("/api/v1/tokens", tokenRoutes);
 app.use("/api/v1/prompts", promptRoutes);
 app.use("/api/v1/projects", projectRoutes);
 app.use("/ai", aiRoutes);
+app.use("/admin", adminRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {

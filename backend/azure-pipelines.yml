@@ -22,9 +22,10 @@ steps:
 
   - script: |
       cd backend
-      npm install
+      npm ci
       npm run build
-    displayName: "npm install and build backend"
+      npx prisma generate
+    displayName: "Install dependencies, build, and generate Prisma client"
 
   - task: CopyFiles@2
     displayName: 'Copy deployment files'
@@ -32,10 +33,9 @@ steps:
       SourceFolder: 'backend'
       Contents: |
         dist/**
-        node_modules/**
+        prisma/**
         package.json
         package-lock.json
-        prisma/**
         .env.example
       TargetFolder: '$(Build.ArtifactStagingDirectory)/backend-deploy'
 

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { PostService } from '../services/postService';
-import { asyncHandler } from '../middleware/errorHandler';
+import { Request, Response } from "express";
+import { PostService } from "../services/postService";
+import { asyncHandler } from "../middleware/errorHandler";
 
 const postService = new PostService();
 
@@ -49,13 +49,13 @@ export const getAllPosts = asyncHandler(async (req: Request, res: Response) => {
  *         description: Post not found
  */
 export const getPostById = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params['id'] as string);
+  const id = parseInt(req.params["id"] as string);
   const post = await postService.getPostById(id);
-  
+
   if (!post) {
-    return res.status(404).json({ error: 'Post not found' });
+    return res.status(404).json({ error: "Post not found" });
   }
-  
+
   res.json(post);
 });
 
@@ -92,11 +92,11 @@ export const getPostById = asyncHandler(async (req: Request, res: Response) => {
  */
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
   const { title, content, authorId } = req.body;
-  
+
   if (!title) {
-    return res.status(400).json({ error: 'Title is required' });
+    return res.status(400).json({ error: "Title is required" });
   }
-  
+
   const post = await postService.createPost({ title, content, authorId });
   res.status(201).json(post);
 });
@@ -138,14 +138,14 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
  *         description: Post not found
  */
 export const updatePost = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params['id'] as string);
+  const id = parseInt(req.params["id"] as string);
   const { title, content, published } = req.body;
-  
+
   const existingPost = await postService.getPostById(id);
   if (!existingPost) {
-    return res.status(404).json({ error: 'Post not found' });
+    return res.status(404).json({ error: "Post not found" });
   }
-  
+
   const post = await postService.updatePost(id, { title, content, published });
   res.json(post);
 });
@@ -170,13 +170,13 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
  *         description: Post not found
  */
 export const deletePost = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params['id'] as string);
-  
+  const id = parseInt(req.params["id"] as string);
+
   const existingPost = await postService.getPostById(id);
   if (!existingPost) {
-    return res.status(404).json({ error: 'Post not found' });
+    return res.status(404).json({ error: "Post not found" });
   }
-  
+
   await postService.deletePost(id);
-  res.json({ message: 'Post deleted successfully' });
+  res.json({ message: "Post deleted successfully" });
 });

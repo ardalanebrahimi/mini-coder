@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { UserService } from '../services/userService';
-import { asyncHandler } from '../middleware/errorHandler';
+import { Request, Response } from "express";
+import { UserService } from "../services/userService";
+import { asyncHandler } from "../middleware/errorHandler";
 
 const userService = new UserService();
 
@@ -49,13 +49,13 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
  *         description: User not found
  */
 export const getUserById = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params['id'] as string);
+  const id = parseInt(req.params["id"] as string);
   const user = await userService.getUserById(id);
-  
+
   if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    return res.status(404).json({ error: "User not found" });
   }
-  
+
   res.json(user);
 });
 
@@ -90,16 +90,18 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
  */
 export const createUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, name } = req.body;
-  
+
   if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+    return res.status(400).json({ error: "Email is required" });
   }
-  
+
   const existingUser = await userService.getUserByEmail(email);
   if (existingUser) {
-    return res.status(400).json({ error: 'User with this email already exists' });
+    return res
+      .status(400)
+      .json({ error: "User with this email already exists" });
   }
-  
+
   const user = await userService.createUser({ email, name });
   res.status(201).json(user);
 });
@@ -139,14 +141,14 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
  *         description: User not found
  */
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params['id'] as string);
+  const id = parseInt(req.params["id"] as string);
   const { email, name } = req.body;
-  
+
   const existingUser = await userService.getUserById(id);
   if (!existingUser) {
-    return res.status(404).json({ error: 'User not found' });
+    return res.status(404).json({ error: "User not found" });
   }
-  
+
   const user = await userService.updateUser(id, { email, name });
   res.json(user);
 });
@@ -171,13 +173,13 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
  *         description: User not found
  */
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const id = parseInt(req.params['id'] as string);
-  
+  const id = parseInt(req.params["id"] as string);
+
   const existingUser = await userService.getUserById(id);
   if (!existingUser) {
-    return res.status(404).json({ error: 'User not found' });
+    return res.status(404).json({ error: "User not found" });
   }
-  
+
   await userService.deleteUser(id);
-  res.json({ message: 'User deleted successfully' });
+  res.json({ message: "User deleted successfully" });
 });

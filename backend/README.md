@@ -56,26 +56,31 @@ backend/
 ### Installation
 
 1. **Navigate to the backend directory:**
+
    ```cmd
    cd backend
    ```
 
 2. **Install dependencies:**
+
    ```cmd
    npm install
    ```
 
 3. **Set up environment variables:**
+
    ```cmd
    copy .env.example .env
    ```
-   
+
    Update the `.env` file with your PostgreSQL connection string:
+
    ```
    DATABASE_URL="postgresql://username:password@localhost:5432/mini_coder_db?schema=public"
    ```
 
 4. **Set up the database:**
+
    ```cmd
    npm run db:generate
    npm run db:push
@@ -105,6 +110,7 @@ Once the server is running, visit `http://localhost:3001/api-docs` to view the i
 ## API Endpoints
 
 ### Users
+
 - `GET /api/v1/users` - Get all users
 - `GET /api/v1/users/:id` - Get user by ID
 - `POST /api/v1/users` - Create new user
@@ -112,6 +118,7 @@ Once the server is running, visit `http://localhost:3001/api-docs` to view the i
 - `DELETE /api/v1/users/:id` - Delete user
 
 ### Posts
+
 - `GET /api/v1/posts` - Get all posts
 - `GET /api/v1/posts/:id` - Get post by ID
 - `POST /api/v1/posts` - Create new post
@@ -119,6 +126,7 @@ Once the server is running, visit `http://localhost:3001/api-docs` to view the i
 - `DELETE /api/v1/posts/:id` - Delete post
 
 ### Health Check
+
 - `GET /health` - Application health status
 
 ## Database Schema
@@ -126,6 +134,7 @@ Once the server is running, visit `http://localhost:3001/api-docs` to view the i
 The application includes two main entities:
 
 ### User
+
 - `id` - Auto-incrementing primary key
 - `email` - Unique email address
 - `name` - Optional display name
@@ -133,6 +142,7 @@ The application includes two main entities:
 - `updatedAt` - Last update timestamp
 
 ### Post
+
 - `id` - Auto-incrementing primary key
 - `title` - Post title
 - `content` - Optional post content
@@ -143,13 +153,13 @@ The application includes two main entities:
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment mode | `development` |
-| `PORT` | Server port | `3001` |
-| `DATABASE_URL` | PostgreSQL connection string | Required |
-| `JWT_SECRET` | JWT signing secret | Optional |
-| `API_VERSION` | API version | `v1` |
+| Variable       | Description                  | Default       |
+| -------------- | ---------------------------- | ------------- |
+| `NODE_ENV`     | Environment mode             | `development` |
+| `PORT`         | Server port                  | `3001`        |
+| `DATABASE_URL` | PostgreSQL connection string | Required      |
+| `JWT_SECRET`   | JWT signing secret           | Optional      |
+| `API_VERSION`  | API version                  | `v1`          |
 
 ## Tech Stack
 

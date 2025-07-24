@@ -1,16 +1,32 @@
-import { User } from '@prisma/client';
-import { prisma } from '../config/database';
+import { User } from "@prisma/client";
+import { prisma } from "../config/database";
 
 export class UserService {
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(): Promise<any[]> {
     return await prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        tokens: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { createdAt: "desc" },
     });
   }
 
-  async getUserById(id: number): Promise<User | null> {
+  async getUserById(id: number): Promise<any | null> {
     return await prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        tokens: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
@@ -20,7 +36,10 @@ export class UserService {
     });
   }
 
-  async updateUser(id: number, data: { email?: string; name?: string }): Promise<User> {
+  async updateUser(
+    id: number,
+    data: { email?: string; name?: string }
+  ): Promise<User> {
     return await prisma.user.update({
       where: { id },
       data,
@@ -33,9 +52,17 @@ export class UserService {
     });
   }
 
-  async getUserByEmail(email: string): Promise<User | null> {
+  async getUserByEmail(email: string): Promise<any | null> {
     return await prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        tokens: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 }

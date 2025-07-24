@@ -9,6 +9,8 @@ import { authenticateJWT } from "./middleware/auth";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import postRoutes from "./routes/postRoutes";
+import tokenRoutes from "./routes/tokenRoutes";
+import promptRoutes from "./routes/promptRoutes";
 
 dotenv.config();
 
@@ -38,6 +40,8 @@ app.use("/me", authenticateJWT, (req, res, next) => {
 });
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/posts", postRoutes);
+app.use("/api/v1/tokens", tokenRoutes);
+app.use("/api/v1/prompts", promptRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {

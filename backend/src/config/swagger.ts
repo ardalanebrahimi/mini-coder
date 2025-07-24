@@ -96,6 +96,40 @@ const options = {
             },
           },
         },
+        TokenResponse: {
+          type: "object",
+          properties: {
+            tokens: {
+              type: "integer",
+              description: "Current token count",
+            },
+            userId: {
+              type: "integer",
+              description: "User ID",
+            },
+          },
+        },
+        PromptResponse: {
+          type: "object",
+          properties: {
+            prompt: {
+              type: "string",
+              description: "Generated prompt text",
+            },
+            tokensUsed: {
+              type: "integer",
+              description: "Number of tokens deducted",
+            },
+            tokensRemaining: {
+              type: "integer",
+              description: "Remaining token balance",
+            },
+            metadata: {
+              type: "object",
+              description: "Additional prompt metadata",
+            },
+          },
+        },
         Error: {
           type: "object",
           properties: {

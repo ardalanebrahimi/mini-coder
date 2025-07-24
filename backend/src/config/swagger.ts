@@ -205,6 +205,84 @@ const options = {
             },
           },
         },
+        AIGenerateRequest: {
+          type: "object",
+          required: ["prompt"],
+          properties: {
+            prompt: {
+              type: "string",
+              description: "Description of the code to generate",
+              example: "Create a function to calculate fibonacci numbers",
+            },
+            language: {
+              type: "string",
+              description: "Programming language for the generated code",
+              example: "javascript",
+            },
+            context: {
+              type: "string",
+              description: "Additional context or requirements",
+              example: "Make it recursive and add error handling",
+            },
+            maxTokens: {
+              type: "integer",
+              minimum: 100,
+              maximum: 4000,
+              default: 2000,
+              description: "Maximum tokens to generate",
+            },
+            temperature: {
+              type: "number",
+              minimum: 0,
+              maximum: 2,
+              default: 0.7,
+              description:
+                "Creativity level (0 = deterministic, 2 = very creative)",
+            },
+          },
+        },
+        AIGenerateResponse: {
+          type: "object",
+          properties: {
+            generatedCode: {
+              type: "string",
+              description: "The AI-generated code",
+            },
+            usage: {
+              type: "object",
+              properties: {
+                promptTokens: {
+                  type: "integer",
+                  description: "Tokens used for the prompt",
+                },
+                completionTokens: {
+                  type: "integer",
+                  description: "Tokens used for the completion",
+                },
+                totalTokens: {
+                  type: "integer",
+                  description: "Total tokens used",
+                },
+              },
+            },
+            model: {
+              type: "string",
+              description: "The AI model used",
+            },
+            finishReason: {
+              type: "string",
+              description: "Why the generation stopped",
+            },
+            tokensRemaining: {
+              type: "integer",
+              description: "User's remaining token balance",
+            },
+            metadata: {
+              type: "object",
+              description: "Additional metadata about the request",
+            },
+          },
+        },
         Error: {
           type: "object",
           properties: {

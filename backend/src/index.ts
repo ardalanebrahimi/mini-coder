@@ -12,6 +12,8 @@ import postRoutes from "./routes/postRoutes";
 import tokenRoutes from "./routes/tokenRoutes";
 import promptRoutes from "./routes/promptRoutes";
 import projectRoutes from "./routes/projectRoutes";
+import aiRoutes from "./routes/aiRoutes";
+import { validateOpenAIConfig } from "./config/openai";
 
 dotenv.config();
 
@@ -44,6 +46,7 @@ app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/tokens", tokenRoutes);
 app.use("/api/v1/prompts", promptRoutes);
 app.use("/api/v1/projects", projectRoutes);
+app.use("/ai", aiRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {
@@ -58,6 +61,13 @@ app.listen(PORT, () => {
   console.log(
     `📚 API Documentation available at http://localhost:${PORT}/api-docs`
   );
+
+  // Validate OpenAI configuration
+  if (validateOpenAIConfig()) {
+    console.log("🤖 OpenAI integration ready");
+  } else {
+    console.log("⚠️  OpenAI integration disabled - API key not configured");
+  }
 });
 
 export default app;

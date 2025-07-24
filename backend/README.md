@@ -1,17 +1,16 @@
 # Mini Coder Backend
 
-A minimal Node.js + Express + TypeScript backend with PostgreSQL and Prisma ORM.
+A complete Node.js + Express + TypeScript backend with PostgreSQL, Prisma ORM, JWT authentication, token-based billing, project management, and OpenAI integration.
 
-## Features
+## 🚀 Features
 
-- **Express.js** - Fast, unopinionated web framework
-- **TypeScript** - Type-safe JavaScript
-- **PostgreSQL** - Robust relational database
-- **Prisma ORM** - Modern database toolkit
-- **Swagger/OpenAPI** - Interactive API documentation
-- **Error Handling** - Centralized error management
-- **CORS** - Cross-origin resource sharing
-- **Helmet** - Security headers
+- **Authentication**: JWT-based user registration and login with bcrypt password hashing
+- **Token System**: Token-based billing system with automatic deduction for API usage
+- **Project Management**: Full CRUD operations for user projects with search functionality
+- **AI Integration**: Secure OpenAI API proxy for code generation with token deduction
+- **Database**: PostgreSQL with Prisma ORM for type-safe database operations
+- **Security**: CORS, Helmet, input validation, and SQL injection prevention
+- **Documentation**: Interactive Swagger/OpenAPI docs at `/api-docs`
 
 ## Project Structure
 

@@ -7,24 +7,27 @@ I have successfully implemented a protected admin route `GET /admin` that meets 
 ## 🔧 **Implementation Details**
 
 ### **Route Configuration**
+
 - **Endpoint**: `GET /admin`
 - **Protection**: JWT authentication required
 - **Authorization**: Only users with email matching `process.env.ADMIN_EMAIL`
 - **Response**: Placeholder JSON with system statistics
 
 ### **Access Control**
+
 ```typescript
 // Admin check logic
-const adminEmail = process.env['ADMIN_EMAIL'];
+const adminEmail = process.env["ADMIN_EMAIL"];
 if (req.user.email !== adminEmail) {
-  return res.status(403).json({ 
+  return res.status(403).json({
     error: "Admin access required",
-    code: "ADMIN_ACCESS_DENIED" 
+    code: "ADMIN_ACCESS_DENIED",
   });
 }
 ```
 
 ### **Response Format**
+
 ```json
 {
   "users": 3,
@@ -43,12 +46,14 @@ if (req.user.email !== adminEmail) {
 ## 📁 **Files Created/Modified**
 
 ### **New Files:**
+
 1. **`src/controllers/adminController.ts`** - Admin controller with statistics logic
 2. **`src/routes/adminRoutes.ts`** - Admin route definitions
 3. **`demo-admin.bat`** - Windows demo script for testing
 4. **`demo-admin.sh`** - Unix/Linux demo script for testing
 
 ### **Modified Files:**
+
 1. **`src/index.ts`** - Added admin routes to main app
 2. **`src/config/swagger.ts`** - Added Admin tag for documentation
 3. **`README.md`** - Updated with admin endpoint documentation
@@ -64,6 +69,7 @@ if (req.user.email !== adminEmail) {
 ## 🧪 **Testing**
 
 ### **Demo Script Usage:**
+
 ```bash
 # Set admin email environment variable
 set ADMIN_EMAIL=admin@example.com
@@ -73,6 +79,7 @@ demo-admin.bat
 ```
 
 ### **Test Scenarios Covered:**
+
 1. ✅ Regular user tries to access admin (gets 403)
 2. ✅ Admin user accesses endpoint (gets 200 with stats)
 3. ✅ Unauthenticated access (gets 401)
@@ -81,6 +88,7 @@ demo-admin.bat
 ## 📊 **Statistics Provided**
 
 The admin endpoint returns real-time statistics:
+
 - **User Count**: Total registered users
 - **Project Count**: Total projects created
 - **Token Usage**: Total tokens consumed across all users
@@ -90,6 +98,7 @@ The admin endpoint returns real-time statistics:
 ## 🚀 **Future Extensibility**
 
 The admin route is designed to be easily extensible for future features:
+
 - Additional statistics can be added to the response
 - More admin-only endpoints can be added to the admin routes
 - Role-based access control can be expanded beyond email checking
@@ -98,6 +107,7 @@ The admin route is designed to be easily extensible for future features:
 ## 🔗 **API Documentation**
 
 The admin endpoint is fully documented in Swagger at `/api-docs` with:
+
 - Request/response schemas
 - Authentication requirements
 - Error response codes

@@ -50,19 +50,19 @@ export const getAdminStats = asyncHandler(
     }
 
     // Check if user is admin
-    const adminEmail = process.env['ADMIN_EMAIL'];
+    const adminEmail = process.env["ADMIN_EMAIL"];
     if (!adminEmail) {
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Admin email not configured",
-        code: "ADMIN_CONFIG_MISSING" 
+        code: "ADMIN_CONFIG_MISSING",
       });
       return;
     }
 
     if (req.user.email !== adminEmail) {
-      res.status(403).json({ 
+      res.status(403).json({
         error: "Admin access required",
-        code: "ADMIN_ACCESS_DENIED" 
+        code: "ADMIN_ACCESS_DENIED",
       });
       return;
     }
@@ -81,10 +81,13 @@ export const getAdminStats = asyncHandler(
 
       // Calculate total tokens used (assuming users start with 100 tokens)
       const initialTokensPerUser = 100;
-      const totalTokensUsed = users.reduce((sum: number, user: { tokens: number }) => {
-        const tokensUsed = initialTokensPerUser - user.tokens;
-        return sum + (tokensUsed > 0 ? tokensUsed : 0);
-      }, 0);
+      const totalTokensUsed = users.reduce(
+        (sum: number, user: { tokens: number }) => {
+          const tokensUsed = initialTokensPerUser - user.tokens;
+          return sum + (tokensUsed > 0 ? tokensUsed : 0);
+        },
+        0
+      );
 
       // Return admin statistics
       res.json({
@@ -95,7 +98,7 @@ export const getAdminStats = asyncHandler(
         timestamp: new Date().toISOString(),
         systemInfo: {
           nodeVersion: process.version,
-          environment: process.env['NODE_ENV'] || 'development',
+          environment: process.env["NODE_ENV"] || "development",
           uptime: Math.floor(process.uptime()),
         },
       });

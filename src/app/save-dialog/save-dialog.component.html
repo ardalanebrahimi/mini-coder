@@ -46,10 +46,11 @@
       <button
         class="btn-primary"
         (click)="confirmSave()"
-        [disabled]="!projectName.trim()"
+        [disabled]="!projectName.trim() || isSaving"
       >
-        <span class="emoji">💾</span>
-        {{ t("save") }}
+        <span class="emoji" *ngIf="!isSaving">💾</span>
+        <span class="emoji" *ngIf="isSaving">⏳</span>
+        {{ isSaving ? "Saving..." : t("save") }}
       </button>
     </div>
   </div>

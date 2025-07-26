@@ -13,7 +13,7 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     const token = this.authService.getToken();
 
-    if (token) {
+    if (token && !req.url.includes("api.openai.com")) {
       const authReq = req.clone({
         headers: req.headers.set("Authorization", `Bearer ${token}`),
       });

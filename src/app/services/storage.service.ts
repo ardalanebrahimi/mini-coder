@@ -1,11 +1,16 @@
 import { Injectable } from "@angular/core";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Observable, map, of } from "rxjs";
+import { environment } from "../../environments/environment";
+import { AuthService } from "./auth.service";
 
 export interface SavedProject {
-  id: string;
+  id: number;
   name: string;
-  command: string;
+  command?: string;
   language: string;
   code: string;
+  isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,168 +19,209 @@ export interface SavedProject {
   providedIn: "root",
 })
 export class StorageService {
-  private readonly STORAGE_KEY = "mini-coder-projects";
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/projects`;
 
-  constructor() {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   /**
-   * Save a project to local storage
+   * Get HTTP headers with authentication token
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    });
+  }
+
+  /**
+   * Save a project via API
    * @param project - Project to save
    */
   saveProject(
-    project: Omit<SavedProject, "id" | "createdAt" | "updatedAt">
-  ): SavedProject {
-    const projects = this.getAllProjects();
-    const now = new Date();
-
-    const savedProject: SavedProject = {
+    project: Omit<
+      SavedProject,
+      "id" | "createdAt" | "updatedAt" | "isPublished"
+    >
+  ): Observable<SavedProject> {
+    const projectData = {
       ...project,
-      id: this.generateId(),
-      createdAt: now,
-      updatedAt: now,
+      isPublished: false,
     };
 
-    projects.push(savedProject);
-    this.saveToStorage(projects);
-
-    return savedProject;
+    return this.http
+      .post<SavedProject>(this.apiUrl, projectData, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((response) => ({
+          ...response,
+          createdAt: new Date(response.createdAt),
+          updatedAt: new Date(response.updatedAt),
+        }))
+      );
   }
 
   /**
-   * Get all saved projects
-   * @returns Array of saved projects
+   * Get all saved projects from API
+   * @returns Observable of array of saved projects
    */
-  getAllProjects(): SavedProject[] {
-    try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      if (!stored) return [];
-
-      const projects = JSON.parse(stored);
-      // Convert date strings back to Date objects
-      return projects.map((project: any) => ({
-        ...project,
-        createdAt: new Date(project.createdAt),
-        updatedAt: new Date(project.updatedAt),
-      }));
-    } catch (error) {
-      console.error("Error loading projects:", error);
-      return [];
-    }
+  getAllProjects(): Observable<SavedProject[]> {
+    return this.http
+      .get<{ projects: SavedProject[]; total: number }>(this.apiUrl, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((response) =>
+          response.projects.map((project) => ({
+            ...project,
+            createdAt: new Date(project.createdAt),
+            updatedAt: new Date(project.updatedAt),
+          }))
+        )
+      );
   }
 
   /**
-   * Get a project by ID
+   * Get a project by ID from API
    * @param id - Project ID
-   * @returns Project or null if not found
+   * @returns Observable of project or null if not found
    */
-  getProject(id: string): SavedProject | null {
-    const projects = this.getAllProjects();
-    return projects.find((project) => project.id === id) || null;
+  getProject(id: number): Observable<SavedProject | null> {
+    return this.http
+      .get<SavedProject>(`${this.apiUrl}/${id}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((response) => ({
+          ...response,
+          createdAt: new Date(response.createdAt),
+          updatedAt: new Date(response.updatedAt),
+        }))
+      );
   }
 
   /**
-   * Update an existing project
+   * Update an existing project via API
    * @param id - Project ID
    * @param updates - Partial project updates
-   * @returns Updated project or null if not found
+   * @returns Observable of updated project or null if not found
    */
   updateProject(
-    id: string,
-    updates: Partial<SavedProject>
-  ): SavedProject | null {
-    const projects = this.getAllProjects();
-    const index = projects.findIndex((project) => project.id === id);
-
-    if (index === -1) return null;
-
-    projects[index] = {
-      ...projects[index],
-      ...updates,
-      updatedAt: new Date(),
-    };
-
-    this.saveToStorage(projects);
-    return projects[index];
+    id: number,
+    updates: Partial<Omit<SavedProject, "id" | "createdAt" | "updatedAt">>
+  ): Observable<SavedProject | null> {
+    return this.http
+      .put<SavedProject>(`${this.apiUrl}/${id}`, updates, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((response) => ({
+          ...response,
+          createdAt: new Date(response.createdAt),
+          updatedAt: new Date(response.updatedAt),
+        }))
+      );
   }
 
   /**
-   * Delete a project
+   * Delete a project via API
    * @param id - Project ID
-   * @returns true if deleted, false if not found
+   * @returns Observable of boolean indicating success
    */
-  deleteProject(id: string): boolean {
-    const projects = this.getAllProjects();
-    const index = projects.findIndex((project) => project.id === id);
-
-    if (index === -1) return false;
-
-    projects.splice(index, 1);
-    this.saveToStorage(projects);
-    return true;
+  deleteProject(id: number): Observable<boolean> {
+    return this.http
+      .delete<{ message: string }>(`${this.apiUrl}/${id}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(map(() => true));
   }
 
   /**
-   * Clear all projects
+   * Search projects via API
+   * @param query - Search query
+   * @returns Observable of array of matching projects
    */
-  clearAllProjects(): void {
-    localStorage.removeItem(this.STORAGE_KEY);
+  searchProjects(query: string): Observable<SavedProject[]> {
+    return this.http
+      .get<{ projects: SavedProject[]; total: number }>(
+        `${this.apiUrl}?search=${encodeURIComponent(query)}`,
+        {
+          headers: this.getAuthHeaders(),
+        }
+      )
+      .pipe(
+        map((response) =>
+          response.projects.map((project) => ({
+            ...project,
+            createdAt: new Date(project.createdAt),
+            updatedAt: new Date(project.updatedAt),
+          }))
+        )
+      );
   }
 
-  /**
-   * Get projects count
-   * @returns Number of saved projects
-   */
-  getProjectsCount(): number {
-    return this.getAllProjects().length;
-  }
+  // /**
+  //  * Get projects count via API
+  //  * @returns Observable of number of saved projects
+  //  */
+  // getProjectsCount(): Observable<number> {
+  //   return this.http
+  //     .get<{ projects: SavedProject[]; total: number }>(this.apiUrl, {
+  //       headers: this.getAuthHeaders(),
+  //     })
+  //     .pipe(map((response) => response.total));
+  // }
 
   /**
-   * Check if project name already exists
+   * Check if project name already exists via API
    * @param name - Project name to check
-   * @returns true if name exists
+   * @returns Observable of boolean indicating if name exists
    */
-  isProjectNameExists(name: string): boolean {
-    const projects = this.getAllProjects();
-    return projects.some(
-      (project) => project.name.toLowerCase() === name.toLowerCase()
+  isProjectNameExists(name: string): Observable<boolean> {
+    return this.searchProjects(name).pipe(
+      map((projects) =>
+        projects.some(
+          (project) => project.name.toLowerCase() === name.toLowerCase()
+        )
+      )
     );
   }
 
   /**
-   * Generate unique project name
+   * Generate unique project name via API check
    * @param baseName - Base name for the project
-   * @returns Unique project name
+   * @returns Observable of unique project name
    */
-  generateUniqueProjectName(baseName: string): string {
-    let name = baseName;
-    let counter = 1;
+  generateUniqueProjectName(baseName: string): Observable<string> {
+    return this.getAllProjects().pipe(
+      map((projects) => {
+        let name = baseName;
+        let counter = 1;
 
-    while (this.isProjectNameExists(name)) {
-      name = `${baseName}-${counter}`;
-      counter++;
-    }
+        while (
+          projects.some(
+            (project) => project.name.toLowerCase() === name.toLowerCase()
+          )
+        ) {
+          name = `${baseName}-${counter}`;
+          counter++;
+        }
 
-    return name;
+        return name;
+      })
+    );
   }
 
-  /**
-   * Save projects array to localStorage
-   * @param projects - Projects array
-   */
-  private saveToStorage(projects: SavedProject[]): void {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(projects));
-    } catch (error) {
-      console.error("Error saving projects:", error);
-      throw new Error("Failed to save projects. Storage might be full.");
-    }
-  }
+  // Legacy methods for backward compatibility (deprecated)
 
   /**
-   * Generate unique ID
-   * @returns Unique ID string
+   * @deprecated Use getAllProjects() instead
+   * Clear all projects - Not supported in API mode
    */
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  clearAllProjects(): void {
+    console.warn(
+      "clearAllProjects() is not supported when using API backend. Projects are managed per user account."
+    );
   }
 }

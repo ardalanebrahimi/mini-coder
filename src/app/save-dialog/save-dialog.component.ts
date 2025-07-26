@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { Subject, takeUntil } from "rxjs";
+import { Subject, takeUntil, forkJoin } from "rxjs";
 import {
   SaveDialogService,
   SaveDialogData,
@@ -24,6 +24,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   dialogData: SaveDialogData | null = null;
   projectName = "";
   errorMessage = "";
+  isSaving = false;
 
   constructor(
     private saveDialogService: SaveDialogService,
@@ -110,31 +111,53 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      // Generate unique name if needed
-      const uniqueName = this.storageService.generateUniqueProjectName(
-        this.projectName
-      );
+    this.isSaving = true;
+    this.errorMessage = "";
 
-      const savedProject = this.storageService.saveProject({
-        name: uniqueName,
-        command: this.dialogData.userCommand,
-        language: this.dialogData.currentApp.detectedLanguage,
-        code: this.dialogData.currentApp.generatedCode,
+    // First generate unique name, then save the project
+    this.storageService
+      .generateUniqueProjectName(this.projectName.trim())
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (uniqueName) => {
+          // Now save the project with the unique name
+          this.storageService
+            .saveProject({
+              name: uniqueName,
+              command: this.dialogData!.userCommand,
+              language: this.dialogData!.currentApp!.detectedLanguage,
+              code: this.dialogData!.currentApp!.generatedCode,
+            })
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (savedProject) => {
+                // Update the toolbox service with the new project
+                this.toolboxService.addProject(savedProject);
+
+                // Close dialog and reset form
+                this.saveDialogService.closeDialog();
+
+                // Show success message
+                this.showSuccessMessage(
+                  `Saved "${uniqueName}" to your toolbox!`
+                );
+
+                this.isSaving = false;
+              },
+              error: (error) => {
+                this.errorMessage = "Failed to save project. Please try again.";
+                console.error("Error saving project:", error);
+                this.isSaving = false;
+              },
+            });
+        },
+        error: (error) => {
+          this.errorMessage =
+            "Failed to generate unique name. Please try again.";
+          console.error("Error generating unique name:", error);
+          this.isSaving = false;
+        },
       });
-
-      // Update the toolbox service with the new project
-      this.toolboxService.addProject(savedProject);
-
-      // Close dialog and reset form
-      this.saveDialogService.closeDialog();
-
-      // Show success message through toolbox service or emit an event
-      this.showSuccessMessage(`Saved "${uniqueName}" to your toolbox!`);
-    } catch (error) {
-      this.errorMessage = "Failed to save project. Please try again.";
-      console.error("Error saving project:", error);
-    }
   }
 
   /**
@@ -143,6 +166,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   private resetForm(): void {
     this.projectName = "";
     this.errorMessage = "";
+    this.isSaving = false;
   }
 
   /**

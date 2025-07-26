@@ -57,7 +57,8 @@
               [class.active]="showToolbox"
             >
               <span class="btn-icon">🧰</span>
-              {{ t("myToolbox") }} ({{ savedProjectsCount }})
+              {{ t("myToolbox") }}
+              ({{ (toolboxService.savedProjects$ | async)?.length || 0 }})
             </button>
           </div>
 

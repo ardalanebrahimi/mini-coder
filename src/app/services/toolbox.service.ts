@@ -58,7 +58,7 @@ export class ToolboxService {
     this.savedProjectsSubject.next([...currentProjects, project]);
   }
 
-  removeProject(projectId: string): void {
+  removeProject(projectId: number): void {
     const currentProjects = this.savedProjectsSubject.value;
     const updatedProjects = currentProjects.filter((p) => p.id !== projectId);
     this.savedProjectsSubject.next(updatedProjects);
@@ -89,7 +89,10 @@ export class ToolboxService {
 
   // Utility methods
   refreshProjects(storageService: any): void {
-    const projects = storageService.getAllProjects();
-    this.setSavedProjects(projects);
+    // The storageService now returns observables, so this method should be updated
+    // to handle async operations in the components that use it
+    console.warn(
+      "refreshProjects should be updated to handle async operations"
+    );
   }
 }

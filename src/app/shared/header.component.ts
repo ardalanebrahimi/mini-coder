@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
@@ -6,7 +6,7 @@ import { AuthService } from "../services/auth.service";
 import { TranslationService } from "../services/translation.service";
 import { ToolboxService } from "../services/toolbox.service";
 import { StorageService } from "../services/storage.service";
-import { Observable } from "rxjs";
+import { Observable, map, catchError, of } from "rxjs";
 
 @Component({
   selector: "app-header",
@@ -15,17 +15,32 @@ import { Observable } from "rxjs";
   templateUrl: "./header.component.html",
   styleUrls: ["./header.component.scss"],
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   currentUser$: Observable<any>;
+  // savedProjectsCount$: Observable<number>;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private translationService: TranslationService,
-    private toolboxService: ToolboxService,
+    public toolboxService: ToolboxService,
     private storageService: StorageService
   ) {
     this.currentUser$ = this.authService.currentUser$;
+    // this.savedProjectsCount$ = of(0); // Initialize with 0
+  }
+
+  ngOnInit(): void {
+    // Only load projects count if user is authenticated
+    // this.currentUser$.subscribe((user) => {
+    //   if (user && this.authService.isLoggedIn()) {
+    //     this.savedProjectsCount$ = this.storageService
+    //       .getProjectsCount()
+    //       .pipe(catchError(() => of(0)));
+    //   } else {
+    //     this.savedProjectsCount$ = of(0);
+    //   }
+    // });
   }
 
   // Translation methods
@@ -52,10 +67,6 @@ export class HeaderComponent {
 
   get showToolbox(): boolean {
     return this.toolboxService.isOpen();
-  }
-
-  get savedProjectsCount(): number {
-    return this.storageService.getAllProjects().length;
   }
 
   // Auth methods

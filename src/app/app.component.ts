@@ -8,6 +8,7 @@ import {
   ProcessedCommand,
 } from "./services/prompt-processor.service";
 import { StorageService, SavedProject } from "./services/storage.service";
+import { AuthService } from "./services/auth.service";
 import { ToolboxComponent } from "./toolbox/toolbox.component";
 import { InputSectionComponent } from "./input-section/input-section.component";
 import { SaveDialogComponent } from "./save-dialog/save-dialog.component";
@@ -81,6 +82,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private promptProcessor: PromptProcessorService,
     private storageService: StorageService,
+    private authService: AuthService,
     private sanitizer: DomSanitizer,
     private toolboxService: ToolboxService,
     private translationService: TranslationService,
@@ -543,32 +545,35 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Load a saved project (called by service)
    */
-  private loadProjectFromService(project: SavedProject): void {
-    this.userCommand = project.command;
-    this.previewHtml = project.code;
-    // Create blob URL for iframe
-    this.previewUrl = this.createBlobUrl(project.code);
-    // Sanitize the blob URL for Angular
-    this.safePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-      this.previewUrl
-    );
+  private loadProjectFromService(loadedProject: SavedProject): void {
+    this.storageService.getProject(loadedProject.id).subscribe((project) => {
+      if (!project) return;
+      this.userCommand = project.command || "";
+      this.previewHtml = project.code;
+      // Create blob URL for iframe
+      this.previewUrl = this.createBlobUrl(project.code);
+      // Sanitize the blob URL for Angular
+      this.safePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        this.previewUrl
+      );
 
-    // Create a ProcessedCommand object for consistency
-    this.currentApp = {
-      detectedLanguage: project.language,
-      generatedCode: project.code,
-      sanitizedCode: this.sanitizer.bypassSecurityTrustHtml(project.code),
-      projectName: project.name,
-    };
+      // Create a ProcessedCommand object for consistency
+      this.currentApp = {
+        detectedLanguage: project.language,
+        generatedCode: project.code,
+        sanitizedCode: this.sanitizer.bypassSecurityTrustHtml(project.code),
+        projectName: project.name,
+      };
 
-    // Update preview service
-    this.updatePreviewService();
+      // Update preview service
+      this.updatePreviewService();
 
-    // Close toolbox
-    this.toolboxService.close();
+      // Close toolbox
+      this.toolboxService.close();
 
-    console.log("Loaded project:", project.name);
-    console.log("Preview HTML length:", this.previewHtml.length);
+      console.log("Loaded project:", project.name);
+      console.log("Preview HTML length:", this.previewHtml.length);
+    });
   }
 
   /**
@@ -576,14 +581,26 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   private deleteProjectFromService(project: SavedProject): void {
     if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
-      this.storageService.deleteProject(project.id);
-      this.toolboxService.removeProject(project.id);
+      this.storageService
+        .deleteProject(project.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (success) => {
+            if (success) {
+              this.toolboxService.removeProject(project.id);
 
-      // Clear preview if deleted project was selected
-      const selectedProject = this.toolboxService.getSelectedProject();
-      if (selectedProject?.id === project.id) {
-        this.clearPreview();
-      }
+              // Clear preview if deleted project was selected
+              const selectedProject = this.toolboxService.getSelectedProject();
+              if (selectedProject?.id === project.id) {
+                this.clearPreview();
+              }
+            }
+          },
+          error: (error) => {
+            console.error("Error deleting project:", error);
+            this.errorMessage = "Failed to delete project. Please try again.";
+          },
+        });
     }
   }
 
@@ -638,8 +655,24 @@ export class AppComponent implements OnInit, OnDestroy {
    * Load saved projects from storage and update service
    */
   private loadSavedProjects(): void {
-    const projects = this.storageService.getAllProjects();
-    this.toolboxService.setSavedProjects(projects);
+    if (this.authService.isLoggedIn()) {
+      this.storageService
+        .getAllProjects()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (projects) => {
+            this.toolboxService.setSavedProjects(projects);
+          },
+          error: (error) => {
+            console.error("Error loading projects:", error);
+            // Fallback to empty array if there's an error
+            this.toolboxService.setSavedProjects([]);
+          },
+        });
+    } else {
+      // User not authenticated, set empty projects
+      this.toolboxService.setSavedProjects([]);
+    }
   }
 
   /**

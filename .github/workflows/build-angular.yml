@@ -33,38 +33,15 @@ jobs:
           cp src/environments/environment.template.ts src/environments/environment.ts
           cp src/environments/environment.prod.template.ts src/environments/environment.prod.ts
 
-      - name: Replace environment variables
+      - name: Replace environment variables using envsubst
         env:
           API_URL: ${{ secrets.API_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           MAIN_PROMPT: ${{ secrets.MAIN_PROMPT }}
           OPENAI_FIX_INSTRUCTIONS: ${{ secrets.OPENAI_FIX_INSTRUCTIONS }}
         run: |
-          node -e "
-          const fs = require('fs');
-          const apiUrl = process.env.API_URL || '';
-          const apiKey = process.env.OPENAI_API_KEY || '';
-          const mainPrompt = process.env.MAIN_PROMPT || '';
-          const fixInstructions = process.env.OPENAI_FIX_INSTRUCTIONS || '';
-
-          function escapeTemplateLiteral(str) {
-            return str.replace(/\\\\/g, '\\\\\\\\')
-                     .replace(/\`/g, '\\\\`')
-                     .replace(/\$/g, '\\$');
-          }
-
-          function patchFile(path) {
-            let content = fs.readFileSync(path, 'utf8');
-            content = content.replace('YOUR_API_URL_HERE', escapeTemplateLiteral(apiUrl));
-            content = content.replace('YOUR_OPENAI_API_KEY_HERE', escapeTemplateLiteral(apiKey));
-            content = content.replace('YOUR_MAIN_PROMPT_HERE', escapeTemplateLiteral(mainPrompt));
-            content = content.replace('YOUR_OPENAI_FIX_INSTRUCTIONS_HERE', escapeTemplateLiteral(fixInstructions));
-            fs.writeFileSync(path, content);
-          }
-
-          patchFile('src/environments/environment.ts');
-          patchFile('src/environments/environment.prod.ts');
-          "
+          envsubst < src/environments/environment.template.ts > src/environments/environment.ts
+          envsubst < src/environments/environment.prod.template.ts > src/environments/environment.prod.ts
 
       - name: Build Angular app for production
         run: npm run build

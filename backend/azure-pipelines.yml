@@ -58,35 +58,35 @@ stages:
               pathToPublish: "$(Build.ArtifactStagingDirectory)"
               artifactName: "backend-dist"
 
-  - stage: Deploy
-    displayName: "Deploy Backend"
-    dependsOn:
-      - Build
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    jobs:
-      - deployment: DeployJob
-        displayName: "Deploy to Azure"
-        environment: "Production"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: "backend-dist"
-                  displayName: "Download build artifacts"
+  # - stage: Deploy
+  #   displayName: "Deploy Backend"
+  #   dependsOn:
+  #     - Build
+  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  #   jobs:
+  #     - deployment: DeployJob
+  #       displayName: "Deploy to Azure"
+  #       environment: "Production"
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - download: current
+  #                 artifact: "backend-dist"
+  #                 displayName: "Download build artifacts"
 
-                - task: AzureWebApp@1
-                  displayName: "Deploy to Azure Web App"
-                  inputs:
-                    azureSubscription: "$(azureSubscription)"
-                    appType: "webAppLinux"
-                    appName: "$(backendAppName)"
-                    package: "$(Pipeline.Workspace)/backend-dist/backend-$(Build.BuildId).zip"
-                    runtimeStack: "NODE|20-lts"
-                    startUpCommand: "npm start"
+  #               - task: AzureWebApp@1
+  #                 displayName: "Deploy to Azure Web App"
+  #                 inputs:
+  #                   azureSubscription: "$(azureSubscription)"
+  #                   appType: "webAppLinux"
+  #                   appName: "$(backendAppName)"
+  #                   package: "$(Pipeline.Workspace)/backend-dist/backend-$(Build.BuildId).zip"
+  #                   runtimeStack: "NODE|20-lts"
+  #                   startUpCommand: "npm start"
 
-                - script: |
-                    echo "Backend deployment steps go here"
-                    echo "Artifact location: $(Pipeline.Workspace)/backend-dist"
-                    ls -la $(Pipeline.Workspace)/backend-dist/
-                  displayName: "Placeholder deployment step"
+  #               - script: |
+  #                   echo "Backend deployment steps go here"
+  #                   echo "Artifact location: $(Pipeline.Workspace)/backend-dist"
+  #                   ls -la $(Pipeline.Workspace)/backend-dist/
+  #                 displayName: "Placeholder deployment step"

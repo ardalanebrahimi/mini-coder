@@ -18,7 +18,7 @@ const options = {
         url:
           process.env["NODE_ENV"] === "production"
             ? "https://minicoder-service-g2hxegcxerase6c0.germanywestcentral-01.azurewebsites.net"
-            : `http://localhost:${process.env["PORT"] || 3001}`,
+            : `http://localhost:${process.env["PORT"] || 3000}`,
         description:
           process.env["NODE_ENV"] === "production"
             ? "Production server"

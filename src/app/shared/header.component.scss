@@ -1,0 +1,196 @@
+// Import shared variables
+@import "../shared/variables.scss";
+
+// Gradient mixin
+@mixin gradient-background {
+  background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+}
+
+.header {
+  background-color: #343a40;
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  // App header styling for home route
+  &.app-header {
+    @include gradient-background;
+    color: $white;
+    padding: 2rem 1rem;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.brand-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.logo a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+// App title section for home route
+.app-title {
+  font-size: 2.5rem;
+  margin: 0;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.app-subtitle {
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0;
+  opacity: 0.9;
+}
+
+.emoji {
+  font-size: 1.2em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+// Unified button styling
+.action-btn {
+  @include button-base;
+  background: rgba(255, 255, 255, 0.1);
+  color: $white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  &.primary {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  &.active {
+    background: $white;
+    color: $primary-color;
+    border-color: $white;
+  }
+
+  .btn-icon {
+    margin-right: 0.5rem;
+  }
+}
+
+// Language select specific styling
+.language-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+
+  option {
+    background: $white;
+    color: $text-dark;
+    padding: 0.5rem;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .header.app-header {
+    text-align: center;
+
+    .header-content {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .brand-section {
+      min-width: auto;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .app-title {
+      font-size: 2rem;
+    }
+
+    .nav-content {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-actions {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .user-section {
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+  }
+
+  .user-info {
+    font-size: 0.8rem;
+  }
+
+  .action-btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}

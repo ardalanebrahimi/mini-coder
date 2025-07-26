@@ -1,41 +1,4 @@
 <div class="app-container">
-  <!-- Header -->
-  <header class="app-header">
-    <div class="header-content">
-      <h1 class="app-title">
-        <span class="emoji">🚀</span>
-        {{ t("appTitle") }}
-        <span class="emoji">✨</span>
-      </h1>
-      <p class="app-subtitle">{{ t("appSubtitle") }}</p>
-    </div>
-
-    <div class="header-actions">
-      <!-- Language Selector -->
-      <div class="language-selector">
-        <select
-          [ngModel]="selectedLanguage"
-          (ngModelChange)="changeLanguage($event)"
-          class="language-select"
-        >
-          <option *ngFor="let lang of availableLanguages" [value]="lang.code">
-            {{ lang.flag }} {{ lang.name }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Toolbox Button -->
-      <button
-        class="toolbox-btn"
-        (click)="toggleToolbox()"
-        [class.active]="showToolbox"
-      >
-        <span class="emoji">🧰</span>
-        {{ t("myToolbox") }} ({{ savedProjectsCount }})
-      </button>
-    </div>
-  </header>
-
   <!-- Main Content -->
   <main class="main-content">
     <!-- Input Section -->

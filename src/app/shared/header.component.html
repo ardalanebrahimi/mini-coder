@@ -1,0 +1,78 @@
+<header class="header" [class.app-header]="isAppRoute">
+  <div class="container">
+    <div class="header-content">
+      <!-- Main Logo/Title -->
+      <div class="brand-section">
+        <h1 class="logo" *ngIf="!isAppRoute">
+          <a routerLink="/welcome">Mini Coder</a>
+        </h1>
+        
+        <!-- App Title for home route -->
+        <div class="app-title-section" *ngIf="isAppRoute">
+          <h1 class="app-title">
+            <span class="emoji">🚀</span>
+            {{ t("appTitle") }}
+            <span class="emoji">✨</span>
+          </h1>
+          <p class="app-subtitle">{{ t("appSubtitle") }}</p>
+        </div>
+      </div>
+
+      <!-- Navigation and Actions -->
+      <nav class="nav">
+        <div class="nav-content" *ngIf="currentUser$ | async as user; else loginLinks">
+          <!-- Navigation Links (non-app routes) -->
+          <div class="nav-actions" *ngIf="!isAppRoute">
+            <a routerLink="/welcome" class="action-btn">
+              <span class="btn-icon">📊</span>
+              Dashboard
+            </a>
+            <a routerLink="/home" class="action-btn primary">
+              <span class="btn-icon">🚀</span>
+              App
+            </a>
+          </div>
+
+          <!-- App Controls (app route only) -->
+          <div class="nav-actions" *ngIf="isAppRoute">
+            <select
+              [ngModel]="selectedLanguage"
+              (ngModelChange)="changeLanguage($event)"
+              class="action-btn language-select"
+            >
+              <option *ngFor="let lang of availableLanguages" [value]="lang.code">
+                {{ lang.flag }} {{ lang.name }}
+              </option>
+            </select>
+
+            <button
+              class="action-btn toolbox-btn"
+              (click)="toggleToolbox()"
+              [class.active]="showToolbox"
+            >
+              <span class="btn-icon">🧰</span>
+              {{ t("myToolbox") }} ({{ savedProjectsCount }})
+            </button>
+          </div>
+
+          <!-- User Section -->
+          <div class="user-section">
+            <span class="user-info">Welcome, {{ user.name || user.email || "User" }}</span>
+            <button class="action-btn logout-btn" (click)="logout()">
+              <span class="btn-icon">🚪</span>
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- Login Links -->
+        <ng-template #loginLinks>
+          <div class="nav-actions">
+            <a routerLink="/login" class="action-btn">Login</a>
+            <a routerLink="/register" class="action-btn primary">Register</a>
+          </div>
+        </ng-template>
+      </nav>
+    </div>
+  </div>
+</header>

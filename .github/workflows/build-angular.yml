@@ -28,23 +28,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Prepare environment variables for envsubst
-        run: |
-          echo "API_URL=$(jq -Rn --arg v \"$API_URL\" '$v')" >> $GITHUB_ENV
-          echo "OPENAI_API_KEY=$(jq -Rn --arg v \"$OPENAI_API_KEY\" '$v')" >> $GITHUB_ENV
-          echo "MAIN_PROMPT=$(jq -Rn --arg v \"$MAIN_PROMPT\" '$v')" >> $GITHUB_ENV
-          echo "OPENAI_FIX_INSTRUCTIONS=$(jq -Rn --arg v \"$OPENAI_FIX_INSTRUCTIONS\" '$v')" >> $GITHUB_ENV
+      # - name: Prepare environment variables for envsubst
+      #   run: |
+      #     echo "API_URL=$(jq -Rn --arg v \"$API_URL\" '$v')" >> $GITHUB_ENV
+      #     echo "OPENAI_API_KEY=$(jq -Rn --arg v \"$OPENAI_API_KEY\" '$v')" >> $GITHUB_ENV
+      #     echo "MAIN_PROMPT=$(jq -Rn --arg v \"$MAIN_PROMPT\" '$v')" >> $GITHUB_ENV
+      #     echo "OPENAI_FIX_INSTRUCTIONS=$(jq -Rn --arg v \"$OPENAI_FIX_INSTRUCTIONS\" '$v')" >> $GITHUB_ENV
 
-        env:
-          API_URL: ${{ secrets.API_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          MAIN_PROMPT: ${{ secrets.MAIN_PROMPT }}
-          OPENAI_FIX_INSTRUCTIONS: ${{ secrets.OPENAI_FIX_INSTRUCTIONS }}
+      #   env:
+      #     API_URL: ${{ secrets.API_URL }}
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #     MAIN_PROMPT: ${{ secrets.MAIN_PROMPT }}
+      #     OPENAI_FIX_INSTRUCTIONS: ${{ secrets.OPENAI_FIX_INSTRUCTIONS }}
 
-      - name: Replace environment variables
+      # - name: Replace environment variables
+      #   run: |
+      #     envsubst < src/environments/environment.template.ts > src/environments/environment.ts
+      #     cp src/environments/environment.ts src/environments/environment.prod.ts
+      - name: Generate environment.ts from template
         run: |
-          envsubst < src/environments/environment.template.ts > src/environments/environment.ts
-          cp src/environments/environment.ts src/environments/environment.prod.ts
+          echo 'Generating environment.ts from template...'
+
+          sed -e "s|\${API_URL}|${{ secrets.API_URL }}|g" \
+              -e "s|\${OPENAI_API_KEY}|${{ secrets.OPENAI_API_KEY }}|g" \
+              -e "s|\${MAIN_PROMPT}|$(echo "${{ secrets.MAIN_PROMPT }}" | sed 's/["`]/\\&/g')|g" \
+              -e "s|\${OPENAI_FIX_INSTRUCTIONS}|$(echo "${{ secrets.OPENAI_FIX_INSTRUCTIONS }}" | sed 's/["`]/\\&/g')|g" \
+              src/environments/environment.template.ts > src/environments/environment.ts
 
       - name: Build Angular app for production
         run: npm run build

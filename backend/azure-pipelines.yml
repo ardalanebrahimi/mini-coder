@@ -41,7 +41,7 @@ stages:
               cd $(workingDirectory)
               npm run build
               npx prisma generate
-                displayName: "Install dependencies, build, and generate Prisma client"
+            displayName: "Install dependencies, build, and generate Prisma client"
 
           - task: ArchiveFiles@2
             displayName: "Archive backend files"

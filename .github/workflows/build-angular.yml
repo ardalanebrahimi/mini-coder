@@ -33,7 +33,7 @@ jobs:
           cp src/environments/environment.template.ts src/environments/environment.ts
           cp src/environments/environment.prod.template.ts src/environments/environment.prod.ts
 
-            - name: Replace environment variables
+      - name: Replace environment variables
         env:
           API_URL: ${{ secrets.API_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -65,7 +65,6 @@ jobs:
           patchFile('src/environments/environment.ts');
           patchFile('src/environments/environment.prod.ts');
           "
-
 
       - name: Build Angular app for production
         run: npm run build

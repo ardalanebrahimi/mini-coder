@@ -30,10 +30,15 @@ jobs:
 
       - name: Prepare environment variables for envsubst
         run: |
-          echo "API_URL=$(jq -Rn --arg v '${{ secrets.API_URL }}' '$v')" >> $GITHUB_ENV
-          echo "OPENAI_API_KEY=$(jq -Rn --arg v '${{ secrets.OPENAI_API_KEY }}' '$v')" >> $GITHUB_ENV
-          echo "MAIN_PROMPT=$(jq -Rn --arg v '${{ secrets.MAIN_PROMPT }}' '$v')" >> $GITHUB_ENV
-          echo "OPENAI_FIX_INSTRUCTIONS=$(jq -Rn --arg v '${{ secrets.OPENAI_FIX_INSTRUCTIONS }}' '$v')" >> $GITHUB_ENV
+          jq -Rn --arg v '${{ secrets.API_URL }}'        '$v' >  api_url.txt
+          jq -Rn --arg v '${{ secrets.OPENAI_API_KEY }}' '$v' >  openai_api_key.txt
+          jq -Rn --arg v '${{ secrets.MAIN_PROMPT }}'    '$v' >  main_prompt.txt
+          jq -Rn --arg v '${{ secrets.OPENAI_FIX_INSTRUCTIONS }}' '$v' > openai_fix.txt
+
+          echo "API_URL=$(cat api_url.txt)" >> $GITHUB_ENV
+          echo "OPENAI_API_KEY=$(cat openai_api_key.txt)" >> $GITHUB_ENV
+          echo "MAIN_PROMPT=$(cat main_prompt.txt)" >> $GITHUB_ENV
+          echo "OPENAI_FIX_INSTRUCTIONS=$(cat openai_fix.txt)" >> $GITHUB_ENV
 
       - name: Replace environment variables using envsubst
         run: |

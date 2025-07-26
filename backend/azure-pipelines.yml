@@ -14,52 +14,79 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: "20.x"
-    displayName: "Install Node.js"
+variables:
+  nodeVersion: "20.x"
+  workingDirectory: "backend"
+  azureSubscription: "Azure subscription 1"
+  backendAppName: "minicoder-service"
 
-  - script: |
-      cd backend
-      npm ci
-      npm run build
-      npx prisma generate
-    displayName: "Install dependencies, build, and generate Prisma client"
+stages:
+  - stage: Build
+    displayName: "Build Backend"
+    jobs:
+      - job: BuildJob
+        displayName: "Build Node.js Application"
+        steps:
+          - task: NodeTool@0
+            displayName: "Install Node.js"
+            inputs:
+              versionSpec: $(nodeVersion)
 
-  - task: CopyFiles@2
-    displayName: "Copy deployment files"
-    inputs:
-      SourceFolder: "backend"
-      Contents: |
-        dist/**
-        prisma/**
-        node_modules/**
-        package.json
-        package-lock.json
-        .env.example
-        web.config
-      TargetFolder: "$(Build.ArtifactStagingDirectory)/backend-deploy"
+          - script: |
+              cd $(workingDirectory)
+              npm ci
+            displayName: "Install dependencies"
 
-  - task: ArchiveFiles@2
-    displayName: "Archive backend deployment files"
-    inputs:
-      rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/backend-deploy"
-      includeRootFolder: false
-      archiveType: "zip"
-      archiveFile: "$(Build.ArtifactStagingDirectory)/backend-$(Build.BuildId).zip"
-      replaceExistingArchive: true
+          - script: |
+              cd $(workingDirectory)
+              npm run build
+              npx prisma generate
+                displayName: "Install dependencies, build, and generate Prisma client"
 
-  - task: PublishBuildArtifacts@1
-    displayName: "Publish Artifact: drop"
-    inputs:
-      PathtoPublish: "$(Build.ArtifactStagingDirectory)"
-      ArtifactName: "drop"
-      publishLocation: "Container"
+          - task: ArchiveFiles@2
+            displayName: "Archive backend files"
+            inputs:
+              rootFolderOrFile: "$(workingDirectory)"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/backend-$(Build.BuildId).zip"
+              replaceExistingArchive: true
 
-  - task: AzureWebApp@1
-    displayName: "Deploy to Azure Web App"
-    inputs:
-      azureSubscription: "Azure subscription 1"
-      appName: "minicoder-service"
-      package: "$(Build.ArtifactStagingDirectory)/backend-$(Build.BuildId).zip"
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish build artifacts"
+            inputs:
+              pathToPublish: "$(Build.ArtifactStagingDirectory)"
+              artifactName: "backend-dist"
+
+  - stage: Deploy
+    displayName: "Deploy Backend"
+    dependsOn:
+      - Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    jobs:
+      - deployment: DeployJob
+        displayName: "Deploy to Azure"
+        environment: "Production"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: "backend-dist"
+                  displayName: "Download build artifacts"
+
+                - task: AzureWebApp@1
+                  displayName: "Deploy to Azure Web App"
+                  inputs:
+                    azureSubscription: "$(azureSubscription)"
+                    appType: "webAppLinux"
+                    appName: "$(backendAppName)"
+                    package: "$(Pipeline.Workspace)/backend-dist/backend-$(Build.BuildId).zip"
+                    runtimeStack: "NODE|20-lts"
+                    startUpCommand: "npm start"
+
+                - script: |
+                    echo "Backend deployment steps go here"
+                    echo "Artifact location: $(Pipeline.Workspace)/backend-dist"
+                    ls -la $(Pipeline.Workspace)/backend-dist/
+                  displayName: "Placeholder deployment step"

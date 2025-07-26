@@ -6,7 +6,7 @@
         <h1 class="logo" *ngIf="!isAppRoute">
           <a routerLink="/welcome">Mini Coder</a>
         </h1>
-        
+
         <!-- App Title for home route -->
         <div class="app-title-section" *ngIf="isAppRoute">
           <h1 class="app-title">
@@ -20,7 +20,10 @@
 
       <!-- Navigation and Actions -->
       <nav class="nav">
-        <div class="nav-content" *ngIf="currentUser$ | async as user; else loginLinks">
+        <div
+          class="nav-content"
+          *ngIf="currentUser$ | async as user; else loginLinks"
+        >
           <!-- Navigation Links (non-app routes) -->
           <div class="nav-actions" *ngIf="!isAppRoute">
             <a routerLink="/welcome" class="action-btn">
@@ -40,7 +43,10 @@
               (ngModelChange)="changeLanguage($event)"
               class="action-btn language-select"
             >
-              <option *ngFor="let lang of availableLanguages" [value]="lang.code">
+              <option
+                *ngFor="let lang of availableLanguages"
+                [value]="lang.code"
+              >
                 {{ lang.flag }} {{ lang.name }}
               </option>
             </select>
@@ -57,7 +63,9 @@
 
           <!-- User Section -->
           <div class="user-section">
-            <span class="user-info">Welcome, {{ user.name || user.email || "User" }}</span>
+            <span class="user-info"
+              >Welcome, {{ user.name || user.email || "User" }}</span
+            >
             <button class="action-btn logout-btn" (click)="logout()">
               <span class="btn-icon">🚪</span>
               Logout

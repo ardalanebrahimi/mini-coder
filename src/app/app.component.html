@@ -39,6 +39,14 @@
   <!-- Modify App Dialog -->
   <app-modify-app-dialog></app-modify-app-dialog>
 
+  <!-- Auth Modal -->
+  <app-auth-modal
+    [isOpen]="showAuthModal"
+    [message]="authModalMessage"
+    (closeModal)="closeAuthModal()"
+    (authSuccess)="onAuthSuccess($event)"
+  ></app-auth-modal>
+
   <!-- Overlay for toolbox -->
   <div class="overlay" *ngIf="showToolbox" (click)="toggleToolbox()"></div>
 </div>

@@ -49,6 +49,29 @@ body {
   padding: 0.5rem;
 }
 
+/* Auth-related styles */
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.action-btn .lock-icon {
+  margin-left: 4px;
+  font-size: 0.8em;
+}
+
+.toolbox-btn.not-logged-in {
+  opacity: 0.8;
+}
+
+.toolbox-btn.not-logged-in:hover {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
 .p-2 {
   padding: 1rem;
 }

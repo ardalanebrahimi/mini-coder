@@ -151,9 +151,6 @@ export class PromptProcessorService {
       temperature: 0.3,
     };
 
-    console.log("Sending prompt to OpenAI:", prompt.substring(0, 200) + "...");
-    console.log("Using model:", body.model);
-
     return this.http.post(this.openaiApiUrl, body, { headers });
   }
 
@@ -164,24 +161,16 @@ export class PromptProcessorService {
    */
   private extractCodeFromResponse(response: any): string {
     try {
-      console.log("OpenAI Response:", response);
-
       const content = response.choices[0]?.message?.content;
       if (!content) {
         throw new Error("No content in response");
       }
-
-      console.log(
-        "Raw content from OpenAI:",
-        content.substring(0, 200) + "..."
-      );
 
       // Remove any markdown code blocks if present
       let code = content.replace(/```html\n?/g, "").replace(/```\n?/g, "");
 
       // Ensure we have a complete HTML document
       if (!code.includes("<!DOCTYPE html>")) {
-        console.log("Incomplete HTML detected, wrapping content");
         code = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -232,10 +221,6 @@ export class PromptProcessorService {
 </body>
 </html>`;
       }
-
-      console.log("Final generated code length:", code.length);
-      console.log("Code includes JavaScript:", code.includes("<script>"));
-      console.log("Code includes CSS:", code.includes("<style>"));
 
       return code;
     } catch (error) {

@@ -62,6 +62,7 @@ export class HeaderComponent implements OnInit {
 
   // Toolbox methods
   toggleToolbox(): void {
+    // Always allow toolbox to open, but content will differ based on auth status
     this.toolboxService.toggle();
   }
 

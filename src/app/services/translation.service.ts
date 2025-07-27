@@ -48,6 +48,25 @@ export class TranslationService {
       buildChoiceText:
         "You can either modify the current app or rebuild completely from scratch.",
       modifyExisting: "Modify Current App",
+      // Auth related translations
+      loginRequired: "Login Required",
+      registerRequired: "Register Required",
+      authRequiredMessage: "Please log in or register to use this feature.",
+      email: "Email",
+      password: "Password",
+      name: "Name",
+      emailPlaceholder: "Enter your email",
+      passwordPlaceholder: "Enter your password",
+      namePlaceholder: "Enter your name",
+      login: "Login",
+      register: "Register",
+      noAccount: "Don't have an account?",
+      haveAccount: "Already have an account?",
+      fillAllFields: "Please fill in all fields",
+      loginFailed: "Login failed. Please check your credentials.",
+      registrationFailed: "Registration failed. Please try again.",
+      notLoggedInMessage:
+        "Not logged in: Please log in or register to use this feature",
       rebuildFromScratch: "Rebuild from Scratch",
     },
     de: {
@@ -85,6 +104,28 @@ export class TranslationService {
       buildChoiceText:
         "Du kannst entweder die aktuelle App ändern oder komplett neu von Grund auf erstellen.",
       modifyExisting: "Aktuelle App ändern",
+      // Auth related translations
+      loginRequired: "Anmeldung erforderlich",
+      registerRequired: "Registrierung erforderlich",
+      authRequiredMessage:
+        "Bitte melden Sie sich an oder registrieren Sie sich, um diese Funktion zu nutzen.",
+      email: "E-Mail",
+      password: "Passwort",
+      name: "Name",
+      emailPlaceholder: "E-Mail eingeben",
+      passwordPlaceholder: "Passwort eingeben",
+      namePlaceholder: "Name eingeben",
+      login: "Anmelden",
+      register: "Registrieren",
+      noAccount: "Noch kein Konto?",
+      haveAccount: "Bereits ein Konto?",
+      fillAllFields: "Bitte füllen Sie alle Felder aus",
+      loginFailed:
+        "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten.",
+      registrationFailed:
+        "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      notLoggedInMessage:
+        "Nicht angemeldet: Bitte melden Sie sich an oder registrieren Sie sich, um diese Funktion zu nutzen",
       rebuildFromScratch: "Neu von Grund auf erstellen",
     },
   };

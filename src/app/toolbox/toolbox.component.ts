@@ -1,15 +1,17 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
 import { Subject, takeUntil } from "rxjs";
 import { SavedProject } from "../services/storage.service";
 import { ToolboxProjectItemComponent } from "../toolbox-project-item/toolbox-project-item.component";
 import { ToolboxService } from "../services/toolbox.service";
 import { TranslationService } from "../services/translation.service";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-toolbox",
   standalone: true,
-  imports: [CommonModule, ToolboxProjectItemComponent],
+  imports: [CommonModule, ToolboxProjectItemComponent, RouterModule],
   templateUrl: "./toolbox.component.html",
   styleUrls: ["./toolbox.component.scss"],
 })
@@ -23,7 +25,8 @@ export class ToolboxComponent implements OnInit, OnDestroy {
 
   constructor(
     private toolboxService: ToolboxService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +60,13 @@ export class ToolboxComponent implements OnInit, OnDestroy {
    */
   t(key: string): string {
     return this.translationService.t(key);
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  get isAuthenticated(): boolean {
+    return this.authService.isLoggedIn();
   }
 
   onCloseClick(): void {

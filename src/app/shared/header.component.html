@@ -58,7 +58,9 @@
             >
               <span class="btn-icon">🧰</span>
               {{ t("myToolbox") }}
-              ({{ (toolboxService.savedProjects$ | async)?.length || 0 }})
+              <span *ngIf="currentUser$ | async">
+                ({{ (toolboxService.savedProjects$ | async)?.length || 0 }})
+              </span>
             </button>
           </div>
 

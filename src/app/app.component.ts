@@ -15,6 +15,7 @@ import { SaveDialogComponent } from "./save-dialog/save-dialog.component";
 import { BuildChoiceDialogComponent } from "./build-choice-dialog/build-choice-dialog.component";
 import { ModifyAppDialogComponent } from "./modify-app-dialog/modify-app-dialog.component";
 import { PreviewSectionComponent } from "./preview-section/preview-section.component";
+import { AuthModalComponent } from "./shared/auth-modal.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
@@ -46,6 +47,7 @@ import { PreviewSectionService } from "./services/preview-section.service";
     BuildChoiceDialogComponent,
     ModifyAppDialogComponent,
     PreviewSectionComponent,
+    AuthModalComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -75,6 +77,33 @@ export class AppComponent implements OnInit, OnDestroy {
   isListening = false;
   speechRecognition: any = null;
   voiceSupported = false;
+
+  // Auth modal state
+  showAuthModal = false;
+  authModalMessage = "";
+
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  /**
+   * Show auth modal with custom message
+   */
+  showAuthModalWithMessage(message: string): void {
+    this.authModalMessage = message;
+    this.showAuthModal = true;
+  }
+
+  /**
+   * Close auth modal
+   */
+  closeAuthModal(): void {
+    this.showAuthModal = false;
+    this.authModalMessage = "";
+  }
 
   // Rebuild vs modify choice
   // UI state - removed build choice dialog related properties
@@ -126,8 +155,6 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.voiceSupported && this.speechRecognition) {
       this.speechRecognition.lang = languageCode === "de" ? "de-DE" : "en-US";
     }
-
-    console.log("Changed language to:", languageCode);
   }
 
   /**
@@ -147,6 +174,14 @@ export class AppComponent implements OnInit, OnDestroy {
    * Show modify app dialog
    */
   showModifyAppDialog(): void {
+    // Check authentication before allowing modify
+    if (!this.authService.isLoggedIn()) {
+      this.showAuthModalWithMessage(
+        `Please log in or register to modify your app.`
+      );
+      return;
+    }
+
     this.modifyAppDialogService.openModifyDialog(
       this.currentApp,
       this.userCommand
@@ -170,9 +205,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isModifying = true;
     this.errorMessage = "";
 
-    console.log("Processing modify command:", command);
-    console.log("Is rebuilding:", isRebuilding);
-
     // Choose prompt based on whether we're rebuilding or modifying
     const prompt = isRebuilding
       ? command // For rebuild, use the command directly
@@ -180,8 +212,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.promptProcessor.processCommand(prompt).subscribe({
       next: (result: ProcessedCommand) => {
-        console.log("Modified/Rebuilt app result:", result);
-
         // Update current app with modified/rebuilt version
         this.currentApp = result;
         this.previewHtml = result.generatedCode;
@@ -207,8 +237,6 @@ export class AppComponent implements OnInit, OnDestroy {
           ? `${this.t("rebuildApp")} successful!`
           : `${this.t("modifyApp")} successful!`;
         this.showSuccessMessage(successMessage);
-
-        console.log("App modified/rebuilt successfully");
       },
       error: (error) => {
         console.error("Error modifying/rebuilding app:", error);
@@ -242,12 +270,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this.speechRecognition.onstart = () => {
         this.commandInputService.setListening(true);
-        console.log("Voice recognition started");
       };
 
       this.speechRecognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
-        console.log("Voice input received:", transcript);
         this.commandInputService.updateUserCommand(transcript);
         this.commandInputService.setListening(false);
       };
@@ -260,12 +286,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this.speechRecognition.onend = () => {
         this.commandInputService.setListening(false);
-        console.log("Voice recognition ended");
       };
     } else {
       this.voiceSupported = false;
       this.commandInputService.setVoiceSupported(false);
-      console.log("Speech recognition not supported");
     }
   }
 
@@ -295,6 +319,14 @@ export class AppComponent implements OnInit, OnDestroy {
    * Show build choice dialog (modify vs rebuild)
    */
   showBuildChoiceModal(): void {
+    // Check authentication before allowing modify/rebuild
+    if (!this.authService.isLoggedIn()) {
+      this.showAuthModalWithMessage(
+        `Please log in or register to modify your app.`
+      );
+      return;
+    }
+
     this.buildChoiceDialogService.openDialog();
     this.errorMessage = "";
   }
@@ -307,6 +339,30 @@ export class AppComponent implements OnInit, OnDestroy {
       this.currentApp,
       this.userCommand
     );
+  }
+
+  /**
+   * Check if user is authenticated for protected features
+   */
+  private checkAuthForFeature(featureName: string): boolean {
+    if (!this.authService.isLoggedIn()) {
+      this.authModalMessage = `${this.t(
+        "notLoggedInMessage"
+      )} (${featureName})`;
+      this.showAuthModal = true;
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Handle successful authentication
+   */
+  onAuthSuccess(user: any): void {
+    // Reload saved projects after successful auth
+    this.loadSavedProjects();
+    this.closeAuthModal();
+    this.showSuccessMessage(`Welcome, ${user.name || user.email}!`);
   }
 
   ngOnInit(): void {
@@ -452,14 +508,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.errorMessage = "";
     this.currentApp = null;
 
-    console.log("Processing command:", currentCommand);
-
     // For debugging: bypass OpenAI and use static HTML
     if (
       currentCommand.toLowerCase().includes("test") ||
       currentCommand.toLowerCase().includes("debug")
     ) {
-      console.log("Using test mode - bypassing OpenAI");
       this.testStaticPreview();
       this.commandInputService.setProcessing(false);
       return;
@@ -467,12 +520,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.promptProcessor.processCommand(currentCommand).subscribe({
       next: (result: ProcessedCommand) => {
-        console.log("Generated app result:", result);
-        console.log(
-          "Generated code preview:",
-          result.generatedCode.substring(0, 300) + "..."
-        );
-
         this.currentApp = result;
         // Use the raw generated code for iframe srcdoc
         this.previewHtml = result.generatedCode;
@@ -491,26 +538,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.showSuccessMessage(
           `Created "${result.projectName}" successfully!`
         );
-
-        // Log what's being set for iframe
-        console.log(
-          "Setting previewHtml for iframe, length:",
-          this.previewHtml.length
-        );
-        console.log(
-          "PreviewHtml includes DOCTYPE:",
-          this.previewHtml.includes("<!DOCTYPE html>")
-        );
-        console.log(
-          "PreviewHtml includes script tags:",
-          this.previewHtml.includes("<script>")
-        );
-        console.log(
-          "PreviewHtml includes style tags:",
-          this.previewHtml.includes("<style>")
-        );
-        console.log("Created blob URL:", this.previewUrl);
-        console.log("Sanitized blob URL:", this.safePreviewUrl);
       },
       error: (error) => {
         console.error("Error processing command:", error);
@@ -521,7 +548,6 @@ export class AppComponent implements OnInit, OnDestroy {
         console.error("Error processing command:", error);
 
         // For debugging: show the error but also create a test preview
-        console.log("Creating test preview due to error");
         this.testStaticPreview();
       },
     });
@@ -533,6 +559,14 @@ export class AppComponent implements OnInit, OnDestroy {
   saveToToolbox(): void {
     if (!this.currentApp) {
       this.errorMessage = "No app to save!";
+      return;
+    }
+
+    // Check authentication before allowing save
+    if (!this.authService.isLoggedIn()) {
+      this.showAuthModalWithMessage(
+        `Please log in or register to save your app.`
+      );
       return;
     }
 
@@ -570,9 +604,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
       // Close toolbox
       this.toolboxService.close();
-
-      console.log("Loaded project:", project.name);
-      console.log("Preview HTML length:", this.previewHtml.length);
     });
   }
 
@@ -751,11 +782,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Update preview service
     this.updatePreviewService();
-
-    console.log("Test static preview set");
-    console.log("Preview URL:", this.previewUrl);
-    console.log("Safe Preview URL:", this.safePreviewUrl);
-    console.log("Data URL length:", dataUrl.length);
   }
 
   /**
@@ -766,8 +792,6 @@ export class AppComponent implements OnInit, OnDestroy {
     const blobUrl = this.testPreviewService.createBlobUrl(
       testResult.generatedCode
     );
-    console.log("Test blob URL created:", blobUrl);
-
     // Try to open the blob URL in a new window for testing
     window.open(blobUrl, "_blank");
   }

@@ -8,19 +8,54 @@
   </div>
 
   <div class="toolbox-content">
-    <div class="empty-state" *ngIf="savedProjects.length === 0">
-      <span class="emoji">📦</span>
-      <p>{{ t("noProjects") }}</p>
-      <p class="empty-subtext">
-        {{ t("noProjectsSubtext") }}
-      </p>
+    <!-- Not Authenticated State -->
+    <div class="auth-required-state" *ngIf="!isAuthenticated">
+      <div class="auth-notice">
+        <span class="emoji">🔐</span>
+        <h4>{{ t("loginRequired") }}</h4>
+        <p>{{ t("authRequiredMessage") }}</p>
+        <p class="feature-description">
+          Save your created apps, access them anytime, and build your personal
+          collection of mini applications.
+        </p>
+      </div>
+
+      <div class="auth-actions">
+        <a
+          routerLink="/login"
+          class="auth-btn primary"
+          (click)="onCloseClick()"
+        >
+          <span class="btn-icon">🚪</span>
+          {{ t("login") }}
+        </a>
+        <a
+          routerLink="/register"
+          class="auth-btn secondary"
+          (click)="onCloseClick()"
+        >
+          <span class="btn-icon">📝</span>
+          {{ t("register") }}
+        </a>
+      </div>
     </div>
 
-    <div class="project-list" *ngIf="savedProjects.length > 0">
-      <app-toolbox-project-item
-        *ngFor="let project of savedProjects"
-        [project]="project"
-      ></app-toolbox-project-item>
+    <!-- Authenticated State -->
+    <div *ngIf="isAuthenticated">
+      <div class="empty-state" *ngIf="savedProjects.length === 0">
+        <span class="emoji">📦</span>
+        <p>{{ t("noProjects") }}</p>
+        <p class="empty-subtext">
+          {{ t("noProjectsSubtext") }}
+        </p>
+      </div>
+
+      <div class="project-list" *ngIf="savedProjects.length > 0">
+        <app-toolbox-project-item
+          *ngFor="let project of savedProjects"
+          [project]="project"
+        ></app-toolbox-project-item>
+      </div>
     </div>
   </div>
 </div>

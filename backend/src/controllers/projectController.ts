@@ -430,10 +430,12 @@ export const getAppStoreProjects = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const page = parseInt(req.query["page"] as string) || 1;
     const limit = Math.min(parseInt(req.query["limit"] as string) || 10, 50); // Max 50 per page
+    const userId = req.user?.id || null; // Get user ID if authenticated
 
     const result = await projectService.getPublishedProjectsWithPagination(
       page,
-      limit
+      limit,
+      userId
     );
 
     return res.json({

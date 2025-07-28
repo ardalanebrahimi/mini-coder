@@ -14,6 +14,7 @@ import promptRoutes from "./routes/promptRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import aiRoutes from "./routes/aiRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import starRoutes from "./routes/starRoutes";
 import { validateOpenAIConfig } from "./config/openai";
 
 dotenv.config();
@@ -67,6 +68,7 @@ app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/tokens", tokenRoutes);
 app.use("/api/v1/prompts", promptRoutes);
 app.use("/api/v1/projects", projectRoutes);
+app.use("/api/v1/stars", starRoutes);
 app.use("/ai", aiRoutes);
 app.use("/admin", adminRoutes);
 

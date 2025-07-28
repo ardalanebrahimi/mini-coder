@@ -65,4 +65,6 @@ export interface PublishedProjectResponse {
     username: string;
     name?: string;
   };
+  starCount?: number; // Total number of stars
+  starred?: boolean; // Whether current user has starred (if user is authenticated)
 }

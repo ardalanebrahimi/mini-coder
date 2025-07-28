@@ -6,6 +6,7 @@ import {
   ProjectListResponse,
   PublishedProjectResponse,
 } from "../models/Project";
+import { StarService } from "./starService";
 
 export class ProjectService {
   async getAllUserProjects(userId: number): Promise<ProjectListResponse[]> {
@@ -108,46 +109,15 @@ export class ProjectService {
 
   async getPublishedProjectsWithPagination(
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    userId: number | null = null
   ): Promise<{
     projects: PublishedProjectResponse[];
     total: number;
     hasMore: boolean;
   }> {
-    const skip = (page - 1) * limit;
-
-    const [projects, total] = await Promise.all([
-      prisma.project.findMany({
-        where: { isPublished: true },
-        select: {
-          id: true,
-          name: true,
-          language: true,
-          isPublished: true,
-          createdAt: true,
-          updatedAt: true,
-          user: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-            },
-          },
-        },
-        orderBy: { updatedAt: "desc" },
-        skip,
-        take: limit,
-      }),
-      prisma.project.count({
-        where: { isPublished: true },
-      }),
-    ]);
-
-    return {
-      projects: projects as PublishedProjectResponse[],
-      total,
-      hasMore: skip + limit < total,
-    };
+    // Use StarService to get projects with star information
+    return await StarService.getProjectsWithStars(userId, page, limit);
   }
 
   async getPublicProjectById(

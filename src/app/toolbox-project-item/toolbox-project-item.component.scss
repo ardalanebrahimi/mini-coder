@@ -74,6 +74,32 @@ $border-radius: 12px;
   color: $text-light;
 }
 
+.published-badge {
+  background: #4caf50;
+  color: $white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.private-badge {
+  background: #ff9800;
+  color: $white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.project-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.publish-btn,
+.unpublish-btn,
 .delete-btn {
   background: none;
   border: none;
@@ -81,7 +107,27 @@ $border-radius: 12px;
   padding: 0.5rem;
   border-radius: $border-radius;
   transition: all 0.3s ease;
+  font-size: 1rem;
 
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.publish-btn {
+  &:hover:not(:disabled) {
+    background: rgba(76, 175, 80, 0.1);
+  }
+}
+
+.unpublish-btn {
+  &:hover:not(:disabled) {
+    background: rgba(255, 152, 0, 0.1);
+  }
+}
+
+.delete-btn {
   &:hover {
     background: rgba(244, 67, 54, 0.1);
   }

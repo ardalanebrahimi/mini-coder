@@ -23,6 +23,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   showDialog = false;
   dialogData: SaveDialogData | null = null;
   projectName = "";
+  isPrivate = false; // Default to false (meaning public by default)
   errorMessage = "";
   isSaving = false;
 
@@ -127,6 +128,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
               command: this.dialogData!.userCommand,
               language: this.dialogData!.currentApp!.detectedLanguage,
               code: this.dialogData!.currentApp!.generatedCode,
+              isPublished: !this.isPrivate, // Invert logic: if private is checked, don't publish
             })
             .pipe(takeUntil(this.destroy$))
             .subscribe({
@@ -165,6 +167,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
    */
   private resetForm(): void {
     this.projectName = "";
+    this.isPrivate = false;
     this.errorMessage = "";
     this.isSaving = false;
   }

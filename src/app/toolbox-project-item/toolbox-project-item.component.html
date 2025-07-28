@@ -7,14 +7,50 @@
         {{ project.language === "de" ? "DE" : "EN" }}
       </span>
       <span class="project-date">{{ project.createdAt | date : "short" }}</span>
+      <span
+        *ngIf="project.isPublished"
+        class="published-badge"
+        title="Published to App Store"
+      >
+        📱 Public
+      </span>
+      <span
+        *ngIf="!project.isPublished"
+        class="private-badge"
+        title="Private project"
+      >
+        🔒 Private
+      </span>
     </div>
   </div>
 
-  <button
-    class="delete-btn"
-    (click)="onDeleteClick($event)"
-    title="Delete project"
-  >
-    🗑️
-  </button>
+  <div class="project-actions">
+    <button
+      *ngIf="!project.isPublished"
+      class="publish-btn"
+      (click)="onPublishClick($event)"
+      [disabled]="isPublishing"
+      title="Publish to App Store"
+    >
+      {{ isPublishing ? "⏳" : "🌐" }}
+    </button>
+
+    <button
+      *ngIf="project.isPublished"
+      class="unpublish-btn"
+      (click)="onUnpublishClick($event)"
+      [disabled]="isUnpublishing"
+      title="Make private"
+    >
+      {{ isUnpublishing ? "⏳" : "�" }}
+    </button>
+
+    <button
+      class="delete-btn"
+      (click)="onDeleteClick($event)"
+      title="Delete project"
+    >
+      🗑️
+    </button>
+  </div>
 </div>

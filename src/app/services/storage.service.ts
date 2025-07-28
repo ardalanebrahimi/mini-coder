@@ -1,8 +1,8 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, map, of } from "rxjs";
 import { environment } from "../../environments/environment";
 import { AuthService } from "./auth.service";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 
 export interface SavedProject {
   id: number;
@@ -11,6 +11,7 @@ export interface SavedProject {
   language: string;
   code: string;
   isPublished: boolean;
+  publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,12 +42,13 @@ export class StorageService {
   saveProject(
     project: Omit<
       SavedProject,
-      "id" | "createdAt" | "updatedAt" | "isPublished"
+      "id" | "createdAt" | "updatedAt" | "publishedAt"
     >
   ): Observable<SavedProject> {
     const projectData = {
       ...project,
-      isPublished: false,
+      // Default to false if isPublished is not provided
+      isPublished: project.isPublished ?? false,
     };
 
     return this.http
@@ -211,6 +213,60 @@ export class StorageService {
         return name;
       })
     );
+  }
+
+  /**
+   * Publish a project to the app store
+   */
+  publishProject(
+    id: number
+  ): Observable<{ message: string; project: SavedProject }> {
+    return this.http
+      .post<{ message: string; project: SavedProject }>(
+        `${this.apiUrl}/${id}/publish`,
+        {},
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((response) => ({
+          message: response.message,
+          project: {
+            ...response.project,
+            createdAt: new Date(response.project.createdAt),
+            updatedAt: new Date(response.project.updatedAt),
+            publishedAt: response.project.publishedAt
+              ? new Date(response.project.publishedAt)
+              : undefined,
+          },
+        }))
+      );
+  }
+
+  /**
+   * Unpublish a project from the app store
+   */
+  unpublishProject(
+    id: number
+  ): Observable<{ message: string; project: SavedProject }> {
+    return this.http
+      .post<{ message: string; project: SavedProject }>(
+        `${this.apiUrl}/${id}/unpublish`,
+        {},
+        { headers: this.getAuthHeaders() }
+      )
+      .pipe(
+        map((response) => ({
+          message: response.message,
+          project: {
+            ...response.project,
+            createdAt: new Date(response.project.createdAt),
+            updatedAt: new Date(response.project.updatedAt),
+            publishedAt: response.project.publishedAt
+              ? new Date(response.project.publishedAt)
+              : undefined,
+          },
+        }))
+      );
   }
 
   // Legacy methods for backward compatibility (deprecated)

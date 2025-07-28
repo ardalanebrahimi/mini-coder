@@ -18,6 +18,22 @@
         (keyup.enter)="onEnterKey()"
       />
 
+      <!-- Privacy checkbox -->
+      <div class="privacy-option">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="isPrivate"
+            class="privacy-checkbox"
+          />
+          <span class="checkmark"></span>
+          <span class="privacy-text">
+            <span class="emoji">🔒</span>
+            Keep this project private (not published to App Store)
+          </span>
+        </label>
+      </div>
+
       <!-- Error message -->
       <div class="error-message" *ngIf="errorMessage">
         <span class="emoji">❌</span>

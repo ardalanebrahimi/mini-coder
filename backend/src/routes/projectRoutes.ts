@@ -7,6 +7,8 @@ import {
   updateProject,
   deleteProject,
   getPublishedProjects,
+  publishProject,
+  unpublishProject,
 } from "../controllers/projectController";
 
 const router: Router = Router();
@@ -22,5 +24,9 @@ router.get("/:id", getProjectById);
 router.post("/", createProject);
 router.put("/:id", updateProject);
 router.delete("/:id", deleteProject);
+
+// Publish/unpublish routes
+router.post("/:id/publish", publishProject);
+router.post("/:id/unpublish", unpublishProject);
 
 export default router;

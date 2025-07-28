@@ -6,6 +6,7 @@ export interface Project {
   language: string;
   code: string;
   isPublished: boolean;
+  publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,6 +35,7 @@ export interface ProjectResponse {
   language: string;
   code: string;
   isPublished: boolean;
+  publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +45,7 @@ export interface ProjectListResponse {
   name: string;
   language: string;
   isPublished: boolean;
+  publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

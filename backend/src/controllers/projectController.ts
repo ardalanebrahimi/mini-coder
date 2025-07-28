@@ -385,3 +385,131 @@ export const getPublishedProjects = asyncHandler(
     return res.json({ projects });
   }
 );
+
+/**
+ * @swagger
+ * /api/v1/projects/{id}/publish:
+ *   post:
+ *     summary: Publish a project to the app store
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Project ID
+ *     responses:
+ *       200:
+ *         description: Project published successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 project:
+ *                   $ref: '#/components/schemas/Project'
+ *       404:
+ *         description: Project not found
+ *       401:
+ *         description: Unauthorized
+ *       400:
+ *         description: Project already published
+ */
+export const publishProject = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const id = parseInt(req.params["id"] as string);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid project ID" });
+    }
+
+    const result = await projectService.publishProject(id, req.user.id);
+
+    if (!result.success) {
+      if (result.error === "Project not found") {
+        return res.status(404).json({ error: result.error });
+      }
+      if (result.error === "Project already published") {
+        return res.status(400).json({ error: result.error });
+      }
+      return res.status(500).json({ error: result.error });
+    }
+
+    return res.json({
+      message: "Project published successfully",
+      project: result.project,
+    });
+  }
+);
+
+/**
+ * @swagger
+ * /api/v1/projects/{id}/unpublish:
+ *   post:
+ *     summary: Unpublish a project from the app store
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Project ID
+ *     responses:
+ *       200:
+ *         description: Project unpublished successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 project:
+ *                   $ref: '#/components/schemas/Project'
+ *       404:
+ *         description: Project not found
+ *       401:
+ *         description: Unauthorized
+ *       400:
+ *         description: Project not published
+ */
+export const unpublishProject = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const id = parseInt(req.params["id"] as string);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid project ID" });
+    }
+
+    const result = await projectService.unpublishProject(id, req.user.id);
+
+    if (!result.success) {
+      if (result.error === "Project not found") {
+        return res.status(404).json({ error: result.error });
+      }
+      if (result.error === "Project not published") {
+        return res.status(400).json({ error: result.error });
+      }
+      return res.status(500).json({ error: result.error });
+    }
+
+    return res.json({
+      message: "Project unpublished successfully",
+      project: result.project,
+    });
+  }
+);

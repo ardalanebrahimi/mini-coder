@@ -105,6 +105,86 @@ export class ProjectService {
     });
   }
 
+  async publishProject(
+    id: number,
+    userId: number
+  ): Promise<{
+    success: boolean;
+    project?: ProjectResponse;
+    error?: string;
+  }> {
+    try {
+      // Check if project exists and belongs to user
+      const existingProject = await this.getProjectById(id, userId);
+      if (!existingProject) {
+        return { success: false, error: "Project not found" };
+      }
+
+      // Check if project is already published
+      if (existingProject.isPublished) {
+        return { success: false, error: "Project already published" };
+      }
+
+      // Publish the project
+      const updatedProject = await prisma.project.update({
+        where: { id },
+        data: {
+          isPublished: true,
+        },
+      });
+
+      return {
+        success: true,
+        project: {
+          ...updatedProject,
+          command: updatedProject.command ?? "",
+        },
+      };
+    } catch (error) {
+      return { success: false, error: "Failed to publish project" };
+    }
+  }
+
+  async unpublishProject(
+    id: number,
+    userId: number
+  ): Promise<{
+    success: boolean;
+    project?: ProjectResponse;
+    error?: string;
+  }> {
+    try {
+      // Check if project exists and belongs to user
+      const existingProject = await this.getProjectById(id, userId);
+      if (!existingProject) {
+        return { success: false, error: "Project not found" };
+      }
+
+      // Check if project is actually published
+      if (!existingProject.isPublished) {
+        return { success: false, error: "Project not published" };
+      }
+
+      // Unpublish the project
+      const updatedProject = await prisma.project.update({
+        where: { id },
+        data: {
+          isPublished: false,
+        },
+      });
+
+      return {
+        success: true,
+        project: {
+          ...updatedProject,
+          command: updatedProject.command ?? "",
+        },
+      };
+    } catch (error) {
+      return { success: false, error: "Failed to unpublish project" };
+    }
+  }
+
   async getUserProjectCount(userId: number): Promise<number> {
     return await prisma.project.count({
       where: { userId },

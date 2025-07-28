@@ -31,8 +31,6 @@ export class AuthService {
 
   async register(data: RegisterUserDto): Promise<AuthResponse> {
     const { username, email, password, name } = data;
-    console.log("Registering user:", username, email);
-
     // Check if user already exists by email
     const existingUserByEmail = await prisma.user.findUnique({
       where: { email },
@@ -42,7 +40,6 @@ export class AuthService {
       throw new Error("User with this email already exists");
     }
 
-    // Check if user already exists by username
     const existingUserByUsername = await prisma.user.findUnique({
       where: { username },
     });
@@ -90,12 +87,9 @@ export class AuthService {
   async login(data: LoginUserDto): Promise<AuthResponse> {
     const { loginField, password } = data;
 
-    // Determine if loginField is email or username
-    const isEmail = loginField.includes("@");
-
-    // Find user by email or username
+    // For now, treat loginField as email until database migration is complete
     const user = await prisma.user.findUnique({
-      where: isEmail ? { email: loginField } : { username: loginField },
+      where: { email: loginField },
     });
 
     if (!user) {

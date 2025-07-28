@@ -61,54 +61,54 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
   return res.json(user);
 });
 
-/**
- * @swagger
- * /api/v1/users:
- *   post:
- *     summary: Create a new user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *               name:
- *                 type: string
- *     responses:
- *       201:
- *         description: User created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       400:
- *         description: Invalid input
- */
-export const createUser = asyncHandler(async (req: Request, res: Response) => {
-  const { email, name } = req.body;
+// /**
+//  * @swagger
+//  * /api/v1/users:
+//  *   post:
+//  *     summary: Create a new user
+//  *     tags: [Users]
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             required:
+//  *               - email
+//  *             properties:
+//  *               email:
+//  *                 type: string
+//  *               name:
+//  *                 type: string
+//  *     responses:
+//  *       201:
+//  *         description: User created successfully
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               $ref: '#/components/schemas/User'
+//  *       400:
+//  *         description: Invalid input
+//  */
+// export const createUser = asyncHandler(async (req: Request, res: Response) => {
+//   const { email, name } = req.body;
 
-  if (!email) {
-    return res.status(400).json({ error: "Email is required" });
-  }
+//   if (!email) {
+//     return res.status(400).json({ error: "Email is required" });
+//   }
 
-  const existingUser = await userService.getUserByEmail(email);
-  if (existingUser) {
-    return res
-      .status(400)
-      .json({ error: "User with this email already exists" });
-  }
+//   const existingUser = await userService.getUserByEmail(email);
+//   if (existingUser) {
+//     return res
+//       .status(400)
+//       .json({ error: "User with this email already exists" });
+//   }
 
-  // For demonstration, set a default password hash (replace with real hash logic in production)
-  const passwordHash = "";
-  const user = await userService.createUser({ email, passwordHash, name });
-  return res.status(201).json(user);
-});
+//   // For demonstration, set a default password hash (replace with real hash logic in production)
+//   const passwordHash = "";
+//   const user = await userService.createUser({ email, passwordHash, name });
+//   return res.status(201).json(user);
+// });
 
 /**
  * @swagger

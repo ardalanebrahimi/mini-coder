@@ -18,9 +18,13 @@ const authService = new AuthService();
  *           schema:
  *             type: object
  *             required:
+ *               - username
  *               - email
  *               - password
  *             properties:
+ *               username:
+ *                 type: string
+ *                 description: User's unique username
  *               email:
  *                 type: string
  *                 format: email
@@ -54,11 +58,13 @@ const authService = new AuthService();
  */
 export const register = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const { email, password, name } = req.body;
+    const { username, email, password, name } = req.body;
 
     // Validation
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+    if (!username || !email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username, email and password are required" });
     }
 
     if (password.length < 6) {
@@ -74,13 +80,28 @@ export const register = asyncHandler(
         .json({ error: "Please provide a valid email address" });
     }
 
+    // Username validation
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    if (!usernameRegex.test(username)) {
+      return res.status(400).json({
+        error:
+          "Username must be 3-20 characters long and contain only letters, numbers, and underscores",
+      });
+    }
+
     try {
-      const result = await authService.register({ email, password, name });
+      const result = await authService.register({
+        username,
+        email,
+        password,
+        name,
+      });
       return res.status(201).json(result);
     } catch (error) {
       if (
         error instanceof Error &&
-        error.message === "User with this email already exists"
+        (error.message === "User with this email already exists" ||
+          error.message === "User with this username already exists")
       ) {
         return res.status(400).json({ error: error.message });
       }
@@ -102,13 +123,12 @@ export const register = asyncHandler(
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - loginField
  *               - password
  *             properties:
- *               email:
+ *               loginField:
  *                 type: string
- *                 format: email
- *                 description: User's email address
+ *                 description: User's email or username
  *               password:
  *                 type: string
  *                 description: User's password
@@ -134,19 +154,21 @@ export const register = asyncHandler(
  */
 export const login = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const { email, password } = req.body;
+    const { loginField, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+    if (!loginField || !password) {
+      return res
+        .status(400)
+        .json({ error: "Email/username and password are required" });
     }
 
     try {
-      const result = await authService.login({ email, password });
+      const result = await authService.login({ loginField, password });
       return res.json(result);
     } catch (error) {
       if (
         error instanceof Error &&
-        error.message === "Invalid email or password"
+        error.message === "Invalid email/username or password"
       ) {
         return res.status(401).json({ error: error.message });
       }
@@ -190,5 +212,46 @@ export const getCurrentUser = asyncHandler(
     }
 
     return res.json(user);
+  }
+);
+
+/**
+ * @swagger
+ * /auth/check-availability:
+ *   post:
+ *     summary: Check username and email availability
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Username to check
+ *               email:
+ *                 type: string
+ *                 description: Email to check
+ *     responses:
+ *       200:
+ *         description: Availability check result
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 usernameAvailable:
+ *                   type: boolean
+ *                 emailAvailable:
+ *                   type: boolean
+ */
+export const checkAvailability = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { username, email } = req.body;
+
+    const result = await authService.checkAvailability({ username, email });
+    return res.json(result);
   }
 );

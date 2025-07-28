@@ -49,3 +49,18 @@ export interface ProjectListResponse {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface PublishedProjectResponse {
+  id: number;
+  name: string;
+  language: string;
+  isPublished: boolean;
+  publishedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  user: {
+    id: number;
+    username: string;
+    name?: string;
+  };
+}

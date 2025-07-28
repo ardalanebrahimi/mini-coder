@@ -388,6 +388,64 @@ export const getPublishedProjects = asyncHandler(
 
 /**
  * @swagger
+ * /api/v1/projects/app-store:
+ *   get:
+ *     summary: Get published projects for the App Store with pagination and user info
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of projects per page
+ *     responses:
+ *       200:
+ *         description: App Store projects with pagination
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 projects:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/PublishedProjectResponse'
+ *                 total:
+ *                   type: integer
+ *                 hasMore:
+ *                   type: boolean
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ */
+export const getAppStoreProjects = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const page = parseInt(req.query["page"] as string) || 1;
+    const limit = Math.min(parseInt(req.query["limit"] as string) || 10, 50); // Max 50 per page
+
+    const result = await projectService.getPublishedProjectsWithPagination(
+      page,
+      limit
+    );
+
+    return res.json({
+      ...result,
+      page,
+      limit,
+    });
+  }
+);
+
+/**
+ * @swagger
  * /api/v1/projects/{id}/publish:
  *   post:
  *     summary: Publish a project to the app store

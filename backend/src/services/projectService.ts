@@ -4,6 +4,7 @@ import {
   UpdateProjectDto,
   ProjectResponse,
   ProjectListResponse,
+  PublishedProjectResponse,
 } from "../models/Project";
 
 export class ProjectService {
@@ -103,6 +104,50 @@ export class ProjectService {
       },
       orderBy: { updatedAt: "desc" },
     });
+  }
+
+  async getPublishedProjectsWithPagination(
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{
+    projects: PublishedProjectResponse[];
+    total: number;
+    hasMore: boolean;
+  }> {
+    const skip = (page - 1) * limit;
+
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where: { isPublished: true },
+        select: {
+          id: true,
+          name: true,
+          language: true,
+          isPublished: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: { updatedAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.project.count({
+        where: { isPublished: true },
+      }),
+    ]);
+
+    return {
+      projects: projects as PublishedProjectResponse[],
+      total,
+      hasMore: skip + limit < total,
+    };
   }
 
   async publishProject(

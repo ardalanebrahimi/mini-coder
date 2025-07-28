@@ -150,6 +150,41 @@ export class ProjectService {
     };
   }
 
+  async getPublicProjectById(
+    id: number
+  ): Promise<PublishedProjectResponse | null> {
+    const project = await prisma.project.findFirst({
+      where: {
+        id,
+        isPublished: true, // Only return if published
+      },
+      select: {
+        id: true,
+        name: true,
+        language: true,
+        code: true,
+        command: true,
+        isPublished: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!project) return null;
+
+    return {
+      ...project,
+      command: project.command ?? "",
+    } as PublishedProjectResponse;
+  }
+
   async publishProject(
     id: number,
     userId: number

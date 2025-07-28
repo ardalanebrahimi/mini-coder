@@ -53,7 +53,9 @@ export interface ProjectListResponse {
 export interface PublishedProjectResponse {
   id: number;
   name: string;
+  command?: string;
   language: string;
+  code?: string; // Optional, only included when getting individual project details
   isPublished: boolean;
   publishedAt?: Date;
   createdAt: Date;

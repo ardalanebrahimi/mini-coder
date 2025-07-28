@@ -8,6 +8,7 @@ import {
   deleteProject,
   getPublishedProjects,
   getAppStoreProjects,
+  getPublicProject,
   publishProject,
   unpublishProject,
 } from "../controllers/projectController";
@@ -17,6 +18,7 @@ const router: Router = Router();
 // Public routes
 router.get("/published", getPublishedProjects);
 router.get("/app-store", getAppStoreProjects);
+router.get("/public/:id", getPublicProject);
 
 // Protected routes (require authentication)
 router.use(authenticateJWT);

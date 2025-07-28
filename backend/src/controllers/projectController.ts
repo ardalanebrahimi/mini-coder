@@ -446,6 +446,50 @@ export const getAppStoreProjects = asyncHandler(
 
 /**
  * @swagger
+ * /api/v1/projects/public/{id}:
+ *   get:
+ *     summary: Get a public project by ID (for trying/previewing)
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Project ID
+ *     responses:
+ *       200:
+ *         description: Public project details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PublishedProjectResponse'
+ *       404:
+ *         description: Project not found or not published
+ *       403:
+ *         description: Project is private
+ */
+export const getPublicProject = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const id = parseInt(req.params["id"] as string);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid project ID" });
+    }
+
+    const project = await projectService.getPublicProjectById(id);
+
+    if (!project) {
+      return res
+        .status(404)
+        .json({ error: "Project not found or not published" });
+    }
+
+    return res.json(project);
+  }
+);
+
+/**
+ * @swagger
  * /api/v1/projects/{id}/publish:
  *   post:
  *     summary: Publish a project to the app store

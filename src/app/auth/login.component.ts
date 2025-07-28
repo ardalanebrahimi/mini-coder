@@ -27,7 +27,7 @@ export class LoginComponent {
     private router: Router
   ) {
     this.loginForm = this.fb.group({
-      email: ["", [Validators.required, Validators.email]],
+      loginField: ["", [Validators.required]],
       password: ["", [Validators.required, Validators.minLength(6)]],
     });
   }
@@ -52,8 +52,8 @@ export class LoginComponent {
     }
   }
 
-  get email() {
-    return this.loginForm.get("email");
+  get loginField() {
+    return this.loginForm.get("loginField");
   }
   get password() {
     return this.loginForm.get("password");

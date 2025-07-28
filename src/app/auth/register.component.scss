@@ -52,8 +52,18 @@
   border-color: #dc3545;
 }
 
+.form-control.is-valid {
+  border-color: #28a745;
+}
+
 .invalid-feedback {
   color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.valid-feedback {
+  color: #28a745;
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }

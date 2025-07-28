@@ -20,6 +20,8 @@ export class RegisterComponent {
   registerForm: FormGroup;
   loading = false;
   error = "";
+  usernameChecked = false;
+  emailChecked = false;
 
   constructor(
     private fb: FormBuilder,
@@ -28,6 +30,15 @@ export class RegisterComponent {
   ) {
     this.registerForm = this.fb.group(
       {
+        username: [
+          "",
+          [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(20),
+            Validators.pattern(/^[a-zA-Z0-9_]+$/),
+          ],
+        ],
         name: ["", [Validators.required, Validators.minLength(2)]],
         email: ["", [Validators.required, Validators.email]],
         password: ["", [Validators.required, Validators.minLength(6)]],
@@ -53,6 +64,48 @@ export class RegisterComponent {
     return null;
   }
 
+  checkUsernameAvailability(): void {
+    const usernameControl = this.registerForm.get("username");
+    if (usernameControl?.valid && usernameControl.value) {
+      this.authService
+        .checkAvailability({ username: usernameControl.value })
+        .subscribe({
+          next: (response) => {
+            if (response.usernameAvailable === false) {
+              usernameControl.setErrors({ unavailable: true });
+              this.usernameChecked = false;
+            } else {
+              this.usernameChecked = true;
+            }
+          },
+          error: () => {
+            this.usernameChecked = false;
+          },
+        });
+    }
+  }
+
+  checkEmailAvailability(): void {
+    const emailControl = this.registerForm.get("email");
+    if (emailControl?.valid && emailControl.value) {
+      this.authService
+        .checkAvailability({ email: emailControl.value })
+        .subscribe({
+          next: (response) => {
+            if (response.emailAvailable === false) {
+              emailControl.setErrors({ unavailable: true });
+              this.emailChecked = false;
+            } else {
+              this.emailChecked = true;
+            }
+          },
+          error: () => {
+            this.emailChecked = false;
+          },
+        });
+    }
+  }
+
   onSubmit(): void {
     if (this.registerForm.valid) {
       this.loading = true;
@@ -75,6 +128,9 @@ export class RegisterComponent {
     }
   }
 
+  get username() {
+    return this.registerForm.get("username");
+  }
   get name() {
     return this.registerForm.get("name");
   }

@@ -4,11 +4,12 @@ import { BehaviorSubject, Observable, tap } from "rxjs";
 import { environment } from "../../environments/environment";
 
 interface LoginRequest {
-  email: string;
+  loginField: string; // Can be email or username
   password: string;
 }
 
 interface RegisterRequest {
+  username: string;
   email: string;
   password: string;
   name: string;
@@ -18,9 +19,20 @@ interface AuthResponse {
   token: string;
   user: {
     id: string;
+    username: string;
     email: string;
     name: string;
   };
+}
+
+interface AvailabilityRequest {
+  username?: string;
+  email?: string;
+}
+
+interface AvailabilityResponse {
+  usernameAvailable?: boolean;
+  emailAvailable?: boolean;
 }
 
 @Injectable({
@@ -60,6 +72,15 @@ export class AuthService {
           this.currentUserSubject.next(response.user);
         })
       );
+  }
+
+  checkAvailability(
+    data: AvailabilityRequest
+  ): Observable<AvailabilityResponse> {
+    return this.http.post<AvailabilityResponse>(
+      `${this.apiUrl}/check-availability`,
+      data
+    );
   }
 
   logout(): void {

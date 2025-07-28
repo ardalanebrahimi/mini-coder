@@ -31,7 +31,7 @@ import { TranslationService } from "../services/translation.service";
               <input
                 type="email"
                 id="email"
-                [(ngModel)]="credentials.email"
+                [(ngModel)]="credentials.loginField"
                 name="email"
                 required
                 [placeholder]="t('emailPlaceholder')"
@@ -58,7 +58,7 @@ import { TranslationService } from "../services/translation.service";
               type="submit"
               class="submit-btn"
               [disabled]="
-                isLoading || !credentials.email || !credentials.password
+                isLoading || !credentials.loginField || !credentials.password
               "
             >
               <span *ngIf="!isLoading">{{ t("login") }}</span>
@@ -352,11 +352,12 @@ export class AuthModalComponent implements OnInit {
   error = "";
 
   credentials = {
-    email: "",
+    loginField: "",
     password: "",
   };
 
   registerData = {
+    username: "",
     name: "",
     email: "",
     password: "",
@@ -398,7 +399,7 @@ export class AuthModalComponent implements OnInit {
   }
 
   onLogin(): void {
-    if (!this.credentials.email || !this.credentials.password) {
+    if (!this.credentials.loginField || !this.credentials.password) {
       this.error = this.t("fillAllFields");
       return;
     }
@@ -446,8 +447,8 @@ export class AuthModalComponent implements OnInit {
   }
 
   private resetForms(): void {
-    this.credentials = { email: "", password: "" };
-    this.registerData = { name: "", email: "", password: "" };
+    this.credentials = { loginField: "", password: "" };
+    this.registerData = { username: "", name: "", email: "", password: "" };
     this.error = "";
     this.isLoading = false;
     this.isLogin = true;

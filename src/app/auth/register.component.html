@@ -4,6 +4,39 @@
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
+        <label for="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          [class.is-invalid]="username?.invalid && username?.touched"
+          (blur)="checkUsernameAvailability()"
+        />
+        <div
+          *ngIf="username?.invalid && username?.touched"
+          class="invalid-feedback"
+        >
+          <div *ngIf="username?.errors?.['required']">Username is required</div>
+          <div *ngIf="username?.errors?.['minlength']">
+            Username must be at least 3 characters
+          </div>
+          <div *ngIf="username?.errors?.['maxlength']">
+            Username must be at most 20 characters
+          </div>
+          <div *ngIf="username?.errors?.['pattern']">
+            Username can only contain letters, numbers, and underscores
+          </div>
+          <div *ngIf="username?.errors?.['unavailable']">
+            Username is already taken
+          </div>
+        </div>
+        <div *ngIf="username?.valid && usernameChecked" class="valid-feedback">
+          Username is available
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="name">Name:</label>
         <input
           type="text"
@@ -28,10 +61,17 @@
           formControlName="email"
           class="form-control"
           [class.is-invalid]="email?.invalid && email?.touched"
+          (blur)="checkEmailAvailability()"
         />
         <div *ngIf="email?.invalid && email?.touched" class="invalid-feedback">
           <div *ngIf="email?.errors?.['required']">Email is required</div>
           <div *ngIf="email?.errors?.['email']">Please enter a valid email</div>
+          <div *ngIf="email?.errors?.['unavailable']">
+            Email is already registered
+          </div>
+        </div>
+        <div *ngIf="email?.valid && emailChecked" class="valid-feedback">
+          Email is available
         </div>
       </div>
 

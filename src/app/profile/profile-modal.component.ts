@@ -1,13 +1,17 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ProfileComponent } from './profile.component';
+import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ProfileComponent } from "./profile.component";
 
 @Component({
-  selector: 'app-profile-modal',
+  selector: "app-profile-modal",
   standalone: true,
   imports: [CommonModule, ProfileComponent],
   template: `
-    <div class="profile-modal-overlay" *ngIf="isOpen" (click)="onOverlayClick($event)">
+    <div
+      class="profile-modal-overlay"
+      *ngIf="isOpen"
+      (click)="onOverlayClick($event)"
+    >
       <div class="profile-modal-content" (click)="$event.stopPropagation()">
         <div class="profile-modal-header">
           <button class="close-button" (click)="onClose()" type="button">
@@ -18,7 +22,7 @@ import { ProfileComponent } from './profile.component';
       </div>
     </div>
   `,
-  styleUrls: ['./profile-modal.component.scss']
+  styleUrls: ["./profile-modal.component.scss"],
 })
 export class ProfileModalComponent {
   @Input() isOpen = false;

@@ -378,14 +378,18 @@ export const updateProfile = asyncHandler(
 
     // Validate inputs
     if (!username && !email && !name && !newPassword) {
-      return res.status(400).json({ error: "At least one field must be provided for update" });
+      return res
+        .status(400)
+        .json({ error: "At least one field must be provided for update" });
     }
 
     // Validate email format if provided
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: "Please provide a valid email address" });
+        return res
+          .status(400)
+          .json({ error: "Please provide a valid email address" });
       }
     }
 
@@ -394,7 +398,8 @@ export const updateProfile = asyncHandler(
       const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
       if (!usernameRegex.test(username)) {
         return res.status(400).json({
-          error: "Username must be 3-20 characters long and contain only letters, numbers, and underscores",
+          error:
+            "Username must be 3-20 characters long and contain only letters, numbers, and underscores",
         });
       }
     }
@@ -402,11 +407,15 @@ export const updateProfile = asyncHandler(
     // Validate password change
     if (newPassword) {
       if (!currentPassword) {
-        return res.status(400).json({ error: "Current password is required to change password" });
+        return res
+          .status(400)
+          .json({ error: "Current password is required to change password" });
       }
 
       if (newPassword.length < 6) {
-        return res.status(400).json({ error: "New password must be at least 6 characters long" });
+        return res
+          .status(400)
+          .json({ error: "New password must be at least 6 characters long" });
       }
     }
 

@@ -181,13 +181,22 @@ export class AuthService {
     return result;
   }
 
-  async updateProfile(userId: number, data: {
-    username?: string;
-    email?: string;
-    name?: string;
-    currentPassword?: string;
-    newPassword?: string;
-  }): Promise<{ id: number; username: string; email: string; name: string | null; tokens: number }> {
+  async updateProfile(
+    userId: number,
+    data: {
+      username?: string;
+      email?: string;
+      name?: string;
+      currentPassword?: string;
+      newPassword?: string;
+    }
+  ): Promise<{
+    id: number;
+    username: string;
+    email: string;
+    name: string | null;
+    tokens: number;
+  }> {
     const { username, email, name, currentPassword, newPassword } = data;
 
     // Get current user for validation
@@ -205,7 +214,10 @@ export class AuthService {
         throw new Error("Current password is required to change password");
       }
 
-      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, currentUser.passwordHash);
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        currentUser.passwordHash
+      );
       if (!isCurrentPasswordValid) {
         throw new Error("Invalid current password");
       }

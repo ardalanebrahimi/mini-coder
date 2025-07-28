@@ -114,19 +114,21 @@ export class AuthService {
 
   getProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.apiUrl}/profile`, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
   }
 
   updateProfile(data: UpdateProfileRequest): Observable<UpdateProfileResponse> {
-    return this.http.patch<UpdateProfileResponse>(`${this.apiUrl}/profile`, data, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      tap((response) => {
-        // Update current user data
-        this.currentUserSubject.next(response.user);
+    return this.http
+      .patch<UpdateProfileResponse>(`${this.apiUrl}/profile`, data, {
+        headers: this.getAuthHeaders(),
       })
-    );
+      .pipe(
+        tap((response) => {
+          // Update current user data
+          this.currentUserSubject.next(response.user);
+        })
+      );
   }
 
   logout(): void {
@@ -145,6 +147,6 @@ export class AuthService {
 
   private getAuthHeaders(): { [key: string]: string } {
     const token = this.getToken();
-    return token ? { 'Authorization': `Bearer ${token}` } : {};
+    return token ? { Authorization: `Bearer ${token}` } : {};
   }
 }

@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, Output, EventEmitter } from "@angular/core";
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  Output,
+  EventEmitter,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { Subject, takeUntil } from "rxjs";

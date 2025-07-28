@@ -49,11 +49,19 @@
           <span class="user-greeting">{{ t("welcome") || "Welcome" }}</span>
         </div>
         <div class="user-actions">
-          <button class="user-action-btn" (click)="openProfile()" title="{{ t('profile') || 'Profile' }}">
+          <button
+            class="user-action-btn"
+            (click)="openProfile()"
+            title="{{ t('profile') || 'Profile' }}"
+          >
             <span class="emoji">⚙️</span>
             {{ t("profile") || "Profile" }}
           </button>
-          <button class="user-action-btn logout" (click)="logout()" title="{{ t('logout') || 'Logout' }}">
+          <button
+            class="user-action-btn logout"
+            (click)="logout()"
+            title="{{ t('logout') || 'Logout' }}"
+          >
             <span class="emoji">🚪</span>
             {{ t("logout") || "Logout" }}
           </button>

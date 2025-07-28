@@ -1,10 +1,10 @@
-@import '../shared/modal-styles.scss';
+@import "../shared/modal-styles.scss";
 
 .profile-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .profile-header {
@@ -31,7 +31,7 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  
+
   .loading-spinner {
     width: 40px;
     height: 40px;
@@ -49,8 +49,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .profile-content {
@@ -122,7 +126,8 @@
     font-size: 0.95rem;
   }
 
-  input, select {
+  input,
+  select {
     width: 100%;
     padding: 0.75rem;
     border: 2px solid #e9ecef;
@@ -155,7 +160,7 @@
 
   select {
     cursor: pointer;
-    
+
     &:disabled {
       background-color: #f8f9fa;
       cursor: not-allowed;
@@ -314,7 +319,8 @@
       color: #e9ecef;
     }
 
-    input, select {
+    input,
+    select {
       background-color: #4a5568;
       border-color: #718096;
       color: #e9ecef;

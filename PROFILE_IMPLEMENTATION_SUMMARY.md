@@ -5,12 +5,14 @@
 ### Backend Implementation
 
 #### API Endpoints Added:
+
 - **GET /profile** - Get user profile information (protected)
 - **PATCH /profile** - Update user profile information (protected)
 - **GET /auth/profile** - Alternative profile endpoint (protected)
 - **PATCH /auth/profile** - Alternative profile update endpoint (protected)
 
 #### Backend Features:
+
 - ✅ **Profile Retrieval**: Returns username, email, name, tokens, creation date, and last updated date
 - ✅ **Profile Updates**: Allows changing username, email, name, and password
 - ✅ **Password Validation**: Requires current password to change password
@@ -22,11 +24,13 @@
 ### Frontend Implementation
 
 #### Components Created:
+
 - **ProfileComponent**: Main profile management component
 - **ProfileModalComponent**: Modal wrapper for profile component
 - **ProfileService**: Service for managing profile modal state
 
 #### Frontend Features:
+
 - ✅ **Profile Viewing**: Display current user information
 - ✅ **Profile Editing**: Edit username, email, and display name
 - ✅ **Password Change**: Secure password change with validation
@@ -42,24 +46,26 @@
 ### Backend Architecture
 
 #### New Files Created:
+
 - Updated `src/controllers/authController.ts` - Added profile endpoints
 - Updated `src/services/authService.ts` - Added profile update methods
 - Updated `src/routes/authRoutes.ts` - Added profile routes
 - Updated `src/index.ts` - Added direct profile routes
 
 #### New Methods:
+
 ```typescript
 // Controller Methods
-- getProfile()
-- updateProfile()
-
-// Service Methods  
-- updateProfile(userId, data)
+-getProfile() -
+  updateProfile() -
+  // Service Methods
+  updateProfile(userId, data);
 ```
 
 #### API Response Examples:
 
 **GET /profile**
+
 ```json
 {
   "id": 1,
@@ -73,6 +79,7 @@
 ```
 
 **PATCH /profile**
+
 ```json
 {
   "message": "Profile updated successfully",
@@ -89,6 +96,7 @@
 ### Frontend Architecture
 
 #### New Files Created:
+
 - `src/app/profile/profile.component.ts` - Main profile component
 - `src/app/profile/profile.component.html` - Profile template
 - `src/app/profile/profile.component.scss` - Profile styles
@@ -98,6 +106,7 @@
 - `src/app/services/profile.service.ts` - Profile state management
 
 #### Updated Files:
+
 - `src/app/services/auth.service.ts` - Added profile API methods
 - `src/app/app.component.ts` - Added profile modal integration
 - `src/app/app.component.html` - Added profile modal to template
@@ -109,18 +118,21 @@
 ## 🎨 **User Interface Features**
 
 ### Profile Modal
+
 - **Clean Design**: Modern card-based layout
 - **Responsive**: Works on all screen sizes
 - **Accessibility**: Proper labels and error messages
 - **Animations**: Smooth transitions and hover effects
 
 ### User Menu in Toolbox
+
 - **Profile Access**: Quick access to profile settings
 - **Logout Option**: Easy logout functionality
 - **Visual Design**: Gradient background with icons
 - **Mobile Friendly**: Responsive button layout
 
 ### Form Validation
+
 - **Real-time Validation**: Immediate feedback on input
 - **Error Messages**: Clear, helpful error messages
 - **Password Matching**: Confirms password changes
@@ -129,6 +141,7 @@
 ## 🚀 **Usage Guide**
 
 ### Accessing Profile
+
 1. **From Toolbox**: Open toolbox sidebar → Click "Profile" button
 2. **When Logged In**: Profile button appears in user menu
 3. **Authentication Required**: Redirects to login if not authenticated
@@ -136,12 +149,14 @@
 ### Profile Operations
 
 #### Editing Profile Information:
+
 1. Click "Edit" button in profile modal
 2. Modify username, email, or display name
 3. Click "Save Changes" to update
 4. Success/error message displays
 
 #### Changing Password:
+
 1. Click "Change Password" button
 2. Enter current password
 3. Enter and confirm new password
@@ -149,6 +164,7 @@
 5. Password change confirmation
 
 #### Changing Language:
+
 1. Use language dropdown in profile
 2. Interface immediately updates
 3. Setting persists across sessions
@@ -156,6 +172,7 @@
 ## 🔒 **Security Features**
 
 ### Backend Security:
+
 - **JWT Authentication**: All endpoints require valid token
 - **Password Hashing**: bcrypt with 12 salt rounds
 - **Input Validation**: Server-side validation for all inputs
@@ -163,6 +180,7 @@
 - **Current Password Required**: For password changes
 
 ### Frontend Security:
+
 - **Token Management**: Secure token storage and transmission
 - **Input Sanitization**: Prevents XSS attacks
 - **Form Validation**: Client-side validation for better UX
@@ -171,11 +189,13 @@
 ## 🧪 **Testing**
 
 ### Backend Testing:
+
 - Use the included `test-profile-api.html` file
 - Test all endpoints with curl or Postman
 - Verify authentication and validation
 
 ### Frontend Testing:
+
 1. Register/login as a user
 2. Open toolbox and click profile
 3. Test editing profile information
@@ -185,12 +205,14 @@
 ## 📱 **Responsive Design**
 
 ### Mobile Optimization:
+
 - **Modal Layout**: Full-screen on mobile devices
 - **Touch-Friendly**: Large buttons and touch targets
 - **Readable Text**: Appropriate font sizes
 - **Accessible Forms**: Easy input on mobile keyboards
 
 ### Desktop Features:
+
 - **Modal Overlay**: Professional overlay design
 - **Hover Effects**: Interactive button states
 - **Grid Layout**: Organized form layout
@@ -199,6 +221,7 @@
 ## 🔮 **Future Enhancements**
 
 ### Potential Additions:
+
 - **Avatar Upload**: Profile picture functionality
 - **Two-Factor Authentication**: Enhanced security
 - **Account Deletion**: Self-service account removal

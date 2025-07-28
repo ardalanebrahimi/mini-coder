@@ -90,7 +90,8 @@ export class TranslationService {
       "profile.currentPassword": "Current Password",
       "profile.currentPasswordPlaceholder": "Enter your current password",
       "profile.newPassword": "New Password",
-      "profile.newPasswordPlaceholder": "Enter your new password (min 6 characters)",
+      "profile.newPasswordPlaceholder":
+        "Enter your new password (min 6 characters)",
       "profile.confirmPassword": "Confirm New Password",
       "profile.confirmPasswordPlaceholder": "Confirm your new password",
       "profile.updatePassword": "Update Password",
@@ -162,7 +163,8 @@ export class TranslationService {
       welcome: "Willkommen",
       logout: "Abmelden",
       "profile.title": "Profil",
-      "profile.subtitle": "Verwalten Sie Ihre Kontoeinstellungen und Präferenzen",
+      "profile.subtitle":
+        "Verwalten Sie Ihre Kontoeinstellungen und Präferenzen",
       "profile.userInfo": "Benutzerinformationen",
       "profile.username": "Benutzername",
       "profile.email": "E-Mail",
@@ -177,9 +179,11 @@ export class TranslationService {
       "profile.security": "Sicherheit",
       "profile.changePassword": "Passwort ändern",
       "profile.currentPassword": "Aktuelles Passwort",
-      "profile.currentPasswordPlaceholder": "Geben Sie Ihr aktuelles Passwort ein",
+      "profile.currentPasswordPlaceholder":
+        "Geben Sie Ihr aktuelles Passwort ein",
       "profile.newPassword": "Neues Passwort",
-      "profile.newPasswordPlaceholder": "Geben Sie Ihr neues Passwort ein (mind. 6 Zeichen)",
+      "profile.newPasswordPlaceholder":
+        "Geben Sie Ihr neues Passwort ein (mind. 6 Zeichen)",
       "profile.confirmPassword": "Neues Passwort bestätigen",
       "profile.confirmPasswordPlaceholder": "Bestätigen Sie Ihr neues Passwort",
       "profile.updatePassword": "Passwort aktualisieren",

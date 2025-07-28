@@ -1,8 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
-import { TranslationService } from '../services/translation.service';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
+import { AuthService } from "../services/auth.service";
+import { TranslationService } from "../services/translation.service";
 
 interface UserProfile {
   id: number;
@@ -15,11 +20,11 @@ interface UserProfile {
 }
 
 @Component({
-  selector: 'app-profile',
+  selector: "app-profile",
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  templateUrl: "./profile.component.html",
+  styleUrls: ["./profile.component.scss"],
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
@@ -28,8 +33,8 @@ export class ProfileComponent implements OnInit {
   isEditing = false;
   isChangingPassword = false;
   userProfile: UserProfile | null = null;
-  message = '';
-  errorMessage = '';
+  message = "";
+  errorMessage = "";
 
   constructor(
     private fb: FormBuilder,
@@ -37,16 +42,22 @@ export class ProfileComponent implements OnInit {
     private translationService: TranslationService
   ) {
     this.profileForm = this.fb.group({
-      username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]{3,20}$/)]],
-      email: ['', [Validators.required, Validators.email]],
-      name: ['']
+      username: [
+        "",
+        [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]{3,20}$/)],
+      ],
+      email: ["", [Validators.required, Validators.email]],
+      name: [""],
     });
 
-    this.passwordForm = this.fb.group({
-      currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validator: this.passwordMatchValidator });
+    this.passwordForm = this.fb.group(
+      {
+        currentPassword: ["", [Validators.required]],
+        newPassword: ["", [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ["", [Validators.required]],
+      },
+      { validator: this.passwordMatchValidator }
+    );
   }
 
   ngOnInit(): void {
@@ -54,15 +65,19 @@ export class ProfileComponent implements OnInit {
   }
 
   private passwordMatchValidator(form: FormGroup) {
-    const newPassword = form.get('newPassword');
-    const confirmPassword = form.get('confirmPassword');
-    
-    if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
+    const newPassword = form.get("newPassword");
+    const confirmPassword = form.get("confirmPassword");
+
+    if (
+      newPassword &&
+      confirmPassword &&
+      newPassword.value !== confirmPassword.value
+    ) {
       confirmPassword.setErrors({ passwordMismatch: true });
-    } else if (confirmPassword?.hasError('passwordMismatch')) {
+    } else if (confirmPassword?.hasError("passwordMismatch")) {
       confirmPassword.setErrors(null);
     }
-    
+
     return null;
   }
 
@@ -74,15 +89,15 @@ export class ProfileComponent implements OnInit {
         this.profileForm.patchValue({
           username: profile.username,
           email: profile.email,
-          name: profile.name || ''
+          name: profile.name || "",
         });
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading profile:', error);
-        this.errorMessage = 'Failed to load profile information';
+        console.error("Error loading profile:", error);
+        this.errorMessage = "Failed to load profile information";
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -93,13 +108,13 @@ export class ProfileComponent implements OnInit {
         this.profileForm.patchValue({
           username: this.userProfile.username,
           email: this.userProfile.email,
-          name: this.userProfile.name || ''
+          name: this.userProfile.name || "",
         });
       }
     }
     this.isEditing = !this.isEditing;
-    this.message = '';
-    this.errorMessage = '';
+    this.message = "";
+    this.errorMessage = "";
   }
 
   saveProfile(): void {
@@ -116,17 +131,17 @@ export class ProfileComponent implements OnInit {
         this.message = response.message;
         this.userProfile = {
           ...this.userProfile!,
-          ...response.user
+          ...response.user,
         };
         this.isEditing = false;
         this.isLoading = false;
-        this.errorMessage = '';
+        this.errorMessage = "";
       },
       error: (error) => {
-        console.error('Error updating profile:', error);
-        this.errorMessage = error.error?.error || 'Failed to update profile';
+        console.error("Error updating profile:", error);
+        this.errorMessage = error.error?.error || "Failed to update profile";
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -135,8 +150,8 @@ export class ProfileComponent implements OnInit {
     if (!this.isChangingPassword) {
       this.passwordForm.reset();
     }
-    this.message = '';
-    this.errorMessage = '';
+    this.message = "";
+    this.errorMessage = "";
   }
 
   changePassword(): void {
@@ -150,22 +165,22 @@ export class ProfileComponent implements OnInit {
 
     this.authService.updateProfile({ currentPassword, newPassword }).subscribe({
       next: (response) => {
-        this.message = 'Password changed successfully';
+        this.message = "Password changed successfully";
         this.passwordForm.reset();
         this.isChangingPassword = false;
         this.isLoading = false;
-        this.errorMessage = '';
+        this.errorMessage = "";
       },
       error: (error) => {
-        console.error('Error changing password:', error);
-        this.errorMessage = error.error?.error || 'Failed to change password';
+        console.error("Error changing password:", error);
+        this.errorMessage = error.error?.error || "Failed to change password";
         this.isLoading = false;
-      }
+      },
     });
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
+    Object.keys(formGroup.controls).forEach((key) => {
       const control = formGroup.get(key);
       control?.markAsTouched();
     });
@@ -174,23 +189,23 @@ export class ProfileComponent implements OnInit {
   getFieldError(formGroup: FormGroup, fieldName: string): string {
     const field = formGroup.get(fieldName);
     if (field?.touched && field?.errors) {
-      if (field.errors['required']) {
+      if (field.errors["required"]) {
         return `${this.capitalizeFirst(fieldName)} is required`;
       }
-      if (field.errors['email']) {
-        return 'Please enter a valid email address';
+      if (field.errors["email"]) {
+        return "Please enter a valid email address";
       }
-      if (field.errors['pattern']) {
-        return 'Username must be 3-20 characters long and contain only letters, numbers, and underscores';
+      if (field.errors["pattern"]) {
+        return "Username must be 3-20 characters long and contain only letters, numbers, and underscores";
       }
-      if (field.errors['minlength']) {
-        return 'Password must be at least 6 characters long';
+      if (field.errors["minlength"]) {
+        return "Password must be at least 6 characters long";
       }
-      if (field.errors['passwordMismatch']) {
-        return 'Passwords do not match';
+      if (field.errors["passwordMismatch"]) {
+        return "Passwords do not match";
       }
     }
-    return '';
+    return "";
   }
 
   private capitalizeFirst(str: string): string {

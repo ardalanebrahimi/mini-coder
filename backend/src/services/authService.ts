@@ -180,4 +180,83 @@ export class AuthService {
 
     return result;
   }
+
+  async updateProfile(userId: number, data: {
+    username?: string;
+    email?: string;
+    name?: string;
+    currentPassword?: string;
+    newPassword?: string;
+  }): Promise<{ id: number; username: string; email: string; name: string | null; tokens: number }> {
+    const { username, email, name, currentPassword, newPassword } = data;
+
+    // Get current user for validation
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!currentUser) {
+      throw new Error("User not found");
+    }
+
+    // Validate current password if changing password
+    if (newPassword) {
+      if (!currentPassword) {
+        throw new Error("Current password is required to change password");
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, currentUser.passwordHash);
+      if (!isCurrentPasswordValid) {
+        throw new Error("Invalid current password");
+      }
+    }
+
+    // Check for uniqueness if username or email is being changed
+    if (username && username !== currentUser.username) {
+      const existingUserByUsername = await prisma.user.findUnique({
+        where: { username },
+      });
+
+      if (existingUserByUsername) {
+        throw new Error("User with this username already exists");
+      }
+    }
+
+    if (email && email !== currentUser.email) {
+      const existingUserByEmail = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUserByEmail) {
+        throw new Error("User with this email already exists");
+      }
+    }
+
+    // Prepare update data
+    const updateData: any = {};
+
+    if (username !== undefined) updateData.username = username;
+    if (email !== undefined) updateData.email = email;
+    if (name !== undefined) updateData.name = name;
+
+    // Hash new password if provided
+    if (newPassword) {
+      updateData.passwordHash = await bcrypt.hash(newPassword, this.saltRounds);
+    }
+
+    // Update user
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        tokens: true,
+      },
+    });
+
+    return updatedUser;
+  }
 }

@@ -51,6 +51,17 @@ app.use("/me", authenticateJWT, (req, res, next) => {
   const { getCurrentUser } = require("./controllers/authController");
   getCurrentUser(req, res, next);
 });
+app.use("/profile", authenticateJWT, (req, res, next) => {
+  // Delegate to auth controller profile endpoints
+  const { getProfile, updateProfile } = require("./controllers/authController");
+  if (req.method === "GET") {
+    getProfile(req, res, next);
+  } else if (req.method === "PATCH") {
+    updateProfile(req, res, next);
+  } else {
+    res.status(405).json({ error: "Method not allowed" });
+  }
+});
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/tokens", tokenRoutes);

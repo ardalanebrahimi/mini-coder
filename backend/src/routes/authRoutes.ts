@@ -4,6 +4,8 @@ import {
   login,
   getCurrentUser,
   checkAvailability,
+  getProfile,
+  updateProfile,
 } from "../controllers/authController";
 import { authenticateJWT } from "../middleware/auth";
 
@@ -16,5 +18,7 @@ router.post("/check-availability", checkAvailability);
 
 // Protected routes
 router.get("/me", authenticateJWT, getCurrentUser);
+router.get("/profile", authenticateJWT, getProfile);
+router.patch("/profile", authenticateJWT, updateProfile);
 
 export default router;

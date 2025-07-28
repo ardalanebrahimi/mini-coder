@@ -255,3 +255,184 @@ export const checkAvailability = asyncHandler(
     return res.json(result);
   }
 );
+
+/**
+ * @swagger
+ * /profile:
+ *   get:
+ *     summary: Get user profile information
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 username:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 tokens:
+ *                   type: integer
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         description: Unauthorized
+ */
+export const getProfile = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const user = await authService.getCurrentUser(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Return user profile without password hash
+    const { passwordHash, ...profileData } = user;
+    return res.json(profileData);
+  }
+);
+
+/**
+ * @swagger
+ * /profile:
+ *   patch:
+ *     summary: Update user profile information
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: New username (optional)
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: New email (optional)
+ *               name:
+ *                 type: string
+ *                 description: New display name (optional)
+ *               currentPassword:
+ *                 type: string
+ *                 description: Current password (required when changing password)
+ *               newPassword:
+ *                 type: string
+ *                 minLength: 6
+ *                 description: New password (optional)
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     username:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     tokens:
+ *                       type: integer
+ *       400:
+ *         description: Invalid input or validation error
+ *       401:
+ *         description: Unauthorized
+ *       409:
+ *         description: Username or email already exists
+ */
+export const updateProfile = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const { username, email, name, currentPassword, newPassword } = req.body;
+
+    // Validate inputs
+    if (!username && !email && !name && !newPassword) {
+      return res.status(400).json({ error: "At least one field must be provided for update" });
+    }
+
+    // Validate email format if provided
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Please provide a valid email address" });
+      }
+    }
+
+    // Validate username format if provided
+    if (username) {
+      const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+      if (!usernameRegex.test(username)) {
+        return res.status(400).json({
+          error: "Username must be 3-20 characters long and contain only letters, numbers, and underscores",
+        });
+      }
+    }
+
+    // Validate password change
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ error: "Current password is required to change password" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "New password must be at least 6 characters long" });
+      }
+    }
+
+    try {
+      const result = await authService.updateProfile(req.user.id, {
+        username,
+        email,
+        name,
+        currentPassword,
+        newPassword,
+      });
+
+      return res.json({
+        message: "Profile updated successfully",
+        user: result,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes("already exists")) {
+          return res.status(409).json({ error: error.message });
+        }
+        if (error.message === "Invalid current password") {
+          return res.status(400).json({ error: error.message });
+        }
+      }
+      throw error;
+    }
+  }
+);

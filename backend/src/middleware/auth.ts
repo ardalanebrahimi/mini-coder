@@ -43,6 +43,7 @@ export const authenticateJWT = async (
       where: { id: decoded.userId },
       select: {
         id: true,
+        username: true,
         email: true,
         name: true,
         tokens: true,

@@ -55,7 +55,7 @@
 
     <!-- App Store View -->
     <div class="app-store-view" *ngIf="currentView === 'store'">
-      <app-app-store></app-app-store>
+      <app-app-store (tryProject)="onTryProject($event)"></app-app-store>
     </div>
   </main>
 

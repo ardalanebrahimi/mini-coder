@@ -9,10 +9,12 @@ import { franc } from "franc-min";
 import { environment } from "../../environments/environment";
 
 export interface ProcessedCommand {
+  userCommand?: string;
   detectedLanguage: string;
   generatedCode: string;
-  sanitizedCode: SafeHtml;
+  sanitizedCode?: SafeHtml;
   projectName: string;
+  isReadOnly?: boolean; // For App Store projects that can't be edited
 }
 
 @Injectable({

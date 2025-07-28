@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Subject, takeUntil } from "rxjs";
 import {
@@ -16,6 +22,8 @@ import {
 })
 export class AppStoreComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  @Output() tryProject = new EventEmitter<PublishedProject>();
 
   projects: PublishedProject[] = [];
   isLoading = false;
@@ -90,11 +98,23 @@ export class AppStoreComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Preview/run a project
+   * Try/preview a project
    */
-  previewProject(project: PublishedProject): void {
-    // TODO: Implement project preview/run functionality
-    console.log("Preview project:", project);
+  onTryProject(project: PublishedProject): void {
+    // Get the full project details including code
+    this.appStoreService
+      .getPublicProject(project.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (fullProject: PublishedProject) => {
+          // Emit event to parent component to load project for preview
+          this.tryProject.emit(fullProject);
+        },
+        error: (error: any) => {
+          console.error("Error loading project for preview:", error);
+          // Could show a toast notification here
+        },
+      });
   }
 
   /**

@@ -201,8 +201,7 @@ $shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
   display: flex;
   gap: 1rem;
 
-  .preview-btn,
-  .run-btn {
+  .try-btn {
     flex: 1;
     padding: 0.75rem 1rem;
     border: none;
@@ -214,20 +213,6 @@ $shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-  }
-
-  .preview-btn {
-    background: $background-light;
-    color: $text-dark;
-    border: 2px solid #e0e0e0;
-
-    &:hover {
-      background: #e0e0e0;
-      border-color: #ccc;
-    }
-  }
-
-  .run-btn {
     background: $primary-color;
     color: $white;
 

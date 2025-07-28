@@ -4,8 +4,11 @@
     <h3>
       <span class="emoji">📱</span>
       {{ t("livePreview") }}
+      <span *ngIf="isReadOnly" class="read-only-badge">{{
+        t("readOnly")
+      }}</span>
     </h3>
-    <div class="preview-actions">
+    <div class="preview-actions" *ngIf="!isReadOnly">
       <button class="action-btn modify" (click)="onModifyClick()">
         <span class="emoji">🔧</span>
         {{ t("modifyApp") }}

@@ -52,6 +52,13 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Check if current app is read-only (from App Store)
+   */
+  get isReadOnly(): boolean {
+    return this.previewData.currentApp?.isReadOnly === true;
+  }
+
+  /**
    * Handle modify button click
    */
   onModifyClick(): void {

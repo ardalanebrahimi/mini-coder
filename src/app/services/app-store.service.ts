@@ -6,7 +6,9 @@ import { environment } from "../../environments/environment";
 export interface PublishedProject {
   id: number;
   name: string;
+  command?: string;
   language: string;
+  code?: string; // Optional, only included when getting individual project details
   isPublished: boolean;
   publishedAt?: Date;
   createdAt: Date;
@@ -61,5 +63,21 @@ export class AppStoreService {
           })),
         }))
       );
+  }
+
+  /**
+   * Get a public project by ID for trying/previewing
+   */
+  getPublicProject(id: number): Observable<PublishedProject> {
+    return this.http.get<PublishedProject>(`${this.apiUrl}/public/${id}`).pipe(
+      map((project) => ({
+        ...project,
+        createdAt: new Date(project.createdAt),
+        updatedAt: new Date(project.updatedAt),
+        publishedAt: project.publishedAt
+          ? new Date(project.publishedAt)
+          : undefined,
+      }))
+    );
   }
 }

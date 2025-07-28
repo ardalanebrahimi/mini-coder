@@ -27,6 +27,16 @@
     align-items: center;
     gap: 0.5rem;
   }
+
+  .read-only-badge {
+    background: #f0f0f0;
+    color: #666;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: normal;
+    border: 1px solid #ddd;
+  }
 }
 
 .preview-actions {

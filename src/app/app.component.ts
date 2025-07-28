@@ -19,6 +19,7 @@ import { AuthModalComponent } from "./shared/auth-modal.component";
 import { ProfileModalComponent } from "./profile/profile-modal.component";
 import { AppStoreComponent } from "./app-store/app-store.component";
 import { ToolboxService } from "./services/toolbox.service";
+import { PublishedProject } from "./services/app-store.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
 import { CommandInputService } from "./services/command-input.service";
@@ -155,6 +156,56 @@ export class AppComponent implements OnInit, OnDestroy {
 
   switchToStore(): void {
     this.currentView = "store";
+  }
+
+  // Try project from App Store
+  onTryProject(project: PublishedProject): void {
+    if (!project.code) {
+      this.errorMessage = "❌ Unable to load project code.";
+      return;
+    }
+
+    // Create a ProcessedCommand-like object for the preview
+    this.currentApp = {
+      userCommand: `Try: ${project.name}`,
+      detectedLanguage: project.language,
+      generatedCode: project.code,
+      projectName: project.name,
+      isReadOnly: true, // Mark as read-only
+      sanitizedCode: this.sanitizer.bypassSecurityTrustHtml(project.code),
+    } as ProcessedCommand;
+
+    // Set preview HTML
+    this.previewHtml = project.code;
+
+    // Create blob URL for iframe
+    this.previewUrl = this.createBlobUrl(project.code);
+
+    // Sanitize the blob URL for Angular
+    this.safePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+      this.previewUrl
+    );
+
+    // Update the preview service
+    this.updatePreviewService();
+
+    // Switch to app view to show the preview
+    this.currentView = "app";
+
+    // Clear any existing error messages
+    this.errorMessage = "";
+
+    // Show success message
+    this.errorMessage = `✅ Trying "${project.name}" by ${
+      project.user.name || project.user.username
+    }`;
+
+    // Clear the success message after 3 seconds
+    setTimeout(() => {
+      if (this.errorMessage.startsWith("✅")) {
+        this.errorMessage = "";
+      }
+    }, 3000);
   }
 
   // Rebuild vs modify choice

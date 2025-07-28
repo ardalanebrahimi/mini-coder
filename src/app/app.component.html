@@ -1,29 +1,61 @@
 <div class="app-container">
+  <!-- Navigation Header -->
+  <header class="app-header">
+    <nav class="main-nav">
+      <button
+        class="nav-btn"
+        [class.active]="currentView === 'app'"
+        (click)="switchToApp()"
+      >
+        <span class="emoji">⚡</span>
+        App Creator
+      </button>
+      <button
+        class="nav-btn"
+        [class.active]="currentView === 'store'"
+        (click)="switchToStore()"
+      >
+        <span class="emoji">🏪</span>
+        App Store
+      </button>
+    </nav>
+  </header>
+
   <!-- Main Content -->
   <main class="main-content">
-    <!-- Input Section -->
-    <app-input-section></app-input-section>
+    <!-- App Creator View -->
+    <div class="app-creator-view" *ngIf="currentView === 'app'">
+      <!-- Input Section -->
+      <app-input-section></app-input-section>
 
-    <!-- Error/Success Display -->
-    <div
-      class="error-message"
-      [class.success]="errorMessage.startsWith('✅')"
-      *ngIf="errorMessage"
-    >
-      <span class="emoji">{{ errorMessage.startsWith("✅") ? "" : "❌" }}</span>
-      {{ errorMessage }}
+      <!-- Error/Success Display -->
+      <div
+        class="error-message"
+        [class.success]="errorMessage.startsWith('✅')"
+        *ngIf="errorMessage"
+      >
+        <span class="emoji">{{
+          errorMessage.startsWith("✅") ? "" : "❌"
+        }}</span>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Preview Section -->
+      <app-preview-section *ngIf="currentApp"></app-preview-section>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isProcessing">
+        <div class="loading-content">
+          <div class="loading-spinner"></div>
+          <p>Creating your awesome app...</p>
+          <p class="loading-subtext">This might take a few seconds ⏳</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Preview Section -->
-    <app-preview-section *ngIf="currentApp"></app-preview-section>
-
-    <!-- Loading State -->
-    <div class="loading-state" *ngIf="isProcessing">
-      <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <p>Creating your awesome app...</p>
-        <p class="loading-subtext">This might take a few seconds ⏳</p>
-      </div>
+    <!-- App Store View -->
+    <div class="app-store-view" *ngIf="currentView === 'store'">
+      <app-app-store></app-app-store>
     </div>
   </main>
 

@@ -1,0 +1,96 @@
+<div class="app-store-container">
+  <!-- Header -->
+  <div class="app-store-header">
+    <h2 class="store-title">
+      <span class="emoji">🏪</span>
+      App Store
+    </h2>
+    <p class="store-subtitle">Discover amazing apps created by the community</p>
+
+    <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">
+      <span class="emoji">{{ isLoading ? "⏳" : "🔄" }}</span>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Error message -->
+  <div class="error-message" *ngIf="error">
+    <span class="emoji">❌</span>
+    {{ error }}
+    <button class="retry-btn" (click)="refresh()">Try Again</button>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading-state" *ngIf="isLoading && projects.length === 0">
+    <span class="emoji">⏳</span>
+    <p>Loading amazing apps...</p>
+  </div>
+
+  <!-- Projects grid -->
+  <div class="projects-grid" *ngIf="!isLoading || projects.length > 0">
+    <div
+      class="project-card"
+      *ngFor="let project of projects; trackBy: trackByProjectId"
+    >
+      <div class="project-header">
+        <h3 class="project-name">{{ project.name }}</h3>
+        <span
+          class="language-badge"
+          [class]="'lang-' + project.language.toLowerCase()"
+        >
+          {{ project.language }}
+        </span>
+      </div>
+
+      <div class="project-meta">
+        <div class="creator-info">
+          <span class="emoji">👤</span>
+          <span class="creator-name">{{
+            project.user.name || project.user.username
+          }}</span>
+        </div>
+
+        <div class="publish-date">
+          <span class="emoji">📅</span>
+          <span>{{ project.updatedAt | date : "short" }}</span>
+        </div>
+      </div>
+
+      <div class="project-actions">
+        <button class="preview-btn" (click)="previewProject(project)">
+          <span class="emoji">👁️</span>
+          Preview
+        </button>
+
+        <button class="run-btn" (click)="previewProject(project)">
+          <span class="emoji">▶️</span>
+          Run
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="projects.length === 0 && !isLoading">
+      <span class="emoji">📱</span>
+      <h3>No apps published yet</h3>
+      <p>Be the first to publish an app to the store!</p>
+    </div>
+  </div>
+
+  <!-- Load more button -->
+  <div class="load-more-container" *ngIf="hasMore && projects.length > 0">
+    <button
+      class="load-more-btn"
+      (click)="loadMore()"
+      [disabled]="isLoadingMore"
+    >
+      <span class="emoji">{{ isLoadingMore ? "⏳" : "⬇️" }}</span>
+      {{ isLoadingMore ? "Loading..." : "Load More" }}
+    </button>
+  </div>
+
+  <!-- Stats footer -->
+  <div class="stats-footer" *ngIf="total > 0">
+    <p>Showing {{ projects.length }} of {{ total }} apps</p>
+  </div>
+</div>

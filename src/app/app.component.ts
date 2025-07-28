@@ -17,6 +17,7 @@ import { ModifyAppDialogComponent } from "./modify-app-dialog/modify-app-dialog.
 import { PreviewSectionComponent } from "./preview-section/preview-section.component";
 import { AuthModalComponent } from "./shared/auth-modal.component";
 import { ProfileModalComponent } from "./profile/profile-modal.component";
+import { AppStoreComponent } from "./app-store/app-store.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
@@ -51,6 +52,7 @@ import { PreviewSectionService } from "./services/preview-section.service";
     PreviewSectionComponent,
     AuthModalComponent,
     ProfileModalComponent,
+    AppStoreComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -87,6 +89,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Profile modal state
   showProfileModal = false;
+
+  // Navigation state
+  currentView: "app" | "store" = "app";
 
   /**
    * Check if user is authenticated
@@ -141,6 +146,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.safePreviewUrl = null;
     this.userCommand = "";
     this.errorMessage = "";
+  }
+
+  // Navigation methods
+  switchToApp(): void {
+    this.currentView = "app";
+  }
+
+  switchToStore(): void {
+    this.currentView = "store";
   }
 
   // Rebuild vs modify choice

@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Subject, takeUntil } from "rxjs";
 import {
@@ -107,25 +113,29 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
     }
 
     // Toggle star status
-    this.appStoreService.toggleStar(this.previewData.sourceProject.id).subscribe({
-      next: (response) => {
-        if (this.previewData.sourceProject) {
-          // Update the project's star information
-          this.previewData.sourceProject.starred = response.starred;
-          this.previewData.sourceProject.starCount = response.starCount;
-        }
-      },
-      error: (error) => {
-        console.error("Error toggling star:", error);
-      },
-    });
+    this.appStoreService
+      .toggleStar(this.previewData.sourceProject.id)
+      .subscribe({
+        next: (response) => {
+          if (this.previewData.sourceProject) {
+            // Update the project's star information
+            this.previewData.sourceProject.starred = response.starred;
+            this.previewData.sourceProject.starCount = response.starCount;
+          }
+        },
+        error: (error) => {
+          console.error("Error toggling star:", error);
+        },
+      });
   }
 
   /**
    * Show authentication modal
    */
   private showAuthModal(): void {
-    this.showAuthModalEvent.emit("Please log in or register to star apps from the App Store.");
+    this.showAuthModalEvent.emit(
+      "Please log in or register to star apps from the App Store."
+    );
   }
 
   /**

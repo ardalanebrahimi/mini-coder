@@ -41,9 +41,10 @@
       </div>
 
       <!-- Preview Section -->
-      <app-preview-section 
+      <app-preview-section
         *ngIf="currentApp"
-        (showAuthModalEvent)="showAuthModalWithMessage($event)">
+        (showAuthModalEvent)="showAuthModalWithMessage($event)"
+      >
       </app-preview-section>
 
       <!-- Loading State -->

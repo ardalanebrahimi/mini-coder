@@ -28,15 +28,26 @@
   <div class="app-store-info" *ngIf="isAppStorePreview()">
     <div class="project-info">
       <h4>{{ previewData.sourceProject?.name }}</h4>
-      <p class="author">by {{ (previewData.sourceProject?.user?.name || previewData.sourceProject?.user?.username) }}</p>
+      <p class="author">
+        by
+        {{
+          previewData.sourceProject?.user?.name ||
+            previewData.sourceProject?.user?.username
+        }}
+      </p>
     </div>
     <div class="star-section">
-      <button 
+      <button
         class="star-btn"
         [class.starred]="previewData.sourceProject?.starred"
-        (click)="onStarProject()">
-        <span class="star-icon">{{ previewData.sourceProject?.starred ? '⭐' : '☆' }}</span>
-        <span class="star-count">{{ previewData.sourceProject?.starCount || 0 }}</span>
+        (click)="onStarProject()"
+      >
+        <span class="star-icon">{{
+          previewData.sourceProject?.starred ? "⭐" : "☆"
+        }}</span>
+        <span class="star-count">{{
+          previewData.sourceProject?.starCount || 0
+        }}</span>
       </button>
     </div>
   </div>

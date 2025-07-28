@@ -67,14 +67,14 @@
           Try It
         </button>
 
-        <button 
+        <button
           class="star-btn"
           [class.starred]="project.starred"
           (click)="onStarProject(project)"
           [title]="project.starred ? 'Remove star' : 'Star this app'"
         >
-          <span class="emoji">{{ project.starred ? '⭐' : '☆' }}</span>
-          {{ project.starred ? 'Starred' : 'Star' }}
+          <span class="emoji">{{ project.starred ? "⭐" : "☆" }}</span>
+          {{ project.starred ? "Starred" : "Star" }}
         </button>
       </div>
     </div>

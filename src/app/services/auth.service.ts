@@ -35,6 +35,35 @@ interface AvailabilityResponse {
   emailAvailable?: boolean;
 }
 
+interface UpdateProfileRequest {
+  username?: string;
+  email?: string;
+  name?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}
+
+interface UpdateProfileResponse {
+  message: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    name: string;
+    tokens: number;
+  };
+}
+
+interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  name: string;
+  tokens: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 @Injectable({
   providedIn: "root",
 })
@@ -83,6 +112,23 @@ export class AuthService {
     );
   }
 
+  getProfile(): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${this.apiUrl}/profile`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  updateProfile(data: UpdateProfileRequest): Observable<UpdateProfileResponse> {
+    return this.http.patch<UpdateProfileResponse>(`${this.apiUrl}/profile`, data, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap((response) => {
+        // Update current user data
+        this.currentUserSubject.next(response.user);
+      })
+    );
+  }
+
   logout(): void {
     localStorage.removeItem("token");
     this.currentUserSubject.next(null);
@@ -95,5 +141,10 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem("token");
+  }
+
+  private getAuthHeaders(): { [key: string]: string } {
+    const token = this.getToken();
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
   }
 }

@@ -28,7 +28,10 @@
   </main>
 
   <!-- Toolbox Component -->
-  <app-toolbox></app-toolbox>
+  <app-toolbox 
+    (profileRequested)="showProfile()"
+    (logoutRequested)="handleLogout()"
+  ></app-toolbox>
 
   <!-- Save Dialog Component -->
   <app-save-dialog></app-save-dialog>
@@ -46,6 +49,12 @@
     (closeModal)="closeAuthModal()"
     (authSuccess)="onAuthSuccess($event)"
   ></app-auth-modal>
+
+  <!-- Profile Modal -->
+  <app-profile-modal
+    [isOpen]="showProfileModal"
+    (closeModal)="closeProfileModal()"
+  ></app-profile-modal>
 
   <!-- Overlay for toolbox -->
   <div class="overlay" *ngIf="showToolbox" (click)="toggleToolbox()"></div>

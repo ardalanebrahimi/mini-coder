@@ -1,0 +1,212 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>{{ translate('profile.title') || 'Profile' }}</h1>
+    <p>{{ translate('profile.subtitle') || 'Manage your account settings and preferences' }}</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>{{ translate('common.loading') || 'Loading...' }}</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div class="profile-content" *ngIf="!isLoading && userProfile">
+    
+    <!-- Success/Error Messages -->
+    <div class="message success" *ngIf="message">
+      <span class="emoji">✅</span>
+      {{ message }}
+    </div>
+    
+    <div class="message error" *ngIf="errorMessage">
+      <span class="emoji">❌</span>
+      {{ errorMessage }}
+    </div>
+
+    <!-- User Information Card -->
+    <div class="profile-card">
+      <h2>{{ translate('profile.userInfo') || 'User Information' }}</h2>
+      
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">{{ translate('profile.username') || 'Username' }}</label>
+            <input 
+              type="text" 
+              id="username" 
+              formControlName="username" 
+              [readonly]="!isEditing"
+              [class.readonly]="!isEditing"
+            />
+            <div class="error-message" *ngIf="getFieldError(profileForm, 'username')">
+              {{ getFieldError(profileForm, 'username') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">{{ translate('profile.email') || 'Email' }}</label>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email" 
+              [readonly]="!isEditing"
+              [class.readonly]="!isEditing"
+            />
+            <div class="error-message" *ngIf="getFieldError(profileForm, 'email')">
+              {{ getFieldError(profileForm, 'email') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="name">{{ translate('profile.displayName') || 'Display Name' }}</label>
+          <input 
+            type="text" 
+            id="name" 
+            formControlName="name" 
+            [readonly]="!isEditing"
+            [class.readonly]="!isEditing"
+            [placeholder]="translate('profile.displayNamePlaceholder') || 'Optional display name'"
+          />
+          <div class="error-message" *ngIf="getFieldError(profileForm, 'name')">
+            {{ getFieldError(profileForm, 'name') }}
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn secondary" 
+            (click)="toggleEdit()"
+            [disabled]="isLoading"
+          >
+            {{ isEditing ? (translate('common.cancel') || 'Cancel') : (translate('common.edit') || 'Edit') }}
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn primary" 
+            *ngIf="isEditing"
+            [disabled]="isLoading || profileForm.invalid"
+          >
+            {{ translate('common.save') || 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Account Details Card -->
+    <div class="profile-card">
+      <h2>{{ translate('profile.accountDetails') || 'Account Details' }}</h2>
+      
+      <div class="detail-row">
+        <span class="label">{{ translate('profile.tokens') || 'Tokens' }}:</span>
+        <span class="value">{{ userProfile.tokens }}</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="label">{{ translate('profile.memberSince') || 'Member Since' }}:</span>
+        <span class="value">{{ formatDate(userProfile.createdAt) }}</span>
+      </div>
+      
+      <div class="detail-row">
+        <span class="label">{{ translate('profile.lastUpdated') || 'Last Updated' }}:</span>
+        <span class="value">{{ formatDate(userProfile.updatedAt) }}</span>
+      </div>
+    </div>
+
+    <!-- Language Settings Card -->
+    <div class="profile-card">
+      <h2>{{ translate('profile.languageSettings') || 'Language Settings' }}</h2>
+      
+      <div class="form-group">
+        <label for="language">{{ translate('profile.language') || 'Interface Language' }}</label>
+        <select 
+          id="language" 
+          [value]="selectedLanguage" 
+          (change)="changeLanguage($any($event.target).value)"
+        >
+          <option 
+            *ngFor="let lang of availableLanguages" 
+            [value]="lang.code"
+          >
+            {{ lang.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Password Change Card -->
+    <div class="profile-card">
+      <h2>{{ translate('profile.security') || 'Security' }}</h2>
+      
+      <div class="password-section">
+        <button 
+          type="button" 
+          class="btn secondary" 
+          (click)="togglePasswordChange()"
+          [disabled]="isLoading"
+        >
+          {{ isChangingPassword ? (translate('common.cancel') || 'Cancel') : (translate('profile.changePassword') || 'Change Password') }}
+        </button>
+
+        <form 
+          [formGroup]="passwordForm" 
+          (ngSubmit)="changePassword()" 
+          *ngIf="isChangingPassword"
+          class="password-form"
+        >
+          <div class="form-group">
+            <label for="currentPassword">{{ translate('profile.currentPassword') || 'Current Password' }}</label>
+            <input 
+              type="password" 
+              id="currentPassword" 
+              formControlName="currentPassword"
+              [placeholder]="translate('profile.currentPasswordPlaceholder') || 'Enter your current password'"
+            />
+            <div class="error-message" *ngIf="getFieldError(passwordForm, 'currentPassword')">
+              {{ getFieldError(passwordForm, 'currentPassword') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">{{ translate('profile.newPassword') || 'New Password' }}</label>
+            <input 
+              type="password" 
+              id="newPassword" 
+              formControlName="newPassword"
+              [placeholder]="translate('profile.newPasswordPlaceholder') || 'Enter your new password (min 6 characters)'"
+            />
+            <div class="error-message" *ngIf="getFieldError(passwordForm, 'newPassword')">
+              {{ getFieldError(passwordForm, 'newPassword') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">{{ translate('profile.confirmPassword') || 'Confirm New Password' }}</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              formControlName="confirmPassword"
+              [placeholder]="translate('profile.confirmPasswordPlaceholder') || 'Confirm your new password'"
+            />
+            <div class="error-message" *ngIf="getFieldError(passwordForm, 'confirmPassword')">
+              {{ getFieldError(passwordForm, 'confirmPassword') }}
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn primary" 
+              [disabled]="isLoading || passwordForm.invalid"
+            >
+              {{ translate('profile.updatePassword') || 'Update Password' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

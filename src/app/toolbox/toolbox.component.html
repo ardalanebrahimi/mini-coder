@@ -42,6 +42,24 @@
 
     <!-- Authenticated State -->
     <div *ngIf="isAuthenticated">
+      <!-- User Menu -->
+      <div class="user-menu">
+        <div class="user-info">
+          <span class="emoji">👤</span>
+          <span class="user-greeting">{{ t("welcome") || "Welcome" }}</span>
+        </div>
+        <div class="user-actions">
+          <button class="user-action-btn" (click)="openProfile()" title="{{ t('profile') || 'Profile' }}">
+            <span class="emoji">⚙️</span>
+            {{ t("profile") || "Profile" }}
+          </button>
+          <button class="user-action-btn logout" (click)="logout()" title="{{ t('logout') || 'Logout' }}">
+            <span class="emoji">🚪</span>
+            {{ t("logout") || "Logout" }}
+          </button>
+        </div>
+      </div>
+
       <div class="empty-state" *ngIf="savedProjects.length === 0">
         <span class="emoji">📦</span>
         <p>{{ t("noProjects") }}</p>

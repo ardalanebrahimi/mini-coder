@@ -16,11 +16,13 @@ import { BuildChoiceDialogComponent } from "./build-choice-dialog/build-choice-d
 import { ModifyAppDialogComponent } from "./modify-app-dialog/modify-app-dialog.component";
 import { PreviewSectionComponent } from "./preview-section/preview-section.component";
 import { AuthModalComponent } from "./shared/auth-modal.component";
+import { ProfileModalComponent } from "./profile/profile-modal.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { TranslationService } from "./services/translation.service";
 import { TestPreviewService } from "./services/test-preview.service";
 import { CommandInputService } from "./services/command-input.service";
 import { SaveDialogService } from "./services/save-dialog.service";
+import { ProfileService } from "./services/profile.service";
 import {
   BuildChoiceDialogService,
   BuildChoiceType,
@@ -48,6 +50,7 @@ import { PreviewSectionService } from "./services/preview-section.service";
     ModifyAppDialogComponent,
     PreviewSectionComponent,
     AuthModalComponent,
+    ProfileModalComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -82,6 +85,9 @@ export class AppComponent implements OnInit, OnDestroy {
   showAuthModal = false;
   authModalMessage = "";
 
+  // Profile modal state
+  showProfileModal = false;
+
   /**
    * Check if user is authenticated
    */
@@ -105,6 +111,38 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authModalMessage = "";
   }
 
+  /**
+   * Show profile modal
+   */
+  showProfile(): void {
+    if (!this.isAuthenticated()) {
+      this.showAuthModalWithMessage("Please log in to view your profile.");
+      return;
+    }
+    this.showProfileModal = true;
+  }
+
+  /**
+   * Close profile modal
+   */
+  closeProfileModal(): void {
+    this.showProfileModal = false;
+  }
+
+  /**
+   * Handle logout request from toolbox
+   */
+  handleLogout(): void {
+    this.authService.logout();
+    // Clear any current app data
+    this.currentApp = null;
+    this.previewHtml = "";
+    this.previewUrl = "";
+    this.safePreviewUrl = null;
+    this.userCommand = "";
+    this.errorMessage = "";
+  }
+
   // Rebuild vs modify choice
   // UI state - removed build choice dialog related properties
 
@@ -121,7 +159,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private saveDialogService: SaveDialogService,
     private buildChoiceDialogService: BuildChoiceDialogService,
     private modifyAppDialogService: ModifyAppDialogService,
-    private previewSectionService: PreviewSectionService
+    private previewSectionService: PreviewSectionService,
+    private profileService: ProfileService
   ) {}
 
   /**

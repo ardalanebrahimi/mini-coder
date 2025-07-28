@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, Output, EventEmitter } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { Subject, takeUntil } from "rxjs";
@@ -17,6 +17,9 @@ import { AuthService } from "../services/auth.service";
 })
 export class ToolboxComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  @Output() profileRequested = new EventEmitter<void>();
+  @Output() logoutRequested = new EventEmitter<void>();
 
   // Component state (managed by service)
   isOpen = false;
@@ -71,5 +74,13 @@ export class ToolboxComponent implements OnInit, OnDestroy {
 
   onCloseClick(): void {
     this.toolboxService.close();
+  }
+
+  openProfile(): void {
+    this.profileRequested.emit();
+  }
+
+  logout(): void {
+    this.logoutRequested.emit();
   }
 }

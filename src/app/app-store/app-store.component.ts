@@ -12,6 +12,7 @@ import {
   PublishedProject,
   AppStoreResponse,
 } from "../services/app-store.service";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-app-store",
@@ -24,6 +25,7 @@ export class AppStoreComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   @Output() tryProject = new EventEmitter<PublishedProject>();
+  @Output() starRequiresAuth = new EventEmitter<string>();
 
   projects: PublishedProject[] = [];
   isLoading = false;
@@ -33,7 +35,10 @@ export class AppStoreComponent implements OnInit, OnDestroy {
   total = 0;
   error: string | null = null;
 
-  constructor(private appStoreService: AppStoreService) {}
+  constructor(
+    private appStoreService: AppStoreService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.loadProjects();
@@ -122,6 +127,51 @@ export class AppStoreComponent implements OnInit, OnDestroy {
    */
   refresh(): void {
     this.loadProjects();
+  }
+
+  /**
+   * Handle star button click
+   */
+  onStarProject(project: PublishedProject): void {
+    // Check if user is authenticated
+    if (!this.authService.isLoggedIn()) {
+      this.starRequiresAuth.emit("Please log in to star projects!");
+      return;
+    }
+
+    // Toggle star
+    this.appStoreService
+      .toggleStar(project.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          // Update the project in the local array
+          const projectIndex = this.projects.findIndex(
+            (p) => p.id === project.id
+          );
+          if (projectIndex !== -1) {
+            this.projects[projectIndex] = {
+              ...this.projects[projectIndex],
+              starred: response.starred,
+              starCount: response.starCount,
+            };
+          }
+        },
+        error: (error: any) => {
+          console.error("Error toggling star:", error);
+          if (error.status === 401) {
+            this.starRequiresAuth.emit("Please log in to star projects!");
+          }
+          // Could show a toast notification here
+        },
+      });
+  }
+
+  /**
+   * Check if current user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return this.authService.isLoggedIn();
   }
 
   /**

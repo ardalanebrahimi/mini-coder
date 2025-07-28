@@ -41,7 +41,10 @@
       </div>
 
       <!-- Preview Section -->
-      <app-preview-section *ngIf="currentApp"></app-preview-section>
+      <app-preview-section 
+        *ngIf="currentApp"
+        (showAuthModalEvent)="showAuthModalWithMessage($event)">
+      </app-preview-section>
 
       <!-- Loading State -->
       <div class="loading-state" *ngIf="isProcessing">
@@ -55,7 +58,11 @@
 
     <!-- App Store View -->
     <div class="app-store-view" *ngIf="currentView === 'store'">
-      <app-app-store (tryProject)="onTryProject($event)"></app-app-store>
+      <app-app-store
+        (tryProject)="onTryProject($event)"
+        (starRequiresAuth)="showAuthModalWithMessage($event)"
+      >
+      </app-app-store>
     </div>
   </main>
 

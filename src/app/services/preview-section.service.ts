@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { ProcessedCommand } from "./prompt-processor.service";
+import { PublishedProject } from "./app-store.service";
 
 export interface PreviewData {
   currentApp: ProcessedCommand | null;
@@ -8,6 +9,7 @@ export interface PreviewData {
   previewUrl: string;
   safePreviewUrl: any;
   userCommand: string;
+  sourceProject?: PublishedProject; // Add source project for app store previews
 }
 
 export interface PreviewAction {
@@ -24,6 +26,7 @@ export class PreviewSectionService {
     previewUrl: "",
     safePreviewUrl: null,
     userCommand: "",
+    sourceProject: undefined,
   });
 
   private actionSubject = new BehaviorSubject<PreviewAction | null>(null);
@@ -45,6 +48,27 @@ export class PreviewSectionService {
    */
   getCurrentPreviewData(): PreviewData {
     return this.previewDataSubject.value;
+  }
+
+  /**
+   * Set preview data for app store projects
+   */
+  setAppStorePreview(
+    currentApp: ProcessedCommand,
+    previewHtml: string,
+    previewUrl: string,
+    safePreviewUrl: any,
+    userCommand: string,
+    sourceProject: PublishedProject
+  ): void {
+    this.previewDataSubject.next({
+      currentApp,
+      previewHtml,
+      previewUrl,
+      safePreviewUrl,
+      userCommand,
+      sourceProject,
+    });
   }
 
   /**

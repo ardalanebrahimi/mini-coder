@@ -97,3 +97,86 @@
   border: none;
   background: $white;
 }
+
+// App Store project info section
+.app-store-info {
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .project-info {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 0.25rem 0;
+      color: $text-dark;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .author {
+      margin: 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  }
+
+  .star-section {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.star-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: $text-dark;
+
+  &:hover {
+    border-color: #ffd700;
+    background: #fffbf0;
+    transform: translateY(-1px);
+  }
+
+  &.starred {
+    border-color: #ffd700;
+    background: #fffbf0;
+    
+    .star-icon {
+      color: #ffd700;
+    }
+  }
+
+  .star-icon {
+    font-size: 1.1rem;
+    transition: color 0.2s ease;
+  }
+
+  .star-count {
+    font-weight: 600;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    
+    .star-icon {
+      font-size: 1rem;
+    }
+  }
+}

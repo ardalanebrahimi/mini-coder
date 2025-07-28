@@ -18,6 +18,8 @@ export interface PublishedProject {
     username: string;
     name?: string;
   };
+  starCount?: number; // Total number of stars
+  starred?: boolean; // Whether current user has starred (if user is authenticated)
 }
 
 export interface AppStoreResponse {
@@ -79,5 +81,37 @@ export class AppStoreService {
           : undefined,
       }))
     );
+  }
+
+  /**
+   * Toggle star for a project
+   */
+  toggleStar(projectId: number): Observable<{
+    message: string;
+    starred: boolean;
+    starCount: number;
+    projectId: number;
+  }> {
+    return this.http.post<{
+      message: string;
+      starred: boolean;
+      starCount: number;
+      projectId: number;
+    }>(`${environment.apiUrl}/api/v1/stars/${projectId}/toggle`, {});
+  }
+
+  /**
+   * Get star status for a project
+   */
+  getStarStatus(projectId: number): Observable<{
+    starred: boolean;
+    starCount: number;
+    projectId: number;
+  }> {
+    return this.http.get<{
+      starred: boolean;
+      starCount: number;
+      projectId: number;
+    }>(`${environment.apiUrl}/api/v1/stars/${projectId}/status`);
   }
 }

@@ -179,7 +179,8 @@ $shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
   gap: 0.5rem;
 
   .creator-info,
-  .publish-date {
+  .publish-date,
+  .star-info {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -194,6 +195,11 @@ $shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
   .creator-name {
     font-weight: 500;
     color: $text-dark;
+  }
+
+  .star-info {
+    color: #f39c12;
+    font-weight: 600;
   }
 }
 
@@ -219,6 +225,41 @@ $shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
     &:hover {
       background: darken($primary-color, 10%);
       transform: translateY(-1px);
+    }
+  }
+
+  .star-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid #f39c12;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: #f39c12;
+    min-width: 100px;
+
+    &:hover {
+      background: #f39c12;
+      color: $white;
+      transform: translateY(-1px);
+    }
+
+    &.starred {
+      background: #f39c12;
+      color: $white;
+
+      &:hover {
+        background: darken(#f39c12, 10%);
+      }
+    }
+
+    .emoji {
+      font-size: 1rem;
     }
   }
 }

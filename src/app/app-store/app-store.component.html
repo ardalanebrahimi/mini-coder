@@ -54,12 +54,27 @@
           <span class="emoji">📅</span>
           <span>{{ project.updatedAt | date : "short" }}</span>
         </div>
+
+        <div class="star-info" *ngIf="project.starCount !== undefined">
+          <span class="emoji">⭐</span>
+          <span>{{ project.starCount || 0 }}</span>
+        </div>
       </div>
 
       <div class="project-actions">
         <button class="try-btn" (click)="onTryProject(project)">
-          <span class="emoji">�</span>
+          <span class="emoji">▶️</span>
           Try It
+        </button>
+
+        <button 
+          class="star-btn"
+          [class.starred]="project.starred"
+          (click)="onStarProject(project)"
+          [title]="project.starred ? 'Remove star' : 'Star this app'"
+        >
+          <span class="emoji">{{ project.starred ? '⭐' : '☆' }}</span>
+          {{ project.starred ? 'Starred' : 'Star' }}
         </button>
       </div>
     </div>

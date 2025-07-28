@@ -74,6 +74,9 @@ export class AppComponent implements OnInit, OnDestroy {
   previewUrl = ""; // For blob URL
   safePreviewUrl: any = null; // For sanitized blob URL
 
+  // Source project when trying from App Store
+  sourceProject: PublishedProject | null = null;
+
   // UI state - removed save dialog related properties
 
   // Modify app feature
@@ -142,6 +145,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authService.logout();
     // Clear any current app data
     this.currentApp = null;
+    this.sourceProject = null;
     this.previewHtml = "";
     this.previewUrl = "";
     this.safePreviewUrl = null;
@@ -164,6 +168,9 @@ export class AppComponent implements OnInit, OnDestroy {
       this.errorMessage = "❌ Unable to load project code.";
       return;
     }
+
+    // Store the source project for star functionality
+    this.sourceProject = project;
 
     // Create a ProcessedCommand-like object for the preview
     this.currentApp = {
@@ -265,13 +272,26 @@ export class AppComponent implements OnInit, OnDestroy {
    * Update preview service with current data
    */
   private updatePreviewService(): void {
-    this.previewSectionService.updatePreviewData({
-      currentApp: this.currentApp,
-      previewHtml: this.previewHtml,
-      previewUrl: this.previewUrl,
-      safePreviewUrl: this.safePreviewUrl,
-      userCommand: this.userCommand,
-    });
+    if (this.sourceProject) {
+      // Using app store preview with source project information
+      this.previewSectionService.setAppStorePreview(
+        this.currentApp!,
+        this.previewHtml,
+        this.previewUrl,
+        this.safePreviewUrl,
+        this.userCommand,
+        this.sourceProject
+      );
+    } else {
+      // Regular preview without source project
+      this.previewSectionService.updatePreviewData({
+        currentApp: this.currentApp,
+        previewHtml: this.previewHtml,
+        previewUrl: this.previewUrl,
+        safePreviewUrl: this.safePreviewUrl,
+        userCommand: this.userCommand,
+      });
+    }
   }
 
   /**
@@ -611,6 +631,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.commandInputService.setProcessing(true);
     this.errorMessage = "";
     this.currentApp = null;
+    this.sourceProject = null;
 
     // For debugging: bypass OpenAI and use static HTML
     if (
@@ -778,6 +799,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Clear local properties
     this.currentApp = null;
+    this.sourceProject = null;
     this.previewHtml = "";
     this.previewUrl = "";
     this.safePreviewUrl = null;

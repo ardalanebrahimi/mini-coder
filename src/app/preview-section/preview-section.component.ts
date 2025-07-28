@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Subject, takeUntil } from "rxjs";
 import {
@@ -6,6 +6,8 @@ import {
   PreviewData,
 } from "../services/preview-section.service";
 import { TranslationService } from "../services/translation.service";
+import { AppStoreService } from "../services/app-store.service";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-preview-section",
@@ -17,6 +19,8 @@ import { TranslationService } from "../services/translation.service";
 export class PreviewSectionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
+  @Output() showAuthModalEvent = new EventEmitter<string>();
+
   previewData: PreviewData = {
     currentApp: null,
     previewHtml: "",
@@ -27,7 +31,9 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
 
   constructor(
     private previewSectionService: PreviewSectionService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private appStoreService: AppStoreService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +83,49 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
    */
   onClearClick(): void {
     this.previewSectionService.emitAction("clear");
+  }
+
+  /**
+   * Check if current preview is from app store (has source project)
+   */
+  isAppStorePreview(): boolean {
+    return !!this.previewData.sourceProject;
+  }
+
+  /**
+   * Handle star button click for app store preview
+   */
+  onStarProject(): void {
+    if (!this.previewData.sourceProject) {
+      return;
+    }
+
+    if (!this.authService.isLoggedIn()) {
+      // Show auth modal if not logged in
+      this.showAuthModal();
+      return;
+    }
+
+    // Toggle star status
+    this.appStoreService.toggleStar(this.previewData.sourceProject.id).subscribe({
+      next: (response) => {
+        if (this.previewData.sourceProject) {
+          // Update the project's star information
+          this.previewData.sourceProject.starred = response.starred;
+          this.previewData.sourceProject.starCount = response.starCount;
+        }
+      },
+      error: (error) => {
+        console.error("Error toggling star:", error);
+      },
+    });
+  }
+
+  /**
+   * Show authentication modal
+   */
+  private showAuthModal(): void {
+    this.showAuthModalEvent.emit("Please log in or register to star apps from the App Store.");
   }
 
   /**

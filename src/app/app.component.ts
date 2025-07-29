@@ -38,6 +38,7 @@ import {
   CommandAction,
 } from "./services/command-actions.service";
 import { PreviewSectionService } from "./services/preview-section.service";
+import { EXAMPLE_COMMANDS } from "./examples";
 
 @Component({
   selector: "app-root",
@@ -849,39 +850,23 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get example commands for placeholder
+   * Returns example commands for the given language code, or falls back to English.
    */
-  getExampleCommands(): string[] {
-    return [
-      "Create a working calculator with all basic operations",
-      "Make an interactive animal quiz with 5 questions and scoring",
-      "Build a color guessing game with random colors and points",
-      "Create a simple drawing app with different colors and brush sizes",
-      "Make a memory card game with flip animations",
-      "Build a timer app with start, stop, and reset functions",
-      "Create a to-do list with add, delete, and check-off features",
-      "Make a dice rolling app with animations",
-      "Build a simple piano with clickable keys that play sounds",
-      "Create a word counter tool that counts characters and words",
-      "Erstelle einen funktionierenden Taschenrechner mit allen Grundrechenarten",
-      "Mache ein interaktives Tier-Quiz mit 5 Fragen und Punktesystem",
-      "Baue ein Farben-Ratespiel mit zufälligen Farben und Punkten",
-      "Erstelle eine einfache Zeichen-App mit verschiedenen Farben",
-      "Mache ein Memory-Spiel mit Flip-Animationen",
-      "Baue eine Timer-App mit Start-, Stopp- und Reset-Funktionen",
-    ];
+  getExampleCommands(language: string = "en"): string[] {
+    return EXAMPLE_COMMANDS[language] || EXAMPLE_COMMANDS["en"];
   }
 
   /**
-   * Get random example command
+   * Returns a random example command based on the user's current language.
    */
   getRandomExample(): string {
-    const examples = this.getExampleCommands();
+    const lang = this.selectedLanguage || "en"; // or get from user profile/service
+    const examples = this.getExampleCommands(lang);
     return examples[Math.floor(Math.random() * examples.length)];
   }
 
   /**
-   * Set example command
+   * Set a random example command based on current language.
    */
   setExampleCommand(): void {
     this.commandInputService.updateUserCommand(this.getRandomExample());

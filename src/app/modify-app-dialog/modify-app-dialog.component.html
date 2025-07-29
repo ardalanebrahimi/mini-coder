@@ -21,13 +21,11 @@
         <button
           class="voice-btn-small"
           (click)="startVoiceInput()"
-          [disabled]="!voiceSupported || isListening"
-          [class.listening]="isListening"
+          [disabled]="!voiceSupported"
           *ngIf="voiceSupported"
           type="button"
         >
-          <span class="emoji" *ngIf="!isListening">🎤</span>
-          <span class="pulse" *ngIf="isListening">🔴</span>
+          <span class="emoji">🎤</span>
         </button>
       </div>
 

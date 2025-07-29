@@ -8,6 +8,7 @@ import {
   ModifyMode,
 } from "../services/modify-app-dialog.service";
 import { TranslationService } from "../services/translation.service";
+import { VoiceActionService } from "../services/voice-action.service";
 
 @Component({
   selector: "app-modify-app-dialog",
@@ -25,21 +26,21 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
   isProcessing = false;
   errorMessage = "";
 
-  // Voice input properties
-  isListening = false;
+  // Voice input properties - simplified for new system
   voiceSupported = false;
-  speechRecognition: any = null;
 
   // Expose enum to template
   ModifyMode = ModifyMode;
 
   constructor(
     private modifyAppDialogService: ModifyAppDialogService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private voiceActionService: VoiceActionService
   ) {}
 
   ngOnInit(): void {
-    this.initializeVoiceRecognition();
+    // Check if voice is supported
+    this.voiceSupported = this.voiceActionService.isVoiceSupported();
 
     // Subscribe to dialog visibility
     this.modifyAppDialogService.showDialog$
@@ -60,15 +61,20 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
           this.resetForm();
         }
       });
+
+    // Subscribe to voice transcription results for this dialog
+    this.voiceActionService.voiceTranscription$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result.context === "modify-dialog") {
+          this.modifyCommand = result.text;
+        }
+      });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-
-    if (this.speechRecognition) {
-      this.speechRecognition.stop();
-    }
   }
 
   /**
@@ -123,49 +129,13 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialize voice recognition
-   */
-  private initializeVoiceRecognition(): void {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-
-    if (SpeechRecognition) {
-      this.voiceSupported = true;
-      this.speechRecognition = new SpeechRecognition();
-      this.speechRecognition.continuous = false;
-      this.speechRecognition.interimResults = false;
-      this.speechRecognition.lang =
-        this.translationService.getCurrentLanguage() === "de"
-          ? "de-DE"
-          : "en-US";
-
-      this.speechRecognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        this.modifyCommand = transcript;
-        this.isListening = false;
-      };
-
-      this.speechRecognition.onerror = () => {
-        this.isListening = false;
-        this.errorMessage = "Voice recognition failed. Please try again.";
-      };
-
-      this.speechRecognition.onend = () => {
-        this.isListening = false;
-      };
-    }
-  }
-
-  /**
    * Start voice input for modify command
    */
   startVoiceInput(): void {
-    if (!this.voiceSupported || this.isListening) return;
+    if (!this.voiceSupported) return;
 
-    this.isListening = true;
     this.errorMessage = "";
-    this.speechRecognition.start();
+    this.voiceActionService.openVoiceModalForModifyDialog();
   }
 
   /**
@@ -175,7 +145,6 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
     this.modifyCommand = "";
     this.errorMessage = "";
     this.isProcessing = false;
-    this.isListening = false;
   }
 
   /**

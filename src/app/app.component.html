@@ -96,6 +96,13 @@
     (closeModal)="closeProfileModal()"
   ></app-profile-modal>
 
+  <!-- Voice Input Modal -->
+  <app-voice-input-modal
+    [isOpen]="showVoiceModal"
+    (closeModal)="onVoiceModalClose()"
+    (transcriptionResult)="onVoiceTranscription($event)"
+  ></app-voice-input-modal>
+
   <!-- Overlay for toolbox -->
   <div class="overlay" *ngIf="showToolbox" (click)="toggleToolbox()"></div>
 </div>

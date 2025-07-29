@@ -50,17 +50,6 @@
           rows="3"
           [disabled]="state.isProcessing"
         ></textarea>
-        <button
-          class="voice-btn-small"
-          (click)="onStartVoiceInput()"
-          [disabled]="!state.voiceSupported || state.isListening"
-          [class.listening]="state.isListening"
-          *ngIf="state.voiceSupported"
-          type="button"
-        >
-          <span class="emoji" *ngIf="!state.isListening">🎤</span>
-          <span class="pulse" *ngIf="state.isListening">🔴</span>
-        </button>
       </div>
 
       <button

@@ -18,6 +18,7 @@ import { PreviewSectionComponent } from "./preview-section/preview-section.compo
 import { AuthModalComponent } from "./shared/auth-modal.component";
 import { ProfileModalComponent } from "./profile/profile-modal.component";
 import { AppStoreComponent } from "./app-store/app-store.component";
+import { VoiceInputModalComponent } from "./voice-input-modal/voice-input-modal.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { PublishedProject } from "./services/app-store.service";
 import { TranslationService } from "./services/translation.service";
@@ -38,6 +39,7 @@ import {
   CommandAction,
 } from "./services/command-actions.service";
 import { PreviewSectionService } from "./services/preview-section.service";
+import { VoiceActionService } from "./services/voice-action.service";
 import { EXAMPLE_COMMANDS } from "./examples";
 
 @Component({
@@ -55,6 +57,7 @@ import { EXAMPLE_COMMANDS } from "./examples";
     AuthModalComponent,
     ProfileModalComponent,
     AppStoreComponent,
+    VoiceInputModalComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -83,10 +86,13 @@ export class AppComponent implements OnInit, OnDestroy {
   // Modify app feature
   isModifying = false;
 
-  // Voice input feature
+  // Voice input feature (legacy - removed, now using WhisperVoiceService)
+  // These properties are kept for backward compatibility with existing subscriptions
   isListening = false;
-  speechRecognition: any = null;
   voiceSupported = false;
+
+  // Voice modal state
+  showVoiceModal = false;
 
   // Auth modal state
   showAuthModal = false;
@@ -233,7 +239,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private buildChoiceDialogService: BuildChoiceDialogService,
     private modifyAppDialogService: ModifyAppDialogService,
     private previewSectionService: PreviewSectionService,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private voiceActionService: VoiceActionService
   ) {}
 
   /**
@@ -262,11 +269,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   changeLanguage(languageCode: string): void {
     this.translationService.setLanguage(languageCode);
-
-    // Update speech recognition language if supported
-    if (this.voiceSupported && this.speechRecognition) {
-      this.speechRecognition.lang = languageCode === "de" ? "de-DE" : "en-US";
-    }
+    // Note: Voice language is now handled by WhisperVoiceService automatically
   }
 
   /**
@@ -373,71 +376,23 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialize voice recognition
+   * Initialize voice recognition (now handled by WhisperVoiceService)
    */
   initializeVoiceRecognition(): void {
-    // Check if speech recognition is supported
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-
-    if (SpeechRecognition) {
-      this.voiceSupported = true;
-      this.commandInputService.setVoiceSupported(true);
-      this.speechRecognition = new SpeechRecognition();
-      this.speechRecognition.continuous = false;
-      this.speechRecognition.interimResults = false;
-      this.speechRecognition.maxAlternatives = 1;
-
-      // Set language based on selected UI language
-      this.speechRecognition.lang =
-        this.selectedLanguage === "de" ? "de-DE" : "en-US";
-
-      this.speechRecognition.onstart = () => {
-        this.commandInputService.setListening(true);
-      };
-
-      this.speechRecognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        this.commandInputService.updateUserCommand(transcript);
-        this.commandInputService.setListening(false);
-      };
-
-      this.speechRecognition.onerror = (event: any) => {
-        console.error("Voice recognition error:", event.error);
-        this.commandInputService.setListening(false);
-        this.errorMessage = this.t("voiceNotSupported");
-      };
-
-      this.speechRecognition.onend = () => {
-        this.commandInputService.setListening(false);
-      };
-    } else {
-      this.voiceSupported = false;
-      this.commandInputService.setVoiceSupported(false);
-    }
+    // Legacy method kept for compatibility
+    // Voice recognition is now handled by WhisperVoiceService
+    this.voiceSupported = this.voiceActionService.isVoiceSupported();
+    this.commandInputService.setVoiceSupported(this.voiceSupported);
   }
 
   /**
-   * Start voice input
+   * Start voice input (now handled by VoiceActionService)
    */
   startVoiceInput(): void {
-    if (!this.voiceSupported || !this.speechRecognition) {
-      this.errorMessage = this.t("voiceNotSupported");
-      return;
-    }
-
-    // Update language before starting
-    this.speechRecognition.lang =
-      this.selectedLanguage === "de" ? "de-DE" : "en-US";
-
-    try {
-      this.speechRecognition.start();
-      this.errorMessage = "";
-    } catch (error) {
-      console.error("Error starting voice recognition:", error);
-      this.errorMessage = this.t("voiceNotSupported");
-    }
+    // Legacy method - now handled by the new voice modal system
+    // This is called by the command actions service when START_VOICE action is triggered
+    console.log("startVoiceInput called - opening voice modal for main input");
+    this.voiceActionService.openVoiceModalForMainInput();
   }
 
   /**
@@ -494,6 +449,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.loadSavedProjects();
     this.initializeVoiceRecognition();
     this.setupServiceSubscriptions();
+    this.setupVoiceModalSubscriptions();
 
     // Listen for save success events from the save dialog component
     document.addEventListener("saveSuccess", (event: any) => {
@@ -589,10 +545,32 @@ export class AppComponent implements OnInit, OnDestroy {
     this.translationService.selectedLanguage$
       .pipe(takeUntil(this.destroy$))
       .subscribe((languageCode) => {
-        if (this.voiceSupported && this.speechRecognition) {
-          this.speechRecognition.lang =
-            languageCode === "de" ? "de-DE" : "en-US";
+        // Voice language is now handled automatically by WhisperVoiceService
+        console.log(`Language changed to: ${languageCode}`);
+      });
+  }
+
+  /**
+   * Setup voice modal subscriptions
+   */
+  private setupVoiceModalSubscriptions(): void {
+    // Subscribe to voice modal state
+    this.voiceActionService.voiceModalState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state) => {
+        this.showVoiceModal = state.isOpen;
+      });
+
+    // Subscribe to voice transcription results
+    this.voiceActionService.voiceTranscription$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result.context === "main-input") {
+          // The command input service is already updated by the voice action service
+          // We can add any additional handling here if needed
         }
+        // Close voice modal
+        this.showVoiceModal = false;
       });
   }
 
@@ -921,9 +899,26 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.testPreviewService.getDataUrl(html);
   }
 
+  /**
+   * Handle voice modal close event
+   */
+  onVoiceModalClose(): void {
+    this.voiceActionService.closeVoiceModal();
+  }
+
+  /**
+   * Handle voice transcription result
+   */
+  onVoiceTranscription(transcription: string): void {
+    this.voiceActionService.handleVoiceTranscription(transcription);
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+
+    // Clean up voice resources
+    this.voiceActionService.cleanup();
 
     // Clean up blob URL to prevent memory leaks
     if (this.previewUrl) {

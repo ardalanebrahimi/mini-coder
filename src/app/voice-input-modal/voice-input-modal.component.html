@@ -1,0 +1,157 @@
+<!-- Voice Input Modal -->
+<div class="modal-overlay" *ngIf="isOpen" (click)="onOverlayClick()">
+  <div class="modal-content voice-modal" (click)="onContentClick($event)">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <span class="emoji">🎤</span>
+        {{ t("voiceInput") }}
+      </h3>
+      <button class="close-btn" (click)="closeVoiceModal()" type="button">
+        <span class="emoji">❌</span>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Language Indicator -->
+      <div class="language-indicator">
+        <span class="emoji">🌍</span>
+        <span class="language-text">
+          {{ t("language") }}: {{ voiceState.currentLanguage.toUpperCase() }}
+        </span>
+      </div>
+
+      <!-- Status Message -->
+      <div class="status-message" [class]="voiceState.animationState">
+        <p class="status-text">{{ getStatusMessage() }}</p>
+      </div>
+
+      <!-- Microphone Button Container -->
+      <div class="microphone-container">
+        <!-- Recording Progress Ring -->
+        <div class="progress-ring" *ngIf="voiceState.isRecording">
+          <svg class="progress-ring-svg" width="200" height="200">
+            <circle
+              class="progress-ring-background"
+              stroke="#e0e0e0"
+              stroke-width="6"
+              fill="transparent"
+              r="94"
+              cx="100"
+              cy="100"
+            />
+            <circle
+              class="progress-ring-progress"
+              stroke="#ff6b6b"
+              stroke-width="6"
+              fill="transparent"
+              r="94"
+              cx="100"
+              cy="100"
+              [style.stroke-dasharray]="2 * 3.1416 * 94"
+              [style.stroke-dashoffset]="
+                2 * 3.1416 * 94 * (1 - getRecordingProgress() / 100)
+              "
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+
+        <!-- Main Microphone Button -->
+        <button
+          class="microphone-button"
+          [class]="getMicrophoneAnimationClass()"
+          [disabled]="isMainButtonDisabled()"
+          (click)="onMainButtonClick()"
+          type="button"
+        >
+          <span class="microphone-icon">{{ getMicrophoneIcon() }}</span>
+
+          <!-- Recording Time Display -->
+          <div class="recording-time" *ngIf="voiceState.isRecording">
+            {{ getRecordingTimeText() }}
+          </div>
+        </button>
+      </div>
+
+      <!-- Transcription Result -->
+      <div class="transcription-result" *ngIf="showTranscriptionConfirm">
+        <div class="transcription-header">
+          <span class="emoji">👂</span>
+          <strong>{{ t("weHeard") }}:</strong>
+        </div>
+        <div class="transcription-text">
+          <textarea
+            [(ngModel)]="lastTranscription"
+            class="transcription-textarea"
+            rows="3"
+            maxlength="500"
+            [placeholder]="t('editTranscription')"
+          >
+          </textarea>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        <span class="emoji">😅</span>
+        <p>{{ errorMessage }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <!-- Primary Action Button -->
+        <button
+          class="btn-primary voice-action-btn"
+          [disabled]="isMainButtonDisabled()"
+          (click)="onMainButtonClick()"
+          type="button"
+        >
+          <span class="emoji">{{ getMicrophoneIcon() }}</span>
+          {{ getMainButtonText() }}
+        </button>
+
+        <!-- Secondary Buttons -->
+        <div
+          class="secondary-buttons"
+          *ngIf="showTranscriptionConfirm || errorMessage"
+        >
+          <button class="btn-secondary" (click)="tryAgain()" type="button">
+            <span class="emoji">🔄</span>
+            {{ t("tryAgain") }}
+          </button>
+
+          <button
+            class="btn-secondary"
+            (click)="closeVoiceModal()"
+            type="button"
+          >
+            <span class="emoji">❌</span>
+            {{ t("cancel") }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Tips Section -->
+      <div
+        class="tips-section"
+        *ngIf="
+          !voiceState.isRecording &&
+          !voiceState.isProcessing &&
+          !showTranscriptionConfirm
+        "
+      >
+        <div class="tips-header">
+          <span class="emoji">💡</span>
+          <strong>{{ t("voiceTips") }}:</strong>
+        </div>
+        <ul class="tips-list">
+          <li>{{ t("speakClearly") }}</li>
+          <li>{{ t("findQuietPlace") }}</li>
+          <li>{{ t("speakNaturally") }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

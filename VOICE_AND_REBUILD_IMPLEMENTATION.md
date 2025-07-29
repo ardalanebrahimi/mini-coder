@@ -43,23 +43,6 @@
 
 ### Voice Recognition Setup
 
-```typescript
-// Initialize speech recognition
-const SpeechRecognition =
-  (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-this.speechRecognition = new SpeechRecognition();
-this.speechRecognition.continuous = false;
-this.speechRecognition.interimResults = false;
-this.speechRecognition.lang =
-  this.selectedLanguage === "de" ? "de-DE" : "en-US";
-
-// Handle speech results
-this.speechRecognition.onresult = (event: any) => {
-  const transcript = event.results[0][0].transcript;
-  this.userCommand = transcript; // or this.modifyCommand for modify dialog
-};
-```
-
 ### Rebuild vs Modify Logic
 
 ```typescript

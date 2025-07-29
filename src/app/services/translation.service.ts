@@ -17,7 +17,7 @@ export class TranslationService {
   private readonly translations: Translations = {
     en: {
       appTitle: "Mini Coder",
-      appSubtitle: "Create awesome mini apps with just words!",
+      appSubtitle: "Build fun mini apps just by talking or typing!",
       tellMeWhat: "Tell me what to build! 🎯",
       tryExample: "Try Example",
       createApp: "Create App",
@@ -103,7 +103,7 @@ export class TranslationService {
     },
     de: {
       appTitle: "Mini Coder",
-      appSubtitle: "Erstelle großartige Mini-Apps nur mit Worten!",
+      appSubtitle: "Baue coole Mini-Apps - einfach sprechen oder tippen!",
       tellMeWhat: "Sag mir, was ich bauen soll! 🎯",
       tryExample: "Beispiel testen",
       createApp: "App erstellen",

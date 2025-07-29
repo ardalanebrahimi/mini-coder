@@ -80,3 +80,55 @@ export const generateToken = (userId: number, email: string): string => {
     expiresIn,
   } as jwt.SignOptions);
 };
+
+/**
+ * Optional authentication middleware - attaches user if token is valid, but doesn't require authentication
+ * Useful for endpoints that should work for both authenticated and non-authenticated users
+ */
+export const optionalAuthentication = async (
+  req: AuthenticatedRequest,
+  _res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+
+    // If no token provided, continue without user
+    if (!token) {
+      next();
+      return;
+    }
+
+    const jwtSecret = process.env["JWT_SECRET"];
+    if (!jwtSecret) {
+      console.error("JWT secret not configured");
+      next();
+      return;
+    }
+
+    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+
+    // Fetch user from database to ensure they still exist
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        tokens: true,
+      },
+    });
+
+    if (user) {
+      req.user = user;
+    }
+
+    next();
+  } catch (error) {
+    // If token is invalid, just continue without user (don't return error)
+    console.error("Optional authentication error:", error);
+    next();
+  }
+};

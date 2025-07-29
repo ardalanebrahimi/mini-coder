@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticateJWT } from "../middleware/auth";
+import { authenticateJWT, optionalAuthentication } from "../middleware/auth";
 import {
   getAllProjects,
   getProjectById,
@@ -17,8 +17,10 @@ const router: Router = Router();
 
 // Public routes
 router.get("/published", getPublishedProjects);
-router.get("/app-store", getAppStoreProjects);
 router.get("/public/:id", getPublicProject);
+
+// App store route with optional authentication (shows star status if user is logged in)
+router.get("/app-store", optionalAuthentication, getAppStoreProjects);
 
 // Protected routes (require authentication)
 router.use(authenticateJWT);

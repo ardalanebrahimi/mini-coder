@@ -318,6 +318,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   /**
    * Process modify/rebuild command with given parameters
+   * Uses the new processModifyCommand for better context handling
    */
   processModifyCommandWithParams(command: string, isRebuilding: boolean): void {
     if (!command.trim()) {
@@ -333,46 +334,82 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isModifying = true;
     this.errorMessage = "";
 
-    // Choose prompt based on whether we're rebuilding or modifying
-    const prompt = isRebuilding
-      ? command // For rebuild, use the command directly
-      : `${this.userCommand}\n\nCurrent app requirements. Now modify it: ${command}`; // For modify, combine with original
+    // For rebuild mode, use the standard processCommand method
+    if (isRebuilding) {
+      this.promptProcessor.processCommand(command).subscribe({
+        next: (result: ProcessedCommand) => {
+          this.handleModifySuccess(result, command, true);
+        },
+        error: (error) => {
+          this.handleModifyError(error, true);
+        },
+      });
+    } else {
+      // For modify mode, use the new processModifyCommand method with current app code
+      const currentAppCode = this.currentApp?.generatedCode || "";
 
-    this.promptProcessor.processCommand(prompt).subscribe({
-      next: (result: ProcessedCommand) => {
-        // Update current app with modified/rebuilt version
-        this.currentApp = result;
-        this.previewHtml = result.generatedCode;
+      this.promptProcessor
+        .processModifyCommand(command, currentAppCode)
+        .subscribe({
+          next: (result: ProcessedCommand) => {
+            this.handleModifySuccess(result, command, false);
+          },
+          error: (error) => {
+            this.handleModifyError(error, false);
+          },
+        });
+    }
+  }
 
-        // If rebuilding, update the original command too
-        if (isRebuilding) {
-          this.userCommand = command;
-        }
+  /**
+   * Handle successful modify/rebuild operation
+   * @param result - The processed command result
+   * @param command - The original command
+   * @param isRebuilding - Whether this was a rebuild operation
+   */
+  private handleModifySuccess(
+    result: ProcessedCommand,
+    command: string,
+    isRebuilding: boolean
+  ): void {
+    // Update current app with modified/rebuilt version
+    this.currentApp = result;
+    this.previewHtml = result.generatedCode;
 
-        // Create new blob URL for modified app
-        this.previewUrl = this.createBlobUrl(result.generatedCode);
-        this.safePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          this.previewUrl
-        );
+    // If rebuilding, update the original command too
+    if (isRebuilding) {
+      this.userCommand = command;
+    }
 
-        this.isModifying = false;
+    // Create new blob URL for modified app
+    this.previewUrl = this.createBlobUrl(result.generatedCode);
+    this.safePreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+      this.previewUrl
+    );
 
-        // Update preview service
-        this.updatePreviewService();
+    this.isModifying = false;
 
-        // Show success message
-        const successMessage = isRebuilding
-          ? `${this.t("rebuildApp")} successful!`
-          : `${this.t("modifyApp")} successful!`;
-        this.showSuccessMessage(successMessage);
-      },
-      error: (error) => {
-        console.error("Error modifying/rebuilding app:", error);
-        this.errorMessage =
-          error.message || "Failed to modify app. Please try again.";
-        this.isModifying = false;
-      },
-    });
+    // Update preview service
+    this.updatePreviewService();
+
+    // Show success message
+    const successMessage = isRebuilding
+      ? `${this.t("rebuildApp")} successful!`
+      : `${this.t("modifyApp")} successful!`;
+    this.showSuccessMessage(successMessage);
+  }
+
+  /**
+   * Handle modify/rebuild operation error
+   * @param error - The error that occurred
+   * @param isRebuilding - Whether this was a rebuild operation
+   */
+  private handleModifyError(error: any, isRebuilding: boolean): void {
+    console.error("Error modifying/rebuilding app:", error);
+    this.errorMessage = isRebuilding
+      ? `${this.t("rebuildApp")} failed. Please try again.`
+      : `${this.t("modifyApp")} failed. Please try again.`;
+    this.isModifying = false;
   }
 
   /**

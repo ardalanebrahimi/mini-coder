@@ -7,6 +7,7 @@ import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 // Language detection using franc-min
 import { franc } from "franc-min";
 import { environment } from "../../environments/environment";
+import { CodeMinifierService } from "./code-minifier.service";
 
 export interface ProcessedCommand {
   userCommand?: string;
@@ -24,7 +25,11 @@ export class PromptProcessorService {
   private readonly openaiApiUrl = "https://api.openai.com/v1/chat/completions";
   private readonly supportedLanguages = ["en", "de"];
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
+  constructor(
+    private http: HttpClient,
+    private sanitizer: DomSanitizer,
+    private codeMinifierService: CodeMinifierService
+  ) {}
 
   /**
    * Process a natural language command and generate a mini app
@@ -63,6 +68,104 @@ export class PromptProcessorService {
         return throwError(() => error);
       })
     );
+  }
+
+  /**
+   * Process a modify command with current app code included in the prompt
+   * @param modifyCommand - The user's modification instruction
+   * @param currentAppCode - The current app's HTML/CSS/JS code
+   * @returns Observable with processed result
+   */
+  processModifyCommand(
+    modifyCommand: string,
+    currentAppCode: string
+  ): Observable<ProcessedCommand> {
+    if (!modifyCommand.trim()) {
+      return throwError(() => new Error("Modify command cannot be empty"));
+    }
+
+    if (!currentAppCode?.trim()) {
+      return throwError(
+        () => new Error("Current app code is required for modification")
+      );
+    }
+
+    // Detect language of the modify command
+    const detectedLanguage = this.detectLanguage(modifyCommand);
+
+    // Generate project name from modify command (fallback to current app name)
+    const projectName = this.generateProjectName(modifyCommand);
+
+    // Minify the current app code to reduce token usage
+    const minifiedCode = this.codeMinifierService.minifyHtml(currentAppCode);
+
+    // Log minification results for debugging
+    const sizeReduction = this.codeMinifierService.getSizeReduction(
+      currentAppCode,
+      minifiedCode
+    );
+    console.log(
+      `Code minification: ${sizeReduction} reduction (${currentAppCode.length} → ${minifiedCode.length} chars)`
+    );
+
+    // Create specialized modify prompt
+    const prompt = this.createModifyPrompt(
+      modifyCommand,
+      minifiedCode,
+      detectedLanguage
+    );
+
+    // Call OpenAI API
+    return this.callOpenAI(prompt).pipe(
+      map((response) => {
+        const generatedCode = this.extractCodeFromResponse(response);
+        const sanitizedCode = this.sanitizeCode(generatedCode);
+
+        return {
+          userCommand: modifyCommand,
+          detectedLanguage,
+          generatedCode,
+          sanitizedCode,
+          projectName,
+        };
+      }),
+      catchError((error) => {
+        console.error("Error processing modify command:", error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Create a specialized prompt for modifying existing app code
+   * @param modifyCommand - The user's modification instruction
+   * @param currentAppCode - The minified current app code
+   * @param language - Detected language
+   * @returns Formatted modify prompt for OpenAI
+   */
+  private createModifyPrompt(
+    modifyCommand: string,
+    currentAppCode: string,
+    language: string
+  ): string {
+    const langLabel = language === "de" ? "German" : "English";
+
+    return `You are an expert at updating kid-friendly web apps.
+
+Here is the current app code:
+---
+${currentAppCode}
+---
+
+Modify this app as follows (command in ${langLabel}):
+${modifyCommand}
+
+Instructions:
+- Only reply with the complete, updated HTML code
+- Keep it colorful, safe, and fun for kids
+- Make sure all features work properly
+- Preserve the overall structure while implementing the requested changes
+- Use inline CSS and JavaScript as needed`;
   }
 
   /**

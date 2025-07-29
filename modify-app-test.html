@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modify App Feature Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .test-section {
+        background: #f5f5f5;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .code-block {
+        background: #1e1e1e;
+        color: #f8f8f2;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+      }
+      .success {
+        color: #28a745;
+      }
+      .info {
+        color: #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 MiniCoder App Modification Feature Test</h1>
+
+    <div class="test-section">
+      <h2 class="success">✅ Refactoring Complete</h2>
+      <p>
+        The app modification feature has been successfully refactored with the
+        following improvements:
+      </p>
+
+      <h3>1. New Services Created</h3>
+      <ul>
+        <li>
+          <strong>CodeMinifierService</strong> - Minifies HTML/CSS/JS to reduce
+          token usage
+        </li>
+        <li>
+          <strong>Enhanced PromptProcessorService</strong> - Includes current
+          app code in modification prompts
+        </li>
+      </ul>
+
+      <h3>2. Prompt Structure</h3>
+      <div class="code-block">
+        You are an expert at updating kid-friendly web apps. Here is the current
+        app code: --- [minified current app HTML/CSS/JS code] --- Modify this
+        app as follows: [user's modification instruction] Instructions: - Only
+        reply with the complete, updated HTML code - Keep it colorful, safe, and
+        fun for kids - Make sure all features work properly - Preserve the
+        overall structure while implementing the requested changes - Use inline
+        CSS and JavaScript as needed
+      </div>
+
+      <h3>3. Flow Comparison</h3>
+      <p><strong>Before:</strong></p>
+      <div class="code-block">
+        // Old approach - minimal context const prompt =
+        `${this.userCommand}\n\nCurrent app requirements. Now modify it:
+        ${command}`;
+      </div>
+
+      <p><strong>After:</strong></p>
+      <div class="code-block">
+        // New approach - full context with minification if (isRebuilding) {
+        this.promptProcessor.processCommand(command) } else { const
+        currentAppCode = this.currentApp?.generatedCode || '';
+        this.promptProcessor.processModifyCommand(command, currentAppCode) }
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2 class="info">📋 Test Instructions</h2>
+      <ol>
+        <li>Create a new app (e.g., "Create a simple calculator")</li>
+        <li>Click the "Modify App" button</li>
+        <li>
+          Enter a modification command (e.g., "Add a colorful background and
+          bigger buttons")
+        </li>
+        <li>
+          Check browser console for minification logs:
+          <div class="code-block">
+            Code minification: 34.2% reduction (2547 → 1675 chars)
+          </div>
+        </li>
+        <li>
+          Verify the modified app preserves existing functionality while adding
+          requested changes
+        </li>
+      </ol>
+    </div>
+
+    <div class="test-section">
+      <h2>🎯 Key Benefits</h2>
+      <ul>
+        <li>
+          <strong>Better Context:</strong> AI sees complete app structure for
+          intelligent modifications
+        </li>
+        <li>
+          <strong>Token Optimization:</strong> Minification reduces prompt size
+          by 20-50%
+        </li>
+        <li>
+          <strong>Preservation:</strong> Existing functionality is better
+          preserved during modifications
+        </li>
+        <li>
+          <strong>Maintainability:</strong> Clean service-based architecture
+        </li>
+      </ul>
+    </div>
+
+    <div class="test-section">
+      <h2>📁 Files Modified</h2>
+      <ul>
+        <li>
+          <code>src/app/services/code-minifier.service.ts</code> -
+          <strong>NEW</strong>
+        </li>
+        <li>
+          <code>src/app/services/prompt-processor.service.ts</code> - Enhanced
+          with processModifyCommand()
+        </li>
+        <li>
+          <code>src/app/app.component.ts</code> - Refactored
+          processModifyCommandWithParams()
+        </li>
+        <li>
+          <code>package.json</code> - Added html-minifier-terser dependency
+        </li>
+      </ul>
+    </div>
+
+    <div class="test-section">
+      <h2>🚀 Ready to Test</h2>
+      <p>
+        The refactored modify app feature is now ready for testing. The system
+        will:
+      </p>
+      <ol>
+        <li>Include the full current app code in modification prompts</li>
+        <li>Minify the code to reduce token usage</li>
+        <li>
+          Provide better context to the AI for more accurate modifications
+        </li>
+        <li>Log minification statistics for monitoring</li>
+      </ol>
+    </div>
+  </body>
+</html>

@@ -54,14 +54,13 @@ jobs:
 
           # Replace systemPrompt (multiline)
           awk -v prompt="$system_prompt" '
-            /__SYSTEM_PROMPT__/ {print prompt; next}
-            {print}
+          {sub(/__SYSTEM_PROMPT__/, prompt)}1s
           ' src/environments/environment.ts > tmp_env.ts && mv tmp_env.ts src/environments/environment.ts
+
 
           # Replace openAIFixInstructions (multiline)
           awk -v prompt="$openai_fix_instructions" '
-            /__OPENAI_FIX_INSTRUCTIONS__/ {print prompt; next}
-            {print}
+          {sub(/__OPENAI_FIX_INSTRUCTIONS__/, prompt)}1
           ' src/environments/environment.ts > tmp_env.ts && mv tmp_env.ts src/environments/environment.ts
 
       - name: Build Angular app for production

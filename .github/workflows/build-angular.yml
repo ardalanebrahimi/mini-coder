@@ -42,21 +42,23 @@ jobs:
       - name: Generate environment.ts from template
         run: |
           echo 'Generating environment.ts from template...'
-
-          # Decode \n in secrets into real line breaks
+          # Convert \n to actual newlines for prompt strings
           system_prompt=$(echo "${{ secrets.SYSTEM_PROMPT }}" | sed 's/\\n/\'$'\n''/g')
           openai_fix_instructions=$(echo "${{ secrets.OPENAI_FIX_INSTRUCTIONS }}" | sed 's/\\n/\'$'\n''/g')
 
-          # Copy template to output
           cp src/environments/environment.template.ts src/environments/environment.ts
 
-          # Replace the placeholder in systemPrompt
+          # Replace apiUrl and openaiApiKey
+          sed -i "s#__API_URL__#${{ secrets.API_URL }}#g" src/environments/environment.ts
+          sed -i "s#__OPENAI_API_KEY__#${{ secrets.OPENAI_API_KEY }}#g" src/environments/environment.ts
+
+          # Replace systemPrompt (multiline)
           awk -v prompt="$system_prompt" '
             /__SYSTEM_PROMPT__/ {print prompt; next}
             {print}
           ' src/environments/environment.ts > tmp_env.ts && mv tmp_env.ts src/environments/environment.ts
 
-          # Replace the placeholder in openAIFixInstructions
+          # Replace openAIFixInstructions (multiline)
           awk -v prompt="$openai_fix_instructions" '
             /__OPENAI_FIX_INSTRUCTIONS__/ {print prompt; next}
             {print}

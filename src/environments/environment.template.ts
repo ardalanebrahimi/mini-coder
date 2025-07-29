@@ -2,6 +2,6 @@ export const environment = {
   production: false,
   apiUrl: "${API_URL}",
   openaiApiKey: "${OPENAI_API_KEY}",
-  systemPrompt: "${SYSTEM_PROMPT}",
-  openAIFixInstructions: "${OPENAI_FIX_INSTRUCTIONS}",
+  systemPrompt: `__SYSTEM_PROMPT__`,
+  openAIFixInstructions: `__OPENAI_FIX_INSTRUCTIONS__`,
 };

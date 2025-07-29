@@ -198,7 +198,6 @@ export class TestPreviewService {
             }
         });
 
-        console.log('Calculator script loaded successfully!');
     </script>
 </body>
 </html>`;
@@ -255,7 +254,6 @@ export class TestPreviewService {
         <button onclick="alert('Blob URL test successful!')">Test Alert</button>
     </div>
     <script>
-        console.log('Blob URL test page loaded successfully!');
     </script>
 </body>
 </html>`;
@@ -278,15 +276,10 @@ export class TestPreviewService {
       console.warn("No HTML provided to getDataUrl");
       return "";
     }
-
-    console.log("Creating data URL for HTML length:", html.length);
-    console.log("HTML preview:", html.substring(0, 200) + "...");
-
     try {
       // Encode the HTML as a data URL
       const encodedHtml = encodeURIComponent(html);
       const dataUrl = `data:text/html;charset=utf-8,${encodedHtml}`;
-      console.log("Created data URL length:", dataUrl.length);
       return dataUrl;
     } catch (error) {
       console.error("Error creating data URL:", error);
@@ -303,12 +296,8 @@ export class TestPreviewService {
       return "";
     }
 
-    console.log("Creating blob URL for HTML length:", html.length);
-    console.log("HTML preview:", html.substring(0, 200) + "...");
-
     // Revoke previous blob URL to prevent memory leaks
     if (previousBlobUrl) {
-      console.log("Revoking previous blob URL:", previousBlobUrl);
       URL.revokeObjectURL(previousBlobUrl);
     }
 
@@ -316,8 +305,6 @@ export class TestPreviewService {
       // Create blob with HTML content
       const blob = new Blob([html], { type: "text/html" });
       const blobUrl = URL.createObjectURL(blob);
-      console.log("Created blob URL:", blobUrl);
-      console.log("Blob size:", blob.size);
       return blobUrl;
     } catch (error) {
       console.error("Error creating blob URL:", error);

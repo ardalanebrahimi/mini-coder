@@ -62,8 +62,6 @@ export class ToolboxProjectItemComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.project = response.project;
           this.isPublishing = false;
-          // Optionally show success message
-          console.log("Project published successfully:", response.message);
         },
         error: (error) => {
           this.isPublishing = false;
@@ -86,8 +84,6 @@ export class ToolboxProjectItemComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.project = response.project;
           this.isUnpublishing = false;
-          // Optionally show success message
-          console.log("Project unpublished successfully:", response.message);
         },
         error: (error) => {
           this.isUnpublishing = false;

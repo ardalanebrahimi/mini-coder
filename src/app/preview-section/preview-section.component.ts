@@ -142,40 +142,10 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
    * Handle iframe load event
    */
   onIframeLoad(event: any): void {
-    console.log("Iframe loaded successfully");
-    console.log("Event:", event);
-    console.log("Event target:", event.target);
-    console.log("Event target src:", event.target.src);
-    console.log("Event target sandbox:", event.target.sandbox);
-
     const iframe = event.target;
     try {
       const iframeDocument =
         iframe.contentDocument || iframe.contentWindow?.document;
-      if (iframeDocument) {
-        console.log("Iframe document accessible");
-        console.log("Iframe document title:", iframeDocument.title);
-        console.log("Iframe document URL:", iframeDocument.URL);
-        console.log("Iframe document readyState:", iframeDocument.readyState);
-        console.log(
-          "Iframe document body innerHTML length:",
-          iframeDocument.body?.innerHTML?.length || 0
-        );
-        console.log(
-          "Iframe document has script tags:",
-          iframeDocument.querySelectorAll("script").length
-        );
-        console.log(
-          "Iframe document has style tags:",
-          iframeDocument.querySelectorAll("style").length
-        );
-        console.log(
-          "Iframe document body preview:",
-          iframeDocument.body?.innerHTML?.substring(0, 200) || "No body content"
-        );
-      } else {
-        console.log("Iframe document not accessible");
-      }
     } catch (error) {
       console.log(
         "Cannot access iframe content (security restrictions):",

@@ -49,7 +49,5 @@ When the dialog opens:
 The component emits a custom `saveSuccess` event when a project is saved successfully:
 
 ```typescript
-document.addEventListener("saveSuccess", (event: any) => {
-  console.log(event.detail.message);
-});
+document.addEventListener("saveSuccess", (event: any) => {});
 ```

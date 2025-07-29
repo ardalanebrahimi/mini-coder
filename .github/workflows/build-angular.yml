@@ -31,11 +31,12 @@ jobs:
       - name: Generate environment.ts from template
         run: |
           echo 'Generating environment.ts from template...'
-
+          system_prompt=$(echo "${{ secrets.SYSTEM_PROMPT }}" | sed 's/\\n/\'$'\n''/g')
+          openai_fix_instructions=$(echo "${{ secrets.OPENAI_FIX_INSTRUCTIONS }}" | sed 's/\\n/\'$'\n''/g')
           sed -e "s|\${API_URL}|${{ secrets.API_URL }}|g" \
               -e "s|\${OPENAI_API_KEY}|${{ secrets.OPENAI_API_KEY }}|g" \
-              -e "s|\${SYSTEM_PROMPT}|$(echo "${{ secrets.SYSTEM_PROMPT }}" | sed 's/["`]/\\&/g')|g" \
-              -e "s|\${OPENAI_FIX_INSTRUCTIONS}|$(echo "${{ secrets.OPENAI_FIX_INSTRUCTIONS }}" | sed 's/["`]/\\&/g')|g" \
+              -e "s|\${SYSTEM_PROMPT}|$system_prompt|g" \
+              -e "s|\${OPENAI_FIX_INSTRUCTIONS}|$openai_fix_instructions|g" \
               src/environments/environment.template.ts > src/environments/environment.ts
 
       - name: Build Angular app for production

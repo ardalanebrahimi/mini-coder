@@ -120,7 +120,6 @@ export class StarService {
   ) {
     try {
       const skip = (page - 1) * limit;
-      console.log(userId);
       // Get projects with star counts using raw SQL
       const projectsQuery = userId
         ? `

@@ -138,11 +138,16 @@ export class PromptProcessorService {
     });
 
     const body = {
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
           content: environment.mainPrompt,
+        },
+        {
+          role: "assistant",
+          content:
+            "Remember: Always reply with a single, complete HTML file. Make it colorful, safe, and fun for kids. All features must work.",
         },
         {
           role: "user",
@@ -150,7 +155,7 @@ export class PromptProcessorService {
         },
       ],
       max_tokens: 3000,
-      temperature: 0.3,
+      temperature: 0.2,
     };
 
     return this.http.post(this.openaiApiUrl, body, { headers });

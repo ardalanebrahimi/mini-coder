@@ -142,7 +142,7 @@ export class PromptProcessorService {
       messages: [
         {
           role: "system",
-          content: environment.mainPrompt,
+          content: environment.systemPrompt,
         },
         {
           role: "assistant",

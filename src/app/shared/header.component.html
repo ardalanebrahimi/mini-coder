@@ -3,16 +3,14 @@
     <div class="header-content">
       <!-- Main Logo/Title -->
       <div class="brand-section">
-        <h1 class="logo" *ngIf="!isAppRoute">
-          <a routerLink="/welcome">Mini Coder</a>
-        </h1>
-
         <!-- App Title for home route -->
-        <div class="app-title-section" *ngIf="isAppRoute">
+        <div class="app-title-section logo">
           <h1 class="app-title">
-            <span class="emoji">🚀</span>
-            {{ t("appTitle") }}
-            <span class="emoji">✨</span>
+            <a routerLink="/home">
+              <span class="emoji">🚀</span>
+              {{ t("appTitle") }}
+              <span class="emoji">✨</span>
+            </a>
           </h1>
           <p class="app-subtitle">{{ t("appSubtitle") }}</p>
         </div>

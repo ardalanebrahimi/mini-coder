@@ -19,6 +19,7 @@ import { AuthModalComponent } from "./shared/auth-modal.component";
 import { ProfileModalComponent } from "./profile/profile-modal.component";
 import { AppStoreComponent } from "./app-store/app-store.component";
 import { VoiceInputModalComponent } from "./voice-input-modal/voice-input-modal.component";
+import { AnalyticsDashboardComponent } from "./shared/analytics-dashboard.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { PublishedProject } from "./services/app-store.service";
 import { TranslationService } from "./services/translation.service";
@@ -38,6 +39,10 @@ import {
   CommandActionsService,
   CommandAction,
 } from "./services/command-actions.service";
+import {
+  AnalyticsService,
+  AnalyticsEventType,
+} from "./services/analytics.service";
 import { PreviewSectionService } from "./services/preview-section.service";
 import { VoiceActionService } from "./services/voice-action.service";
 import { EXAMPLE_COMMANDS } from "./examples";
@@ -58,6 +63,7 @@ import { EXAMPLE_COMMANDS } from "./examples";
     ProfileModalComponent,
     AppStoreComponent,
     VoiceInputModalComponent,
+    AnalyticsDashboardComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -240,7 +246,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private modifyAppDialogService: ModifyAppDialogService,
     private previewSectionService: PreviewSectionService,
     private profileService: ProfileService,
-    private voiceActionService: VoiceActionService
+    private voiceActionService: VoiceActionService,
+    private analytics: AnalyticsService
   ) {}
 
   /**
@@ -397,6 +404,20 @@ export class AppComponent implements OnInit, OnDestroy {
       ? `${this.t("rebuildApp")} successful!`
       : `${this.t("modifyApp")} successful!`;
     this.showSuccessMessage(successMessage);
+
+    // Track successful modification/rebuild
+    if (isRebuilding) {
+      this.analytics.logEvent(AnalyticsEventType.APP_REBUILT, {
+        appRebuilt: {
+          originalPrompt: this.userCommand || "unknown",
+          newPrompt: command,
+          language: this.selectedLanguage,
+          success: true,
+        },
+      });
+    } else {
+      this.analytics.logAppModified(command, this.selectedLanguage, true);
+    }
   }
 
   /**
@@ -410,6 +431,32 @@ export class AppComponent implements OnInit, OnDestroy {
       ? `${this.t("rebuildApp")} failed. Please try again.`
       : `${this.t("modifyApp")} failed. Please try again.`;
     this.isModifying = false;
+
+    // Track failed modification/rebuild
+    if (isRebuilding) {
+      this.analytics.logEvent(AnalyticsEventType.APP_REBUILT, {
+        appRebuilt: {
+          originalPrompt: this.userCommand || "unknown",
+          newPrompt: "failed_rebuild",
+          language: this.selectedLanguage,
+          success: false,
+        },
+      });
+    } else {
+      this.analytics.logAppModified(
+        "failed_modification",
+        this.selectedLanguage,
+        false,
+        this.errorMessage
+      );
+    }
+
+    // Track general app error
+    this.analytics.logAppError(
+      this.errorMessage,
+      isRebuilding ? "app_rebuild" : "app_modification",
+      error.stack
+    );
   }
 
   /**
@@ -679,6 +726,13 @@ export class AppComponent implements OnInit, OnDestroy {
         this.showSuccessMessage(
           `Created "${result.projectName}" successfully!`
         );
+
+        // Track successful app creation
+        this.analytics.logAppCreated(
+          currentCommand,
+          this.selectedLanguage,
+          true
+        );
       },
       error: (error) => {
         console.error("Error processing command:", error);
@@ -686,6 +740,21 @@ export class AppComponent implements OnInit, OnDestroy {
           error.message ||
           "Failed to generate app. Please try again with a more specific command.";
         this.commandInputService.setProcessing(false);
+
+        // Track failed app creation
+        this.analytics.logAppCreated(
+          currentCommand,
+          this.selectedLanguage,
+          false,
+          this.errorMessage
+        );
+
+        // Track general app error
+        this.analytics.logAppError(
+          this.errorMessage,
+          "app_creation",
+          error.stack
+        );
         console.error("Error processing command:", error);
 
         // For debugging: show the error but also create a test preview

@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, Subject, throwError } from "rxjs";
 import { catchError, timeout } from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import { TranslationService } from "./translation.service";
+import { AnalyticsService, AnalyticsEventType } from "./analytics.service";
 
 export interface VoiceRecordingState {
   isRecording: boolean;
@@ -88,7 +89,8 @@ export class WhisperVoiceService {
 
   constructor(
     private http: HttpClient,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
   ) {
     // Initialize with current UI language
     this.updateCurrentLanguage();
@@ -337,6 +339,9 @@ export class WhisperVoiceService {
         isProcessing: false,
       });
 
+      // Track successful voice input
+      this.analytics.logVoiceInput(result.language, result.duration, true);
+
       // Reset to idle after a short delay
       setTimeout(() => {
         this.resetState();
@@ -344,6 +349,16 @@ export class WhisperVoiceService {
     } catch (error) {
       console.error("Error processing audio:", error);
       this.emitError("api", "Failed to process audio. Please try again.");
+
+      // Track failed voice input
+      const currentState = this.stateSubject.value;
+      this.analytics.logVoiceInput(
+        currentState.currentLanguage,
+        currentState.recordingTime / 1000,
+        false,
+        error instanceof Error ? error.message : "Audio processing failed"
+      );
+
       this.resetState();
     }
   }

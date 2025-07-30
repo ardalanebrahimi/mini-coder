@@ -2,6 +2,11 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, tap } from "rxjs";
 import { environment } from "../../environments/environment";
+import {
+  AnalyticsService,
+  AnalyticsEventType,
+  createAnonymizedUserId,
+} from "./analytics.service";
 
 interface LoginRequest {
   loginField: string; // Can be email or username
@@ -72,7 +77,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private analytics: AnalyticsService) {
     // Check if user is already logged in
     const token = localStorage.getItem("token");
     if (token) {
@@ -88,6 +93,13 @@ export class AuthService {
         tap((response) => {
           localStorage.setItem("token", response.token);
           this.currentUserSubject.next(response.user);
+
+          // Track login event with anonymized user ID
+          const anonymizedId = createAnonymizedUserId(response.user.email);
+          this.analytics.setUser(anonymizedId);
+          this.analytics.logEvent(AnalyticsEventType.AUTH_LOGIN, {
+            authLogin: { success: true, userId: anonymizedId },
+          });
         })
       );
   }
@@ -99,6 +111,17 @@ export class AuthService {
         tap((response) => {
           localStorage.setItem("token", response.token);
           this.currentUserSubject.next(response.user);
+
+          // Track registration and first login
+          const anonymizedId = createAnonymizedUserId(response.user.email);
+          this.analytics.setUser(anonymizedId);
+          this.analytics.logEvent(AnalyticsEventType.AUTH_LOGIN, {
+            authLogin: {
+              success: true,
+              userId: anonymizedId,
+              isRegistration: true,
+            },
+          });
         })
       );
   }
@@ -132,6 +155,11 @@ export class AuthService {
   }
 
   logout(): void {
+    // Track logout event before clearing user data
+    this.analytics.logEvent(AnalyticsEventType.AUTH_LOGOUT, {
+      authLogout: { success: true },
+    });
+
     localStorage.removeItem("token");
     this.currentUserSubject.next(null);
     // Note: In standalone components, we'll handle navigation in the component

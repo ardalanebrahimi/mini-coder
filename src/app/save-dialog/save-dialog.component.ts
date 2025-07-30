@@ -9,6 +9,10 @@ import {
 import { StorageService } from "../services/storage.service";
 import { ToolboxService } from "../services/toolbox.service";
 import { TranslationService } from "../services/translation.service";
+import {
+  AnalyticsService,
+  AnalyticsEventType,
+} from "../services/analytics.service";
 
 @Component({
   selector: "app-save-dialog",
@@ -31,7 +35,8 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
     private saveDialogService: SaveDialogService,
     private storageService: StorageService,
     private toolboxService: ToolboxService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -144,11 +149,27 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
                   `Saved "${uniqueName}" to your toolbox!`
                 );
 
+                // Track successful app save
+                this.analytics.logEvent(AnalyticsEventType.APP_SAVED, {
+                  appSaved: {
+                    appName: uniqueName,
+                    language: this.dialogData!.currentApp!.detectedLanguage,
+                  },
+                });
+
                 this.isSaving = false;
               },
               error: (error) => {
                 this.errorMessage = "Failed to save project. Please try again.";
                 console.error("Error saving project:", error);
+
+                // Track failed app save
+                this.analytics.logAppError(
+                  this.errorMessage,
+                  "app_save",
+                  error.stack
+                );
+
                 this.isSaving = false;
               },
             });

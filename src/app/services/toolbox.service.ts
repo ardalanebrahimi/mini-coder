@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { SavedProject } from "./storage.service";
+import { AnalyticsService, AnalyticsEventType } from "./analytics.service";
 
 @Injectable({
   providedIn: "root",
@@ -25,11 +26,15 @@ export class ToolboxService {
   public projectLoad$ = this.projectLoadSubject.asObservable();
   public projectDelete$ = this.projectDeleteSubject.asObservable();
 
-  constructor() {}
+  constructor(private analytics: AnalyticsService) {}
 
   // Toolbox state management
   open(): void {
     this.isOpenSubject.next(true);
+    // Track toolbox open event
+    this.analytics.logEvent(AnalyticsEventType.TOOLBOX_OPENED, {
+      toolboxOpened: { timestamp: new Date().toISOString() },
+    });
   }
 
   close(): void {
@@ -37,7 +42,15 @@ export class ToolboxService {
   }
 
   toggle(): void {
-    this.isOpenSubject.next(!this.isOpenSubject.value);
+    const wasOpen = this.isOpenSubject.value;
+    this.isOpenSubject.next(!wasOpen);
+
+    // Track only when opening, not closing
+    if (!wasOpen) {
+      this.analytics.logEvent(AnalyticsEventType.TOOLBOX_OPENED, {
+        toolboxOpened: { timestamp: new Date().toISOString() },
+      });
+    }
   }
 
   isOpen(): boolean {
@@ -81,10 +94,26 @@ export class ToolboxService {
   loadProject(project: SavedProject): void {
     this.setSelectedProject(project);
     this.projectLoadSubject.next(project);
+
+    // Track app played/loaded
+    this.analytics.logEvent(AnalyticsEventType.APP_PLAYED, {
+      appPlayed: {
+        appName: project.name,
+        language: project.language || "unknown",
+      },
+    });
   }
 
   deleteProject(project: SavedProject): void {
     this.projectDeleteSubject.next(project);
+
+    // Track app deletion
+    this.analytics.logEvent(AnalyticsEventType.APP_DELETED, {
+      appDeleted: {
+        appId: project.id?.toString() || "unknown",
+        appName: project.name,
+      },
+    });
   }
 
   // Utility methods

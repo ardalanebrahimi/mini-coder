@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
+import { AnalyticsService } from "./analytics.service";
 
 interface Translations {
   [key: string]: {
@@ -235,7 +236,10 @@ export class TranslationService {
     { code: "de", name: "Deutsch", flag: "🇩🇪" },
   ];
 
-  constructor() {}
+  constructor(private analytics: AnalyticsService) {
+    // Set initial language in analytics
+    this.analytics.setLanguage(this.selectedLanguageSubject.value);
+  }
 
   getCurrentLanguage(): string {
     return this.selectedLanguageSubject.value;
@@ -243,7 +247,11 @@ export class TranslationService {
 
   setLanguage(languageCode: string): void {
     if (this.translations[languageCode]) {
+      const previousLanguage = this.selectedLanguageSubject.value;
       this.selectedLanguageSubject.next(languageCode);
+
+      // Update analytics language
+      this.analytics.setLanguage(languageCode);
     }
   }
 

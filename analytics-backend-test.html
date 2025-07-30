@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics Backend Integration Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .test-section h3 {
+        margin-top: 0;
+        color: #007bff;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button.success {
+        background: #28a745;
+      }
+      button.danger {
+        background: #dc3545;
+      }
+      .log {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .status.online {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.offline {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin: 20px 0;
+      }
+      .stat-card {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        text-align: center;
+      }
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📊 Analytics Backend Integration Test</h1>
+        <p>Test the new backend analytics system for MiniCoder</p>
+      </div>
+
+      <div class="status" id="connectionStatus">
+        <span id="connectionText">🔄 Checking connection...</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="localEvents">0</div>
+          <div>Local Events</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="pendingSync">0</div>
+          <div>Pending Sync</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="syncAttempts">0</div>
+          <div>Sync Attempts</div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>🧪 Test Event Generation</h3>
+        <p>Generate different types of analytics events to test the system:</p>
+        <button onclick="sendTestEvent('app_created')">App Created</button>
+        <button onclick="sendTestEvent('voice_input_used')">Voice Input</button>
+        <button onclick="sendTestEvent('api_error')">API Error</button>
+        <button onclick="sendTestEvent('session_start')">Session Start</button>
+        <button onclick="sendBatchEvents()">Send Batch (5 events)</button>
+      </div>
+
+      <div class="test-section">
+        <h3>🔗 Backend API Tests</h3>
+        <p>Test direct communication with the analytics backend:</p>
+        <button onclick="testHealthEndpoint()">Health Check</button>
+        <button onclick="testStatsEndpoint()">Get Stats (Admin)</button>
+        <button onclick="testEventsEndpoint()">Get Events (Admin)</button>
+      </div>
+
+      <div class="test-section">
+        <h3>📡 Network Simulation</h3>
+        <p>Simulate network conditions to test offline buffering:</p>
+        <button onclick="simulateOffline()">Go Offline</button>
+        <button onclick="simulateOnline()" class="success">Go Online</button>
+        <button onclick="clearLocalData()" class="danger">
+          Clear Local Data
+        </button>
+      </div>
+
+      <div class="test-section">
+        <h3>📝 Event Log</h3>
+        <div class="log" id="eventLog"></div>
+        <button onclick="clearLog()">Clear Log</button>
+      </div>
+    </div>
+
+    <script>
+      // Mock analytics service for testing
+      class MockAnalyticsService {
+        constructor() {
+          this.events = [];
+          this.pendingEvents = [];
+          this.syncAttempts = 0;
+          this.isOnline = navigator.onLine;
+          this.sessionId = `session_${Date.now()}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
+          this.userId = `user_${Math.random().toString(36).substr(2, 9)}`;
+          this.backendUrl = "http://localhost:3000"; // Adjust as needed
+
+          this.updateUI();
+          this.setupNetworkListeners();
+        }
+
+        setupNetworkListeners() {
+          window.addEventListener("online", () => {
+            this.isOnline = true;
+            this.log("📶 Back online - attempting to sync pending events");
+            this.updateConnectionStatus();
+            this.syncToBackend();
+          });
+
+          window.addEventListener("offline", () => {
+            this.isOnline = false;
+            this.log("📵 Gone offline - events will be buffered");
+            this.updateConnectionStatus();
+          });
+        }
+
+        logEvent(eventType, details = {}) {
+          const event = {
+            eventType,
+            sessionId: this.sessionId,
+            userId: this.userId,
+            language: "en",
+            timestamp: new Date().toISOString(),
+            details,
+          };
+
+          this.events.push(event);
+          this.pendingEvents.push(event);
+
+          this.log(`📊 Event logged: ${eventType}`);
+          this.updateUI();
+
+          // Auto-sync if we have enough events
+          if (this.pendingEvents.length >= 3) {
+            this.syncToBackend();
+          }
+        }
+
+        async syncToBackend() {
+          if (this.pendingEvents.length === 0 || !this.isOnline) {
+            return;
+          }
+
+          const eventsToSync = [...this.pendingEvents];
+          this.syncAttempts++;
+          this.updateUI();
+
+          try {
+            const response = await fetch(
+              `${this.backendUrl}/api/analytics/events`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ events: eventsToSync }),
+              }
+            );
+
+            if (response.ok) {
+              const result = await response.json();
+              this.pendingEvents = []; // Clear synced events
+              this.log(`✅ Synced ${eventsToSync.length} events to backend`);
+              this.log(`Backend response: ${result.message}`);
+            } else {
+              throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+              );
+            }
+          } catch (error) {
+            this.log(`❌ Sync failed: ${error.message}`);
+            // Keep events in pending queue for retry
+          }
+
+          this.updateUI();
+        }
+
+        async testBackendEndpoint(endpoint, method = "GET") {
+          try {
+            const response = await fetch(
+              `${this.backendUrl}/api/analytics/${endpoint}`,
+              {
+                method,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            const result = await response.json();
+            this.log(
+              `🔗 ${method} ${endpoint}: ${JSON.stringify(result, null, 2)}`
+            );
+            return result;
+          } catch (error) {
+            this.log(`❌ Backend test failed: ${error.message}`);
+            return null;
+          }
+        }
+
+        simulateOffline() {
+          this.isOnline = false;
+          this.log("🔒 Simulated offline mode");
+          this.updateConnectionStatus();
+        }
+
+        simulateOnline() {
+          this.isOnline = true;
+          this.log("🌐 Simulated online mode");
+          this.updateConnectionStatus();
+          this.syncToBackend();
+        }
+
+        clearLocalData() {
+          this.events = [];
+          this.pendingEvents = [];
+          this.syncAttempts = 0;
+          this.log("🗑️ Cleared all local analytics data");
+          this.updateUI();
+        }
+
+        updateUI() {
+          document.getElementById("localEvents").textContent =
+            this.events.length;
+          document.getElementById("pendingSync").textContent =
+            this.pendingEvents.length;
+          document.getElementById("syncAttempts").textContent =
+            this.syncAttempts;
+          this.updateConnectionStatus();
+        }
+
+        updateConnectionStatus() {
+          const statusEl = document.getElementById("connectionStatus");
+          const textEl = document.getElementById("connectionText");
+
+          if (this.isOnline) {
+            statusEl.className = "status online";
+            const pending =
+              this.pendingEvents.length > 0
+                ? ` (${this.pendingEvents.length} pending)`
+                : "";
+            textEl.textContent = `🟢 Online - Events syncing to backend${pending}`;
+          } else {
+            statusEl.className = "status offline";
+            textEl.textContent = "🔴 Offline - Events buffered locally";
+          }
+        }
+
+        log(message) {
+          const logEl = document.getElementById("eventLog");
+          const timestamp = new Date().toLocaleTimeString();
+          logEl.innerHTML += `[${timestamp}] ${message}\n`;
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+      }
+
+      // Initialize the mock service
+      const analytics = new MockAnalyticsService();
+
+      // Test functions
+      function sendTestEvent(eventType) {
+        const details = {
+          [eventType]: {
+            test: true,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+          },
+        };
+
+        // Add specific details based on event type
+        switch (eventType) {
+          case "app_created":
+            details.appCreated = {
+              prompt: "Create a test calculator",
+              language: "en",
+              success: true,
+            };
+            break;
+          case "voice_input_used":
+            details.voiceInputUsed = {
+              language: "en",
+              duration: Math.random() * 10,
+              success: true,
+            };
+            break;
+          case "api_error":
+            details.apiError = {
+              endpoint: "/api/test",
+              statusCode: 500,
+              errorMessage: "Test error message",
+            };
+            break;
+          case "session_start":
+            details.sessionStart = {
+              userAgent: navigator.userAgent,
+              referrer: document.referrer,
+              isReturningUser: false,
+            };
+            break;
+        }
+
+        analytics.logEvent(eventType, details);
+      }
+
+      function sendBatchEvents() {
+        const eventTypes = [
+          "app_created",
+          "app_modified",
+          "voice_input_used",
+          "toolbox_opened",
+          "language_changed",
+        ];
+        eventTypes.forEach((eventType, index) => {
+          setTimeout(() => sendTestEvent(eventType), index * 100);
+        });
+      }
+
+      function testHealthEndpoint() {
+        analytics.testBackendEndpoint("health");
+      }
+
+      function testStatsEndpoint() {
+        analytics.testBackendEndpoint("stats");
+      }
+
+      function testEventsEndpoint() {
+        analytics.testBackendEndpoint("events");
+      }
+
+      function simulateOffline() {
+        analytics.simulateOffline();
+      }
+
+      function simulateOnline() {
+        analytics.simulateOnline();
+      }
+
+      function clearLocalData() {
+        analytics.clearLocalData();
+      }
+
+      function clearLog() {
+        document.getElementById("eventLog").innerHTML = "";
+      }
+
+      // Initial setup
+      analytics.log("🚀 Analytics Backend Integration Test initialized");
+      analytics.log(`Session ID: ${analytics.sessionId}`);
+      analytics.log(`User ID: ${analytics.userId}`);
+      analytics.log("📡 Testing backend connectivity...");
+      analytics.testBackendEndpoint("health");
+    </script>
+  </body>
+</html>

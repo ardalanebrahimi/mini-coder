@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Observable, map } from "rxjs";
+import { Observable, map, tap } from "rxjs";
 import { environment } from "../../environments/environment";
+import { AnalyticsService, AnalyticsEventType } from "./analytics.service";
 
 export interface PublishedProject {
   id: number;
@@ -36,7 +37,7 @@ export interface AppStoreResponse {
 export class AppStoreService {
   private readonly apiUrl = `${environment.apiUrl}/api/v1/projects`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private analytics: AnalyticsService) {}
 
   /**
    * Get published projects from the App Store with pagination
@@ -92,12 +93,25 @@ export class AppStoreService {
     starCount: number;
     projectId: number;
   }> {
-    return this.http.post<{
-      message: string;
-      starred: boolean;
-      starCount: number;
-      projectId: number;
-    }>(`${environment.apiUrl}/api/v1/stars/${projectId}/toggle`, {});
+    return this.http
+      .post<{
+        message: string;
+        starred: boolean;
+        starCount: number;
+        projectId: number;
+      }>(`${environment.apiUrl}/api/v1/stars/${projectId}/toggle`, {})
+      .pipe(
+        tap((response) => {
+          // Track star given/removed
+          this.analytics.logEvent(AnalyticsEventType.STAR_GIVEN, {
+            starGiven: {
+              appId: projectId.toString(),
+              rating: response.starred ? 1 : 0, // 1 for star given, 0 for star removed
+              appLanguage: "unknown", // We don't have language info in this context
+            },
+          });
+        })
+      );
   }
 
   /**

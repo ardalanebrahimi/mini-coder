@@ -13,6 +13,7 @@ import { AppComponent } from "./app/app.component";
 import { LoginComponent } from "./app/auth/login.component";
 import { RegisterComponent } from "./app/auth/register.component";
 import { AuthInterceptor } from "./app/services/auth.interceptor";
+// import { AnalyticsInterceptor } from "./app/services/analytics.interceptor"; // Removed to prevent circular dependency
 import { AuthGuard } from "./app/services/auth.guard";
 
 const routes: Routes = [
@@ -32,5 +33,7 @@ bootstrapApplication(RootComponent, {
       useClass: AuthInterceptor,
       multi: true,
     },
+    // Analytics interceptor removed to prevent circular dependency
+    // API errors will be logged directly in services instead
   ],
 }).catch((err) => console.error(err));

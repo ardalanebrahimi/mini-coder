@@ -79,10 +79,12 @@ export class AuthService {
 
   constructor(private http: HttpClient, private analytics: AnalyticsService) {
     // Check if user is already logged in
-    const token = localStorage.getItem("token");
-    if (token) {
+    const user = localStorage.getItem("user");
+    if (user) {
+      const userParsed = JSON.parse(user);
       // You might want to verify the token with the backend
-      this.currentUserSubject.next({ token });
+      this.currentUserSubject.next(userParsed);
+      this.analytics.setUser(userParsed.id);
     }
   }
 
@@ -92,10 +94,11 @@ export class AuthService {
       .pipe(
         tap((response) => {
           localStorage.setItem("token", response.token);
+          localStorage.setItem("user", JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
 
           // Track login event with anonymized user ID
-          const anonymizedId = createAnonymizedUserId(response.user.email);
+          const anonymizedId = createAnonymizedUserId(response.user.id);
           this.analytics.setUser(anonymizedId);
           this.analytics.logEvent(AnalyticsEventType.AUTH_LOGIN, {
             authLogin: { success: true, userId: anonymizedId },
@@ -110,10 +113,11 @@ export class AuthService {
       .pipe(
         tap((response) => {
           localStorage.setItem("token", response.token);
+          localStorage.setItem("user", JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
 
           // Track registration and first login
-          const anonymizedId = createAnonymizedUserId(response.user.email);
+          const anonymizedId = createAnonymizedUserId(response.user.id);
           this.analytics.setUser(anonymizedId);
           this.analytics.logEvent(AnalyticsEventType.AUTH_LOGIN, {
             authLogin: {
@@ -161,6 +165,7 @@ export class AuthService {
     });
 
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     this.currentUserSubject.next(null);
     // Note: In standalone components, we'll handle navigation in the component
   }

@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 // Remove HttpClient import to avoid circular dependency with interceptors
 // import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { AuthService } from "./auth.service";
 
 /**
  * Enum defining all possible analytics event types

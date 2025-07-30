@@ -14,6 +14,10 @@ import {
 import { TranslationService } from "../services/translation.service";
 import { AppStoreService } from "../services/app-store.service";
 import { AuthService } from "../services/auth.service";
+import {
+  AnalyticsService,
+  AnalyticsEventType,
+} from "../services/analytics.service";
 
 @Component({
   selector: "app-preview-section",
@@ -39,7 +43,8 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
     private previewSectionService: PreviewSectionService,
     private translationService: TranslationService,
     private appStoreService: AppStoreService,
-    private authService: AuthService
+    private authService: AuthService,
+    private analytics: AnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +86,11 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
    * Handle save button click
    */
   onSaveClick(): void {
+    // Log attempt to save app to toolbox
+    if (!this.authService.isLoggedIn()) {
+      // Log guest user trying to save to toolbox
+      this.analytics.logLoginPromptShown("save_to_toolbox");
+    }
     this.previewSectionService.emitAction("save");
   }
 
@@ -107,6 +117,8 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
     }
 
     if (!this.authService.isLoggedIn()) {
+      // Log guest user trying to star an app
+      this.analytics.logLoginPromptShown("star_app_store_project");
       // Show auth modal if not logged in
       this.showAuthModal();
       return;

@@ -157,6 +157,17 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
                   },
                 });
 
+                // Track app publication if it's made public
+                if (!this.isPrivate) {
+                  this.analytics.logEvent(AnalyticsEventType.APP_PUBLISHED, {
+                    appPublished: {
+                      appName: uniqueName,
+                      language: this.dialogData!.currentApp!.detectedLanguage,
+                      success: true,
+                    },
+                  });
+                }
+
                 this.isSaving = false;
               },
               error: (error) => {

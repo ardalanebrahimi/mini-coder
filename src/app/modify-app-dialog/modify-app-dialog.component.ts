@@ -9,6 +9,10 @@ import {
 } from "../services/modify-app-dialog.service";
 import { TranslationService } from "../services/translation.service";
 import { VoiceActionService } from "../services/voice-action.service";
+import {
+  AnalyticsService,
+  AnalyticsEventType,
+} from "../services/analytics.service";
 
 @Component({
   selector: "app-modify-app-dialog",
@@ -35,7 +39,8 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
   constructor(
     private modifyAppDialogService: ModifyAppDialogService,
     private translationService: TranslationService,
-    private voiceActionService: VoiceActionService
+    private voiceActionService: VoiceActionService,
+    private analytics: AnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +54,15 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
         this.showDialog = show;
         if (!show) {
           this.resetForm();
+        } else {
+          // Log modify app dialog shown
+          this.analytics.logEvent(AnalyticsEventType.APP_MODIFIED, {
+            appModified: {
+              modification: "dialog_opened",
+              language: "unknown", // Will be updated when actual modification happens
+              success: false, // Just opening dialog
+            },
+          });
         }
       });
 
@@ -124,6 +138,15 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
       this.errorMessage = "No app to modify!";
       return;
     }
+
+    // Log modify app confirmation (when user clicks to actually modify)
+    this.analytics.logEvent(AnalyticsEventType.APP_MODIFIED, {
+      appModified: {
+        modification: this.modifyCommand,
+        language: this.dialogData?.currentApp?.detectedLanguage || "unknown",
+        success: false, // Will be updated based on result
+      },
+    });
 
     this.modifyAppDialogService.submitCommand(this.modifyCommand);
   }

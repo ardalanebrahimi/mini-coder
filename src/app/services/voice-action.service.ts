@@ -3,6 +3,7 @@ import { Subject, BehaviorSubject } from "rxjs";
 import { WhisperVoiceService } from "./whisper-voice.service";
 import { CommandInputService } from "./command-input.service";
 import { TranslationService } from "./translation.service";
+import { AnalyticsService, AnalyticsEventType } from "./analytics.service";
 
 export interface VoiceModalState {
   isOpen: boolean;
@@ -30,13 +31,23 @@ export class VoiceActionService {
   constructor(
     private whisperVoiceService: WhisperVoiceService,
     private commandInputService: CommandInputService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
   ) {}
 
   /**
    * Open voice modal for main input
    */
   openVoiceModalForMainInput(): void {
+    // Log voice input button click
+    this.analytics.logEvent(AnalyticsEventType.VOICE_INPUT_USED, {
+      voiceInputUsed: {
+        language: this.translationService.getCurrentLanguage(),
+        duration: 0, // Will be updated when actual voice input completes
+        success: false, // Will be updated based on result
+      },
+    });
+
     this.voiceModalStateSubject.next({
       isOpen: true,
       context: "main-input",
@@ -47,6 +58,15 @@ export class VoiceActionService {
    * Open voice modal for modify dialog
    */
   openVoiceModalForModifyDialog(): void {
+    // Log voice input button click in modify dialog
+    this.analytics.logEvent(AnalyticsEventType.VOICE_INPUT_USED, {
+      voiceInputUsed: {
+        language: this.translationService.getCurrentLanguage(),
+        duration: 0, // Will be updated when actual voice input completes
+        success: false, // Will be updated based on result
+      },
+    });
+
     this.voiceModalStateSubject.next({
       isOpen: true,
       context: "modify-dialog",

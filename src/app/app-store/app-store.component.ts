@@ -13,6 +13,10 @@ import {
   AppStoreResponse,
 } from "../services/app-store.service";
 import { AuthService } from "../services/auth.service";
+import {
+  AnalyticsService,
+  AnalyticsEventType,
+} from "../services/analytics.service";
 
 @Component({
   selector: "app-app-store",
@@ -37,7 +41,8 @@ export class AppStoreComponent implements OnInit, OnDestroy {
 
   constructor(
     private appStoreService: AppStoreService,
-    private authService: AuthService
+    private authService: AuthService,
+    private analytics: AnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -106,18 +111,43 @@ export class AppStoreComponent implements OnInit, OnDestroy {
    * Try/preview a project
    */
   onTryProject(project: PublishedProject): void {
+    // Log guest user trying an app from App Store
+    if (!this.authService.isLoggedIn()) {
+      this.analytics.logGuestAppViewed(
+        project.id.toString(),
+        project.name,
+        project.language || "en"
+      );
+    }
+
     // Get the full project details including code
     this.appStoreService
       .getPublicProject(project.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (fullProject: PublishedProject) => {
+          // Log guest user starting an app
+          if (!this.authService.isLoggedIn()) {
+            this.analytics.logGuestAppStarted(
+              fullProject.id.toString(),
+              fullProject.name,
+              fullProject.language || "en"
+            );
+          }
+
           // Emit event to parent component to load project for preview
           this.tryProject.emit(fullProject);
         },
         error: (error: any) => {
           console.error("Error loading project for preview:", error);
-          // Could show a toast notification here
+          // Log error
+          this.analytics.logEvent(AnalyticsEventType.API_ERROR, {
+            apiError: {
+              endpoint: `/public-projects/${project.id}`,
+              statusCode: error.status || 0,
+              errorMessage: error.message || "Failed to load project",
+            },
+          });
         },
       });
   }
@@ -135,6 +165,8 @@ export class AppStoreComponent implements OnInit, OnDestroy {
   onStarProject(project: PublishedProject): void {
     // Check if user is authenticated
     if (!this.authService.isLoggedIn()) {
+      // Log attempt to save app to toolbox as guest
+      this.analytics.logLoginPromptShown("star_project");
       this.starRequiresAuth.emit("Please log in to star projects!");
       return;
     }
@@ -162,7 +194,14 @@ export class AppStoreComponent implements OnInit, OnDestroy {
           if (error.status === 401) {
             this.starRequiresAuth.emit("Please log in to star projects!");
           }
-          // Could show a toast notification here
+          // Log API error
+          this.analytics.logEvent(AnalyticsEventType.API_ERROR, {
+            apiError: {
+              endpoint: `/stars/${project.id}`,
+              statusCode: error.status || 0,
+              errorMessage: error.message || "Failed to toggle star",
+            },
+          });
         },
       });
   }

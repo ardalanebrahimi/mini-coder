@@ -21,6 +21,7 @@ export enum AnalyticsEventType {
   APP_SAVED = "app_saved",
   APP_DELETED = "app_deleted",
   APP_PLAYED = "app_played",
+  APP_PRIVACY_CHANGED = "app_privacy_changed",
 
   // User interaction events
   TOKEN_SPENT = "token_spent",
@@ -37,6 +38,11 @@ export enum AnalyticsEventType {
   LANGUAGE_CHANGED = "language_changed",
   AUTH_LOGIN = "auth_login",
   AUTH_LOGOUT = "auth_logout",
+  NAVIGATION_CHANGED = "navigation_changed",
+  GUEST_APP_VIEWED = "guest_app_viewed",
+  GUEST_APP_STARTED = "guest_app_started",
+  LOGIN_PROMPT_SHOWN = "login_prompt_shown",
+  PROFILE_ACCESSED = "profile_accessed",
 
   // Preview events
   PREVIEW_GENERATED = "preview_generated",
@@ -97,6 +103,13 @@ export interface EventDetails {
     appName: string;
   };
 
+  appPrivacyChanged?: {
+    appId: string;
+    appName: string;
+    fromPrivacy: "public" | "private";
+    toPrivacy: "public" | "private";
+  };
+
   // Voice events
   voiceInputUsed?: {
     language: string;
@@ -148,6 +161,34 @@ export interface EventDetails {
   languageChanged?: {
     fromLanguage: string;
     toLanguage: string;
+  };
+
+  navigationChanged?: {
+    fromView: string;
+    toView: string;
+    userType: "guest" | "logged_in";
+  };
+
+  guestAppViewed?: {
+    appId: string;
+    appName: string;
+    appLanguage: string;
+  };
+
+  guestAppStarted?: {
+    appId: string;
+    appName: string;
+    appLanguage: string;
+  };
+
+  loginPromptShown?: {
+    trigger: string; // What action triggered the login prompt
+    userType: "guest";
+  };
+
+  profileAccessed?: {
+    userType: "logged_in";
+    userId: string;
   };
 }
 
@@ -232,6 +273,11 @@ export class AnalyticsService {
     this.startSession();
     this.setupFlushTimer();
     this.setupNetworkListeners();
+
+    // Make analytics service globally available for error handler
+    if (typeof window !== "undefined") {
+      (window as any).angularAnalyticsService = this;
+    }
 
     // Listen for page unload to flush events
     window.addEventListener("beforeunload", () => {
@@ -404,6 +450,67 @@ export class AnalyticsService {
     this.logEvent(AnalyticsEventType.APP_ERROR, {
       appError: { errorMessage, context, stackTrace },
     });
+  }
+
+  /**
+   * Log navigation changes
+   */
+  logNavigationChange(fromView: string, toView: string): void {
+    this.logEvent(AnalyticsEventType.NAVIGATION_CHANGED, {
+      navigationChanged: {
+        fromView,
+        toView,
+        userType: this.userId ? "logged_in" : "guest",
+      },
+    });
+  }
+
+  /**
+   * Log guest user viewing an app
+   */
+  logGuestAppViewed(appId: string, appName: string, appLanguage: string): void {
+    this.logEvent(AnalyticsEventType.GUEST_APP_VIEWED, {
+      guestAppViewed: { appId, appName, appLanguage },
+    });
+  }
+
+  /**
+   * Log guest user starting an app
+   */
+  logGuestAppStarted(
+    appId: string,
+    appName: string,
+    appLanguage: string
+  ): void {
+    this.logEvent(AnalyticsEventType.GUEST_APP_STARTED, {
+      guestAppStarted: { appId, appName, appLanguage },
+    });
+  }
+
+  /**
+   * Log when login prompt is shown
+   */
+  logLoginPromptShown(trigger: string): void {
+    this.logEvent(AnalyticsEventType.LOGIN_PROMPT_SHOWN, {
+      loginPromptShown: {
+        trigger,
+        userType: "guest",
+      },
+    });
+  }
+
+  /**
+   * Log profile access
+   */
+  logProfileAccessed(): void {
+    if (this.userId) {
+      this.logEvent(AnalyticsEventType.PROFILE_ACCESSED, {
+        profileAccessed: {
+          userType: "logged_in",
+          userId: this.userId,
+        },
+      });
+    }
   }
 
   /**

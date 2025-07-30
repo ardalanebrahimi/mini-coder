@@ -123,6 +123,8 @@ export class AppComponent implements OnInit, OnDestroy {
   showAuthModalWithMessage(message: string): void {
     this.authModalMessage = message;
     this.showAuthModal = true;
+    // Log that login prompt was shown
+    this.analytics.logLoginPromptShown(message);
   }
 
   /**
@@ -142,6 +144,8 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
     this.showProfileModal = true;
+    // Log profile access
+    this.analytics.logProfileAccessed();
   }
 
   /**
@@ -168,11 +172,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Navigation methods
   switchToApp(): void {
+    const previousView = this.currentView;
     this.currentView = "app";
+    // Log navigation to main app view
+    this.analytics.logNavigationChange(previousView, "app");
   }
 
   switchToStore(): void {
+    const previousView = this.currentView;
     this.currentView = "store";
+    // Log tab change to App Store
+    this.analytics.logNavigationChange(previousView, "store");
   }
 
   // Try project from App Store
@@ -309,6 +319,18 @@ export class AppComponent implements OnInit, OnDestroy {
    * Show modify app dialog
    */
   showModifyAppDialog(): void {
+    // Log modify app attempt
+    this.analytics.logEvent(AnalyticsEventType.APP_MODIFIED, {
+      appModified: {
+        modification: "modify_attempt",
+        language: this.selectedLanguage,
+        success: this.authService.isLoggedIn(),
+        errorMessage: this.authService.isLoggedIn()
+          ? undefined
+          : "Authentication required",
+      },
+    });
+
     // Check authentication before allowing modify
     if (!this.authService.isLoggedIn()) {
       this.showAuthModalWithMessage(

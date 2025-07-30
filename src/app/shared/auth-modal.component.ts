@@ -82,13 +82,24 @@ import { TranslationService } from "../services/translation.service";
           <!-- Register Form -->
           <form *ngIf="!isLogin" (ngSubmit)="onRegister()" class="auth-form">
             <div class="form-group">
+              <label for="username">{{ t("username") }}</label>
+              <input
+                type="text"
+                id="username"
+                [(ngModel)]="registerData.username"
+                name="username"
+                required
+                [placeholder]="t('usernamePlaceholder')"
+              />
+            </div>
+
+            <div class="form-group">
               <label for="name">{{ t("name") }}</label>
               <input
                 type="text"
                 id="name"
                 [(ngModel)]="registerData.name"
                 name="name"
-                required
                 [placeholder]="t('namePlaceholder')"
               />
             </div>
@@ -126,9 +137,9 @@ import { TranslationService } from "../services/translation.service";
               class="submit-btn"
               [disabled]="
                 isLoading ||
+                !registerData.username ||
                 !registerData.email ||
-                !registerData.password ||
-                !registerData.name
+                !registerData.password
               "
             >
               <span *ngIf="!isLoading">{{ t("register") }}</span>
@@ -422,7 +433,7 @@ export class AuthModalComponent implements OnInit {
 
   onRegister(): void {
     if (
-      !this.registerData.name ||
+      !this.registerData.username ||
       !this.registerData.email ||
       !this.registerData.password
     ) {

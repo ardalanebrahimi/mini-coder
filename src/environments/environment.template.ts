@@ -1,4 +1,5 @@
 export const environment = {
+  production: true,
   apiUrl: "__API_URL__",
   openaiApiKey: "__OPENAI_API_KEY__",
   systemPrompt: `__SYSTEM_PROMPT__`,

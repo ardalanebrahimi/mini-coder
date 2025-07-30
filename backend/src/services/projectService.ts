@@ -38,6 +38,7 @@ export class ProjectService {
     return {
       ...project,
       command: project.command ?? "",
+      publishedAt: (project as any).publishedAt ?? undefined,
     };
   }
 
@@ -54,6 +55,7 @@ export class ProjectService {
     return {
       ...project,
       command: project.command ?? "",
+      publishedAt: (project as any).publishedAt ?? undefined,
     };
   }
 
@@ -75,6 +77,7 @@ export class ProjectService {
     return {
       ...updatedProject,
       command: updatedProject.command ?? "",
+      publishedAt: (updatedProject as any).publishedAt ?? undefined,
     };
   }
 
@@ -188,6 +191,7 @@ export class ProjectService {
         project: {
           ...updatedProject,
           command: updatedProject.command ?? "",
+          publishedAt: (updatedProject as any).publishedAt ?? undefined,
         },
       };
     } catch (error) {
@@ -228,6 +232,7 @@ export class ProjectService {
         project: {
           ...updatedProject,
           command: updatedProject.command ?? "",
+          publishedAt: (updatedProject as any).publishedAt ?? undefined,
         },
       };
     } catch (error) {

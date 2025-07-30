@@ -71,3 +71,22 @@ model Star {
   @@unique([userId, projectId], name: "unique_user_project_star")
   @@map("stars")
 }
+
+model AnalyticsEvent {
+  id        Int      @id @default(autoincrement())
+  eventType String
+  sessionId String
+  userId    String?   // Anonymized user ID (not email/username)
+  language  String
+  timestamp DateTime
+  details   Json      // JSONB for flexible event data
+  userAgent String?
+  ipAddress String?   // Hashed/anonymized IP for privacy
+  createdAt DateTime @default(now())
+
+  @@map("analytics_events")
+  @@index([eventType])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([timestamp])
+}

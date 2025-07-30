@@ -27,6 +27,7 @@ export class TranslationService {
       readOnly: "Read Only",
       saveToToolbox: "Save to Toolbox",
       clear: "Clear",
+      optional: "optional",
       myToolbox: "My Toolbox",
       noProjects: "No saved projects yet!",
       noProjectsSubtext: "Create and save your first app to get started.",
@@ -132,6 +133,7 @@ export class TranslationService {
       readOnly: "Nur Lesen",
       saveToToolbox: "In Werkzeugkasten speichern",
       clear: "Löschen",
+      optional: "optional",
       myToolbox: "Mein Werkzeugkasten",
       noProjects: "Noch keine gespeicherten Projekte!",
       noProjectsSubtext:

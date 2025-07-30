@@ -39,8 +39,7 @@ export class RegisterComponent {
             Validators.pattern(/^[a-zA-Z0-9_]+$/),
           ],
         ],
-        name: ["", [Validators.required, Validators.minLength(2)]],
-        email: ["", [Validators.required, Validators.email]],
+        email: ["", [Validators.email]], // Optional email
         password: ["", [Validators.required, Validators.minLength(6)]],
         confirmPassword: ["", [Validators.required]],
       },
@@ -103,6 +102,8 @@ export class RegisterComponent {
             this.emailChecked = false;
           },
         });
+    } else {
+      this.emailChecked = false;
     }
   }
 
@@ -113,7 +114,15 @@ export class RegisterComponent {
 
       const { confirmPassword, ...userData } = this.registerForm.value;
 
-      this.authService.register(userData).subscribe({
+      // Use username as name for now
+      const registrationData = {
+        ...userData,
+        name: userData.username,
+        // Only include email if it has a value
+        ...(userData.email && { email: userData.email }),
+      };
+
+      this.authService.register(registrationData).subscribe({
         next: () => {
           this.router.navigate(["/login"]);
         },
@@ -130,9 +139,6 @@ export class RegisterComponent {
 
   get username() {
     return this.registerForm.get("username");
-  }
-  get name() {
-    return this.registerForm.get("name");
   }
   get email() {
     return this.registerForm.get("email");

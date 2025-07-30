@@ -15,9 +15,9 @@ interface LoginRequest {
 
 interface RegisterRequest {
   username: string;
-  email: string;
+  email?: string;
   password: string;
-  name: string;
+  name?: string;
 }
 
 interface AuthResponse {
@@ -25,8 +25,8 @@ interface AuthResponse {
   user: {
     id: string;
     username: string;
-    email: string;
-    name: string;
+    email?: string;
+    name?: string;
   };
 }
 

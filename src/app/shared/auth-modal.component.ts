@@ -94,25 +94,17 @@ import { TranslationService } from "../services/translation.service";
             </div>
 
             <div class="form-group">
-              <label for="name">{{ t("name") }}</label>
-              <input
-                type="text"
-                id="name"
-                [(ngModel)]="registerData.name"
-                name="name"
-                [placeholder]="t('namePlaceholder')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="reg-email">{{ t("email") }}</label>
+              <label for="reg-email"
+                >{{ t("email") }} ({{ t("optional") }})</label
+              >
               <input
                 type="email"
                 id="reg-email"
                 [(ngModel)]="registerData.email"
                 name="email"
-                required
-                [placeholder]="t('emailPlaceholder')"
+                [placeholder]="
+                  t('emailPlaceholder') + ' (' + t('optional') + ')'
+                "
               />
             </div>
 
@@ -136,10 +128,7 @@ import { TranslationService } from "../services/translation.service";
               type="submit"
               class="submit-btn"
               [disabled]="
-                isLoading ||
-                !registerData.username ||
-                !registerData.email ||
-                !registerData.password
+                isLoading || !registerData.username || !registerData.password
               "
             >
               <span *ngIf="!isLoading">{{ t("register") }}</span>
@@ -369,7 +358,6 @@ export class AuthModalComponent implements OnInit {
 
   registerData = {
     username: "",
-    name: "",
     email: "",
     password: "",
   };
@@ -432,11 +420,7 @@ export class AuthModalComponent implements OnInit {
   }
 
   onRegister(): void {
-    if (
-      !this.registerData.username ||
-      !this.registerData.email ||
-      !this.registerData.password
-    ) {
+    if (!this.registerData.username || !this.registerData.password) {
       this.error = this.t("fillAllFields");
       return;
     }
@@ -444,7 +428,15 @@ export class AuthModalComponent implements OnInit {
     this.isLoading = true;
     this.error = "";
 
-    this.authService.register(this.registerData).subscribe({
+    // Prepare registration data with username as name
+    const registrationData = {
+      username: this.registerData.username,
+      password: this.registerData.password,
+      name: this.registerData.username, // Use username as name
+      ...(this.registerData.email && { email: this.registerData.email }), // Only include email if provided
+    };
+
+    this.authService.register(registrationData).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.authSuccess.emit(response.user);
@@ -459,7 +451,7 @@ export class AuthModalComponent implements OnInit {
 
   private resetForms(): void {
     this.credentials = { loginField: "", password: "" };
-    this.registerData = { username: "", name: "", email: "", password: "" };
+    this.registerData = { username: "", email: "", password: "" };
     this.error = "";
     this.isLoading = false;
     this.isLogin = true;

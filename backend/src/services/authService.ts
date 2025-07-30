@@ -5,7 +5,7 @@ import { generateToken } from "../middleware/auth";
 
 export interface RegisterUserDto {
   username: string;
-  email: string;
+  email?: string;
   password: string;
   name?: string;
 }
@@ -19,7 +19,7 @@ export interface AuthResponse {
   user: {
     id: number;
     username: string;
-    email: string;
+    email?: string;
     name?: string;
     tokens: number;
   };
@@ -33,13 +33,15 @@ export class AuthService {
     const { username, email, password, name } = data;
     console.log("Registering user:", username, email);
 
-    // Check if user already exists by email
-    const existingUserByEmail = await prisma.user.findUnique({
-      where: { email },
-    });
+    // Check if email is provided and if user already exists by email
+    if (email) {
+      const existingUserByEmail = await prisma.user.findUnique({
+        where: { email },
+      });
 
-    if (existingUserByEmail) {
-      throw new Error("User with this email already exists");
+      if (existingUserByEmail) {
+        throw new Error("User with this email already exists");
+      }
     }
 
     // Check if user already exists by username
@@ -54,15 +56,22 @@ export class AuthService {
     // Hash password
     const passwordHash = await bcrypt.hash(password, this.saltRounds);
 
+    // Prepare user data for creation
+    const userData: any = {
+      username,
+      passwordHash,
+      name: name ?? username, // Use username as name if not provided
+      tokens: 100,
+    };
+
+    // Only include email if it's provided
+    if (email) {
+      userData.email = email;
+    }
+
     // Create user with 100 tokens
     const user = await prisma.user.create({
-      data: {
-        username,
-        email,
-        passwordHash,
-        name: name ?? null,
-        tokens: 100,
-      },
+      data: userData,
       select: {
         id: true,
         username: true,
@@ -73,16 +82,21 @@ export class AuthService {
     });
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email);
+    const token = generateToken(user.id, user.email || "");
+
+    const userResponse: AuthResponse["user"] = {
+      id: user.id,
+      username: user.username,
+      name: user.name ?? "",
+      tokens: user.tokens,
+    };
+
+    if (user.email) {
+      userResponse.email = user.email;
+    }
 
     return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name ?? "",
-        tokens: user.tokens,
-      },
+      user: userResponse,
       token,
     };
   }
@@ -110,16 +124,21 @@ export class AuthService {
     }
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email);
+    const token = generateToken(user.id, user.email || "");
+
+    const userResponse: AuthResponse["user"] = {
+      id: user.id,
+      username: user.username,
+      name: user.name ?? "",
+      tokens: user.tokens,
+    };
+
+    if (user.email) {
+      userResponse.email = user.email;
+    }
 
     return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name ?? "",
-        tokens: user.tokens,
-      },
+      user: userResponse,
       token,
     };
   }
@@ -193,7 +212,7 @@ export class AuthService {
   ): Promise<{
     id: number;
     username: string;
-    email: string;
+    email?: string;
     name: string | null;
     tokens: number;
   }> {
@@ -269,6 +288,24 @@ export class AuthService {
       },
     });
 
-    return updatedUser;
+    // Return user with proper typing
+    const result: {
+      id: number;
+      username: string;
+      email?: string;
+      name: string | null;
+      tokens: number;
+    } = {
+      id: updatedUser.id,
+      username: updatedUser.username,
+      name: updatedUser.name,
+      tokens: updatedUser.tokens,
+    };
+
+    if (updatedUser.email) {
+      result.email = updatedUser.email;
+    }
+
+    return result;
   }
 }

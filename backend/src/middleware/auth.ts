@@ -5,7 +5,7 @@ import { prisma } from "../config/database";
 export interface AuthenticatedRequest extends Request {
   user?: {
     id: number;
-    email: string;
+    email?: string | null;
     name?: string | null;
     tokens: number;
   };

@@ -61,10 +61,10 @@ export const register = asyncHandler(
     const { username, email, password, name } = req.body;
 
     // Validation
-    if (!username || !email || !password) {
+    if (!username || !password) {
       return res
         .status(400)
-        .json({ error: "Username, email and password are required" });
+        .json({ error: "Username and password are required" });
     }
 
     if (password.length < 6) {
@@ -73,11 +73,14 @@ export const register = asyncHandler(
         .json({ error: "Password must be at least 6 characters long" });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res
-        .status(400)
-        .json({ error: "Please provide a valid email address" });
+    // Email validation only if email is provided
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res
+          .status(400)
+          .json({ error: "Please provide a valid email address" });
+      }
     }
 
     // Username validation

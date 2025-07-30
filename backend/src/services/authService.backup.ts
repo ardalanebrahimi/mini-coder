@@ -19,7 +19,7 @@ export interface AuthResponse {
   user: {
     id: number;
     username: string;
-    email: string;
+    email?: string;
     name?: string;
     tokens: number;
   };
@@ -70,16 +70,21 @@ export class AuthService {
     });
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email);
+    const token = generateToken(user.id, user.email || "");
+
+    const userResponse: AuthResponse["user"] = {
+      id: user.id,
+      username: user.username,
+      name: user.name ?? "",
+      tokens: user.tokens,
+    };
+
+    if (user.email) {
+      userResponse.email = user.email;
+    }
 
     return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name ?? "",
-        tokens: user.tokens,
-      },
+      user: userResponse,
       token,
     };
   }
@@ -104,16 +109,21 @@ export class AuthService {
     }
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email);
+    const token = generateToken(user.id, user.email || "");
+
+    const userResponse: AuthResponse["user"] = {
+      id: user.id,
+      username: user.username,
+      name: user.name ?? "",
+      tokens: user.tokens,
+    };
+
+    if (user.email) {
+      userResponse.email = user.email;
+    }
 
     return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name ?? "",
-        tokens: user.tokens,
-      },
+      user: userResponse,
       token,
     };
   }

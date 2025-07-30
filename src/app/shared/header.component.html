@@ -33,22 +33,18 @@
               App
             </a>
           </div>
+          <select
+            [ngModel]="selectedLanguage"
+            (ngModelChange)="changeLanguage($event)"
+            class="action-btn language-select"
+          >
+            <option *ngFor="let lang of availableLanguages" [value]="lang.code">
+              {{ lang.flag }} {{ lang.name }}
+            </option>
+          </select>
 
           <!-- App Controls (app route only) -->
           <div class="nav-actions" *ngIf="isAppRoute">
-            <select
-              [ngModel]="selectedLanguage"
-              (ngModelChange)="changeLanguage($event)"
-              class="action-btn language-select"
-            >
-              <option
-                *ngFor="let lang of availableLanguages"
-                [value]="lang.code"
-              >
-                {{ lang.flag }} {{ lang.name }}
-              </option>
-            </select>
-
             <button
               class="action-btn toolbox-btn"
               (click)="toggleToolbox()"
@@ -77,6 +73,18 @@
         <!-- Login Links -->
         <ng-template #loginLinks>
           <div class="nav-actions">
+            <select
+              [ngModel]="selectedLanguage"
+              (ngModelChange)="changeLanguage($event)"
+              class="action-btn language-select"
+            >
+              <option
+                *ngFor="let lang of availableLanguages"
+                [value]="lang.code"
+              >
+                {{ lang.flag }} {{ lang.name }}
+              </option>
+            </select>
             <a routerLink="/login" class="action-btn">Login</a>
             <a routerLink="/register" class="action-btn primary">Register</a>
           </div>

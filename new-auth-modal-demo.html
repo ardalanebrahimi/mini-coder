@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Auth Modal Demo</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 2rem;
+      }
+
+      .feature-list {
+        margin-bottom: 2rem;
+      }
+
+      .feature-item {
+        padding: 1rem;
+        margin: 1rem 0;
+        background: #f8f9ff;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+      }
+
+      .demo-section {
+        text-align: center;
+        margin: 2rem 0;
+      }
+
+      .cta-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0.5rem;
+      }
+
+      .cta-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .instructions {
+        background: #fff3cd;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+        border: 1px solid #ffeaa7;
+      }
+
+      .code-block {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        margin: 1rem 0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎨 New MiniCoder Registration Modal</h1>
+
+      <div class="feature-list">
+        <h2>✨ Key Improvements</h2>
+
+        <div class="feature-item">
+          <strong>🖼️ Two-Panel Design:</strong> Left panel for registration
+          form, right panel for benefits
+        </div>
+
+        <div class="feature-item">
+          <strong>📱 Responsive Layout:</strong> Stacks vertically on mobile
+          devices
+        </div>
+
+        <div class="feature-item">
+          <strong>🎯 Clear Benefits:</strong> 8 compelling reasons to join with
+          emojis and clear copy
+        </div>
+
+        <div class="feature-item">
+          <strong>🎨 Modern Design:</strong> Gradient backgrounds, smooth
+          animations, and playful styling
+        </div>
+
+        <div class="feature-item">
+          <strong>🔄 Easy Switching:</strong> Seamless toggle between login and
+          registration
+        </div>
+
+        <div class="feature-item">
+          <strong>👶 Kid-Friendly:</strong> Simple language, emojis, and
+          safety-focused messaging
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>🚀 Test the New Modal</h2>
+        <p>
+          To see the new registration modal in action, go to the MiniCoder app
+          and try any of these actions without being logged in:
+        </p>
+
+        <button
+          class="cta-btn"
+          onclick="window.open('http://localhost:4200', '_blank')"
+        >
+          🎮 Open MiniCoder App
+        </button>
+      </div>
+
+      <div class="instructions">
+        <h3>📋 How to Test</h3>
+        <p>
+          <strong>Step 1:</strong> Make sure you're logged out (if currently
+          logged in)
+        </p>
+        <p><strong>Step 2:</strong> Try any of these locked features:</p>
+        <ul>
+          <li>🎨 Click "Modify App" when viewing an app</li>
+          <li>💾 Try to save an app to your toolbox</li>
+          <li>⭐ Try to star an app in the App Store</li>
+          <li>👤 Click on the Profile button</li>
+        </ul>
+        <p>
+          <strong>Step 3:</strong> The new modal should appear with benefits on
+          the right!
+        </p>
+      </div>
+
+      <div class="feature-list">
+        <h2>📝 Updated Benefits Copy</h2>
+        <p>The benefits are now reordered and simplified as requested:</p>
+
+        <div class="code-block">
+          <!-- Updated benefits list with better order and wording --><br />
+          💾 Save your creations and access them anywhere<br />
+          🎨 Edit and improve your apps<br />
+          🎁 +100 free tokens to build more!<br />
+          👨‍👩‍👧 Share the apps you created<br />
+          🎤 Activate voice recognition (for logged-in users)<br />
+          ⭐ Rate and discover games made by others<br />
+          � Many other cool features on the way<br />
+          �🔄 Use your account across devices (web, Android, iOS coming
+          soon!)<br />
+          <br />
+          <strong
+            >🛡️ Parental Assurance (now prominently displayed on form
+            side):</strong
+          ><br />
+          "Privacy-first, no personal data needed"<br />
+          "Safe for kids, no ads or spam, email is optional"
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <h2>✨ Latest Updates</h2>
+
+        <div class="feature-item">
+          <strong>🎯 Registration First:</strong> Modal now opens with
+          registration form by default
+        </div>
+
+        <div class="feature-item">
+          <strong>📝 Better Title:</strong> Changed from "Why Join MiniCoder?"
+          to "Your Advantages:"
+        </div>
+
+        <div class="feature-item">
+          <strong>🛡️ Prominent Safety:</strong> Parental assurance moved to form
+          side with bold styling
+        </div>
+
+        <div class="feature-item">
+          <strong>📱 Simple Language:</strong> Simplified "Modify and fine-tune"
+          to "Edit and improve"
+        </div>
+
+        <div class="feature-item">
+          <strong>🎤 Voice Feature:</strong> Added voice recognition as a
+          logged-in user benefit
+        </div>
+
+        <div class="feature-item">
+          <strong>🚀 Future Features:</strong> Added "Many other cool features
+          on the way"
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <h2>🔧 Technical Implementation</h2>
+
+        <div class="feature-item">
+          <strong>📁 File Modified:</strong>
+          <code>src/app/shared/auth-modal.component.ts</code>
+        </div>
+
+        <div class="feature-item">
+          <strong>📱 Responsive Breakpoints:</strong> 768px (tablet) and 480px
+          (mobile)
+        </div>
+
+        <div class="feature-item">
+          <strong>🎭 Animation:</strong> Smooth fade-in and slide-up effects
+        </div>
+
+        <div class="feature-item">
+          <strong>♿ Accessibility:</strong> Proper focus management and
+          keyboard navigation
+        </div>
+
+        <div class="feature-item">
+          <strong>🔧 Maintainability:</strong> Benefits list clearly commented
+          for easy updates
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>✅ Implementation Complete</h2>
+        <p>
+          The new registration modal is now live and ready for user conversion
+          optimization!
+        </p>
+
+        <button
+          class="cta-btn"
+          onclick="window.open('http://localhost:4200', '_blank')"
+        >
+          🎯 Test Registration Flow
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

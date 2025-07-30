@@ -495,6 +495,13 @@ export class AppComponent implements OnInit, OnDestroy {
    * Start voice input (now handled by VoiceActionService)
    */
   startVoiceInput(): void {
+    // Check authentication before allowing voice input
+    if (!this.authService.isLoggedIn()) {
+      this.showAuthModalWithMessage(
+        `Please log in or register to use voice input.`
+      );
+      return;
+    }
     // Legacy method - now handled by the new voice modal system
     // This is called by the command actions service when START_VOICE action is triggered
     console.log("startVoiceInput called - opening voice modal for main input");

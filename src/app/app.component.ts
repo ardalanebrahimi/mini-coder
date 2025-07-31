@@ -109,6 +109,10 @@ export class AppComponent implements OnInit, OnDestroy {
   // Profile modal state
   showProfileModal = false;
 
+  // Event listener functions for cleanup
+  private saveSuccessListener?: (event: any) => void;
+  private showAuthModalListener?: (event: any) => void;
+
   // Navigation state
   currentView: "app" | "store" = "app";
 
@@ -567,9 +571,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.setupVoiceModalSubscriptions();
 
     // Listen for save success events from the save dialog component
-    document.addEventListener("saveSuccess", (event: any) => {
+    this.saveSuccessListener = (event: any) => {
       this.showSuccessMessage(event.detail.message);
-    });
+    };
+    document.addEventListener("saveSuccess", this.saveSuccessListener);
+
+    // Listen for auth modal requests from save dialog
+    this.showAuthModalListener = (event: any) => {
+      this.showAuthModalWithMessage(event.detail.message);
+    };
+    document.addEventListener("showAuthModal", this.showAuthModalListener);
 
     // Listen for build choice results
     this.buildChoiceDialogService.choice$
@@ -605,8 +616,14 @@ export class AppComponent implements OnInit, OnDestroy {
             case "modify":
               this.showBuildChoiceModal();
               break;
-            case "save":
-              this.saveToToolbox();
+            case "saveToToolbox":
+              this.saveToToolboxDirect();
+              break;
+            case "addToAppStore":
+              this.saveToAppStore();
+              break;
+            case "save": // Keep for backward compatibility
+              this.saveToToolboxDirect();
               break;
             case "clear":
               this.clearPreview();
@@ -815,6 +832,117 @@ export class AppComponent implements OnInit, OnDestroy {
       currentApp: this.currentApp,
       userCommand: this.userCommand,
     });
+  }
+
+  /**
+   * Save directly to toolbox without dialog
+   */
+  saveToToolboxDirect(): void {
+    if (!this.currentApp) {
+      this.errorMessage = "No app to save!";
+      return;
+    }
+
+    // Prompt for project name
+    const projectName = prompt("Enter a name for your app:");
+    if (!projectName || !projectName.trim()) {
+      return; // User cancelled or didn't enter a name
+    }
+
+    const isLoggedIn = this.authService.isLoggedIn();
+
+    // Log toolbox save attempt
+    this.analytics.logEvent(AnalyticsEventType.TOOLBOX_SAVED, {
+      toolboxSaved: {
+        appName: projectName.trim(),
+        language: this.currentApp.detectedLanguage,
+        userType: isLoggedIn ? "logged_in" : "guest",
+        saveMethod: isLoggedIn ? "backend" : "local_storage",
+      },
+    });
+
+    // Generate unique name and save
+    this.storageService
+      .generateUniqueProjectName(projectName.trim())
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (uniqueName) => {
+          // Save project to toolbox (private, not published)
+          this.storageService
+            .saveProject({
+              name: uniqueName,
+              command: this.userCommand,
+              language: this.currentApp!.detectedLanguage,
+              code: this.currentApp!.generatedCode,
+              isPublished: false, // Toolbox saves are always private
+            })
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (savedProject) => {
+                this.toolboxService.addProject(savedProject);
+                this.showSuccessMessage(
+                  `Saved "${uniqueName}" to your toolbox!`
+                );
+              },
+              error: (error) => {
+                this.errorMessage =
+                  "Failed to save to toolbox. Please try again.";
+                console.error("Error saving to toolbox:", error);
+              },
+            });
+        },
+        error: (error) => {
+          this.errorMessage =
+            "Failed to generate unique name. Please try again.";
+          console.error("Error generating unique name:", error);
+        },
+      });
+  }
+
+  /**
+   * Save to App Store (public, opens dialog for project name)
+   */
+  saveToAppStore(): void {
+    if (!this.currentApp) {
+      this.errorMessage = "No app to save!";
+      return;
+    }
+
+    const isLoggedIn = this.authService.isLoggedIn();
+
+    // Log app store publish attempt
+    this.analytics.logEvent(AnalyticsEventType.APPSTORE_PUBLISH_ATTEMPTED, {
+      appstorePublishAttempted: {
+        appName: "unknown", // Will be updated when user enters name
+        language: this.currentApp.detectedLanguage,
+        userType: isLoggedIn ? "logged_in" : "guest",
+        loginPromptShown: !isLoggedIn,
+      },
+    });
+
+    if (!isLoggedIn) {
+      this.showAuthModalForAppStore();
+      return;
+    }
+
+    // Open save dialog for App Store publishing
+    this.saveDialogService.openDialog({
+      currentApp: this.currentApp,
+      userCommand: this.userCommand,
+    });
+  }
+
+  /**
+   * Show auth modal for guest users
+   */
+  private showAuthModalForAppStore(): void {
+    const event = new CustomEvent("showAuthModal", {
+      detail: {
+        message: "Please log in or register to publish to the App Store.",
+      },
+      bubbles: true,
+    });
+    document.dispatchEvent(event);
   }
 
   /**
@@ -1060,6 +1188,14 @@ export class AppComponent implements OnInit, OnDestroy {
     // Clean up blob URL to prevent memory leaks
     if (this.previewUrl) {
       URL.revokeObjectURL(this.previewUrl);
+    }
+
+    // Clean up event listeners
+    if (this.saveSuccessListener) {
+      document.removeEventListener("saveSuccess", this.saveSuccessListener);
+    }
+    if (this.showAuthModalListener) {
+      document.removeEventListener("showAuthModal", this.showAuthModalListener);
     }
   }
 }

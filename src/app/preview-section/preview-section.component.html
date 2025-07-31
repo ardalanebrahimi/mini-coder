@@ -13,9 +13,13 @@
         <span class="emoji">🔧</span>
         {{ t("modifyApp") }}
       </button>
-      <button class="action-btn save" (click)="onSaveClick()">
-        <span class="emoji">💾</span>
+      <button class="action-btn save-toolbox" (click)="onSaveToToolboxClick()">
+        <span class="emoji">🧰</span>
         {{ t("saveToToolbox") }}
+      </button>
+      <button class="action-btn save-appstore" (click)="onAddToAppStoreClick()">
+        <span class="emoji">🏪</span>
+        {{ t("addToAppStore") }}
       </button>
       <button class="action-btn clear" (click)="onClearClick()">
         <span class="emoji">🗑️</span>

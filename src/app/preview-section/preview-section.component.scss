@@ -63,12 +63,21 @@
     }
   }
 
-  &.save {
-    background: $success-color;
+  &.save-toolbox {
+    background: #28a745; // Green for toolbox saves
     color: $white;
 
     &:hover {
-      background: darken($success-color, 10%);
+      background: darken(#28a745, 10%);
+    }
+  }
+
+  &.save-appstore {
+    background: #007bff; // Blue for app store
+    color: $white;
+
+    &:hover {
+      background: darken(#007bff, 10%);
     }
   }
 

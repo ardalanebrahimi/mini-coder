@@ -1,9 +1,9 @@
-<!-- Save Dialog -->
+<!-- Save/Publish Dialog -->
 <div class="modal-overlay" *ngIf="showDialog" (click)="onOverlayClick()">
   <div class="modal-content" (click)="onContentClick($event)">
     <h3>
-      <span class="emoji">💾</span>
-      {{ t("saveToToolboxTitle") }}
+      <span class="emoji">🏪</span>
+      Add to App Store
     </h3>
 
     <div class="modal-body">
@@ -17,22 +17,6 @@
         maxlength="50"
         (keyup.enter)="onEnterKey()"
       />
-
-      <!-- Privacy checkbox -->
-      <div class="privacy-option">
-        <label class="checkbox-label">
-          <input
-            type="checkbox"
-            [(ngModel)]="isPrivate"
-            class="privacy-checkbox"
-          />
-          <span class="checkmark"></span>
-          <span class="privacy-text">
-            <span class="emoji">🔒</span>
-            Keep this project private (not published to App Store)
-          </span>
-        </label>
-      </div>
 
       <!-- Error message -->
       <div class="error-message" *ngIf="errorMessage">
@@ -53,20 +37,28 @@
           }}
         </p>
       </div>
+
+      <!-- Success message for published apps -->
+      <div class="success-message" *ngIf="publishSuccessMessage">
+        <span class="emoji">🎉</span>
+        {{ publishSuccessMessage }}
+      </div>
     </div>
 
     <div class="modal-actions">
       <button class="btn-secondary" (click)="cancelSave()">
         {{ t("cancel") }}
       </button>
+
+      <!-- Add to App Store Button (only button in dialog now) -->
       <button
-        class="btn-primary"
-        (click)="confirmSave()"
-        [disabled]="!projectName.trim() || isSaving"
+        class="btn-appstore"
+        (click)="addToAppStore()"
+        [disabled]="!projectName.trim() || isPublishing"
       >
-        <span class="emoji" *ngIf="!isSaving">💾</span>
-        <span class="emoji" *ngIf="isSaving">⏳</span>
-        {{ isSaving ? "Saving..." : t("save") }}
+        <span class="emoji" *ngIf="!isPublishing">🏪</span>
+        <span class="emoji" *ngIf="isPublishing">⏳</span>
+        {{ isPublishing ? "Publishing..." : t("addToAppStore") }}
       </button>
     </div>
   </div>

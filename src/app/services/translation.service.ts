@@ -26,6 +26,10 @@ export class TranslationService {
       livePreview: "Live Preview",
       readOnly: "Read Only",
       saveToToolbox: "Save to Toolbox",
+      addToAppStore: "Add to App Store",
+      makeItBetter: "Make it better",
+      toolboxTitle: "Save to Toolbox",
+      appStoreTitle: "Publish to App Store",
       clear: "Clear",
       optional: "optional",
       myToolbox: "My Toolbox",
@@ -39,7 +43,7 @@ export class TranslationService {
       save: "Save",
       placeholderText:
         'Be specific! Examples: "Create a working calculator with all basic operations" or "Make an interactive quiz about animals"',
-      modifyApp: "Modify This App",
+      modifyApp: "Make it better",
       modifyPlaceholder:
         'What would you like to change? e.g., "Change background to blue" or "Add 5 more colors"',
       rebuildApp: "Rebuild from Scratch",
@@ -132,6 +136,9 @@ export class TranslationService {
       livePreview: "Live-Vorschau",
       readOnly: "Nur Lesen",
       saveToToolbox: "In Werkzeugkasten speichern",
+      addToAppStore: "Zum App Store hinzufügen",
+      toolboxTitle: "In Werkzeugkasten speichern",
+      appStoreTitle: "Im App Store veröffentlichen",
       clear: "Löschen",
       optional: "optional",
       myToolbox: "Mein Werkzeugkasten",
@@ -146,7 +153,7 @@ export class TranslationService {
       save: "Speichern",
       placeholderText:
         'Sei spezifisch! Beispiele: "Erstelle einen funktionierenden Taschenrechner mit allen Grundrechenarten" oder "Mache ein interaktives Quiz über Tiere"',
-      modifyApp: "Diese App ändern",
+      modifyApp: "Besser machen",
       modifyPlaceholder:
         'Was möchtest du ändern? z.B. "Hintergrund zu blau ändern" oder "5 weitere Farben hinzufügen"',
       rebuildApp: "Neu von Grund auf erstellen",

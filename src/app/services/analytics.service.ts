@@ -47,6 +47,11 @@ export enum AnalyticsEventType {
   // Preview events
   PREVIEW_GENERATED = "preview_generated",
   PREVIEW_ERROR = "preview_error",
+
+  // New action-specific events for save/publish workflow
+  TOOLBOX_SAVED = "toolbox_saved",
+  APPSTORE_PUBLISH_ATTEMPTED = "appstore_publish_attempted",
+  APP_MODIFY_ATTEMPTED = "app_modify_attempted",
 }
 
 /**
@@ -189,6 +194,31 @@ export interface EventDetails {
   profileAccessed?: {
     userType: "logged_in";
     userId: string;
+  };
+
+  // New save/publish workflow events
+  toolboxSaved?: {
+    appName: string;
+    language: string;
+    userType: "guest" | "logged_in";
+    saveMethod: "local_storage" | "backend";
+  };
+
+  appstorePublishAttempted?: {
+    appName: string;
+    language: string;
+    userType: "guest" | "logged_in";
+    loginPromptShown: boolean;
+    success?: boolean;
+    errorMessage?: string;
+  };
+
+  appModifyAttempted?: {
+    currentAppName?: string;
+    language: string;
+    userType: "guest" | "logged_in";
+    loginPromptShown: boolean;
+    buttonLabel: string; // "Modify This App" or "Make it better"
   };
 }
 

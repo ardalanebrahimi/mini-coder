@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { Subject, takeUntil, forkJoin } from "rxjs";
+import { Subject, takeUntil } from "rxjs";
 import {
   SaveDialogService,
   SaveDialogData,
@@ -13,6 +13,7 @@ import {
   AnalyticsService,
   AnalyticsEventType,
 } from "../services/analytics.service";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-save-dialog",
@@ -27,16 +28,17 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   showDialog = false;
   dialogData: SaveDialogData | null = null;
   projectName = "";
-  isPrivate = false; // Default to false (meaning public by default)
   errorMessage = "";
-  isSaving = false;
+  publishSuccessMessage = "";
+  isPublishing = false;
 
   constructor(
     private saveDialogService: SaveDialogService,
     private storageService: StorageService,
     private toolboxService: ToolboxService,
     private translationService: TranslationService,
-    private analytics: AnalyticsService
+    private analytics: AnalyticsService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -89,10 +91,10 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle Enter key press in input field
+   * Handle Enter key press in input field - publish to App Store
    */
   onEnterKey(): void {
-    this.confirmSave();
+    this.addToAppStore();
   }
 
   /**
@@ -103,9 +105,9 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Confirm save with custom name
+   * Add to App Store (public, requires login)
    */
-  confirmSave(): void {
+  addToAppStore(): void {
     if (!this.projectName.trim()) {
       this.errorMessage =
         this.t("projectNameRequired") || "Please enter a project name!";
@@ -117,71 +119,84 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isSaving = true;
-    this.errorMessage = "";
+    const isLoggedIn = this.authService.isLoggedIn();
 
-    // First generate unique name, then save the project
+    // Log app store publish attempt
+    this.analytics.logEvent(AnalyticsEventType.APPSTORE_PUBLISH_ATTEMPTED, {
+      appstorePublishAttempted: {
+        appName: this.projectName.trim(),
+        language: this.dialogData.currentApp.detectedLanguage,
+        userType: isLoggedIn ? "logged_in" : "guest",
+        loginPromptShown: !isLoggedIn,
+      },
+    });
+
+    // Check if user is logged in
+    if (!isLoggedIn) {
+      this.errorMessage =
+        "Please log in or register to publish to the App Store.";
+      // Close this dialog and show auth modal
+      this.saveDialogService.closeDialog();
+      this.showAuthModal();
+      return;
+    }
+
+    this.isPublishing = true;
+    this.errorMessage = "";
+    this.publishSuccessMessage = "";
+
+    // Generate unique name and publish
     this.storageService
       .generateUniqueProjectName(this.projectName.trim())
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (uniqueName) => {
-          // Now save the project with the unique name
+          // Save and publish project to App Store
           this.storageService
             .saveProject({
               name: uniqueName,
               command: this.dialogData!.userCommand,
               language: this.dialogData!.currentApp!.detectedLanguage,
               code: this.dialogData!.currentApp!.generatedCode,
-              isPublished: !this.isPrivate, // Invert logic: if private is checked, don't publish
+              isPublished: true, // App Store saves are always public
             })
             .pipe(takeUntil(this.destroy$))
             .subscribe({
               next: (savedProject) => {
-                // Update the toolbox service with the new project
                 this.toolboxService.addProject(savedProject);
 
-                // Close dialog and reset form
-                this.saveDialogService.closeDialog();
-
-                // Show success message
-                this.showSuccessMessage(
-                  `Saved "${uniqueName}" to your toolbox!`
-                );
-
-                // Track successful app save
-                this.analytics.logEvent(AnalyticsEventType.APP_SAVED, {
-                  appSaved: {
+                // Track successful publication
+                this.analytics.logEvent(AnalyticsEventType.APP_PUBLISHED, {
+                  appPublished: {
                     appName: uniqueName,
                     language: this.dialogData!.currentApp!.detectedLanguage,
+                    success: true,
                   },
                 });
 
-                // Track app publication if it's made public
-                if (!this.isPrivate) {
-                  this.analytics.logEvent(AnalyticsEventType.APP_PUBLISHED, {
-                    appPublished: {
-                      appName: uniqueName,
-                      language: this.dialogData!.currentApp!.detectedLanguage,
-                      success: true,
-                    },
-                  });
-                }
+                this.publishSuccessMessage = `🎉 "${uniqueName}" is now live in the App Store! Other kids can discover and try your creation.`;
+                this.isPublishing = false;
 
-                this.isSaving = false;
+                // Close dialog after showing success message briefly
+                setTimeout(() => {
+                  this.saveDialogService.closeDialog();
+                }, 2000);
               },
               error: (error) => {
-                this.errorMessage = "Failed to save project. Please try again.";
-                console.error("Error saving project:", error);
+                this.errorMessage =
+                  "Failed to publish to App Store. Please try again.";
+                console.error("Error publishing to App Store:", error);
 
-                // Track failed app save
-                this.analytics.logAppError(
-                  this.errorMessage,
-                  "app_save",
-                  error.stack
-                );
+                // Track failed publication
+                this.analytics.logEvent(AnalyticsEventType.APP_PUBLISHED, {
+                  appPublished: {
+                    appName: this.projectName.trim(),
+                    language: this.dialogData!.currentApp!.detectedLanguage,
+                    success: false,
+                  },
+                });
 
-                this.isSaving = false;
+                this.isPublishing = false;
               },
             });
         },
@@ -189,29 +204,41 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
           this.errorMessage =
             "Failed to generate unique name. Please try again.";
           console.error("Error generating unique name:", error);
-          this.isSaving = false;
+          this.isPublishing = false;
         },
       });
   }
 
   /**
-   * Reset form data
+   * Reset form state
    */
   private resetForm(): void {
     this.projectName = "";
-    this.isPrivate = false;
     this.errorMessage = "";
-    this.isSaving = false;
+    this.publishSuccessMessage = "";
+    this.isPublishing = false;
   }
 
   /**
-   * Show success message (you might want to use a toast service or emit an event)
+   * Show success message
    */
   private showSuccessMessage(message: string): void {
-    // For now, we'll emit a custom event that the parent can listen to
-    // In a real app, you might use a toast service or notification service
     const event = new CustomEvent("saveSuccess", {
       detail: { message },
+      bubbles: true,
+    });
+    document.dispatchEvent(event);
+  }
+
+  /**
+   * Show auth modal for login/register
+   */
+  private showAuthModal(): void {
+    // Emit an event that the app component can listen to
+    const event = new CustomEvent("showAuthModal", {
+      detail: {
+        message: "Please log in or register to publish to the App Store.",
+      },
       bubbles: true,
     });
     document.dispatchEvent(event);

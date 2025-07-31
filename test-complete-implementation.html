@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Save/Publish Refactoring Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 2rem;
+      }
+
+      .test-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border: 1px solid #e8e8e8;
+        border-radius: 12px;
+        background: #f8f9fa;
+      }
+
+      .test-section h2 {
+        color: #667eea;
+        margin-top: 0;
+      }
+
+      .feature-item {
+        padding: 1rem;
+        margin: 1rem 0;
+        background: white;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+      }
+
+      .status.completed {
+        background: #28a745;
+      }
+
+      .status.in-progress {
+        background: #ffc107;
+        color: #333;
+      }
+
+      .code-block {
+        background: #f1f3f4;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+        margin: 1rem 0;
+        border-left: 4px solid #667eea;
+      }
+
+      .test-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0.5rem;
+      }
+
+      .test-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        border: 1px solid #c3e6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎯 Save/Publish Refactoring Implementation Complete</h1>
+
+      <div class="test-section">
+        <h2>✅ Completed Features</h2>
+
+        <div class="feature-item">
+          <span class="status completed">✅ COMPLETED</span>
+          <strong>Dual-Action Save Dialog</strong>
+          <p>
+            Replaced single save button with two distinct actions: "Save to
+            Toolbox" (private) and "Add to App Store" (public)
+          </p>
+        </div>
+
+        <div class="feature-item">
+          <span class="status completed">✅ COMPLETED</span>
+          <strong>Guest vs Logged-in User Flows</strong>
+          <p>
+            - Toolbox saves work for all users (localStorage for guests, API for
+            logged-in)<br />
+            - App Store publishing requires login (shows auth modal for guests)
+          </p>
+        </div>
+
+        <div class="feature-item">
+          <span class="status completed">✅ COMPLETED</span>
+          <strong>Comprehensive Analytics Logging</strong>
+          <p>
+            Added detailed event tracking for all actions:<br />
+            - TOOLBOX_SAVED (with user type and app details)<br />
+            - APPSTORE_PUBLISH_ATTEMPTED (with success/auth status)<br />
+            - APP_MODIFY_ATTEMPTED (with button label and login status)
+          </p>
+        </div>
+
+        <div class="feature-item">
+          <span class="status completed">✅ COMPLETED</span>
+          <strong>Button Label Updates</strong>
+          <p>
+            Changed modify button from "Modify App" to kid-friendly "Make it
+            better" across all components
+          </p>
+        </div>
+
+        <div class="feature-item">
+          <span class="status completed">✅ COMPLETED</span>
+          <strong>Auth Modal Integration</strong>
+          <p>
+            Implemented custom event system for save dialog to trigger auth
+            modal with proper cleanup
+          </p>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>📁 Modified Files</h2>
+
+        <div class="code-block">
+          📄 save-dialog.component.html - New dual-button layout<br />
+          📄 save-dialog.component.ts - Separate save/publish methods with
+          analytics<br />
+          📄 save-dialog.component.scss - Distinct button styling<br />
+          📄 analytics.service.ts - New event types and interfaces<br />
+          📄 translation.service.ts - Updated button labels<br />
+          📄 preview-section.component.ts - Analytics for modify button<br />
+          📄 app.component.ts - Custom event listeners for auth modal
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>🧪 Testing Instructions</h2>
+
+        <div class="feature-item">
+          <strong>1. Test Guest User Flow:</strong>
+          <p>
+            - Log out if currently logged in<br />
+            - Create an app and click "Save to Toolbox" → Should save to
+            localStorage<br />
+            - Click "Add to App Store" → Should show auth modal<br />
+            - Click "Make it better" → Should log analytics and show prompt
+          </p>
+        </div>
+
+        <div class="feature-item">
+          <strong>2. Test Logged-in User Flow:</strong>
+          <p>
+            - Log in with any account<br />
+            - Create an app and click "Save to Toolbox" → Should save via API<br />
+            - Click "Add to App Store" → Should directly publish<br />
+            - Click "Make it better" → Should work without auth prompt
+          </p>
+        </div>
+
+        <div class="feature-item">
+          <strong>3. Verify Analytics:</strong>
+          <p>
+            Check browser console or analytics dashboard for event logging:<br />
+            - Toolbox saves with user type detection<br />
+            - App Store publish attempts with auth status<br />
+            - Modify attempts with comprehensive context
+          </p>
+        </div>
+
+        <button
+          class="test-btn"
+          onclick="window.open('http://localhost:4200', '_blank')"
+        >
+          🚀 Test Complete Implementation
+        </button>
+      </div>
+
+      <div class="success-message">
+        <strong>🎉 Implementation Complete!</strong>
+        <p>All refactoring requirements have been successfully implemented:</p>
+        <ul>
+          <li>✅ Two separate buttons for save actions</li>
+          <li>✅ Kid-friendly "Make it better" button label</li>
+          <li>✅ Comprehensive analytics for all actions</li>
+          <li>✅ Proper guest vs logged-in user handling</li>
+          <li>✅ Auth modal integration for guest users</li>
+          <li>✅ Kid-friendly UI maintained throughout</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

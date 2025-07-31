@@ -13,7 +13,7 @@ export interface PreviewData {
 }
 
 export interface PreviewAction {
-  action: "modify" | "save" | "clear";
+  action: "modify" | "save" | "clear" | "saveToToolbox" | "addToAppStore";
 }
 
 @Injectable({
@@ -93,7 +93,9 @@ export class PreviewSectionService {
   /**
    * Emit a preview action
    */
-  emitAction(action: "modify" | "save" | "clear"): void {
+  emitAction(
+    action: "modify" | "save" | "clear" | "saveToToolbox" | "addToAppStore"
+  ): void {
     this.actionSubject.next({ action });
   }
 

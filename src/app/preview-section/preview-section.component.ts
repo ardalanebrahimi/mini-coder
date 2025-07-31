@@ -79,19 +79,54 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
    * Handle modify button click
    */
   onModifyClick(): void {
+    const isLoggedIn = this.authService.isLoggedIn();
+
+    // Log modify app attempt with new analytics event
+    this.analytics.logEvent(AnalyticsEventType.APP_MODIFY_ATTEMPTED, {
+      appModifyAttempted: {
+        currentAppName: this.previewData.currentApp?.projectName,
+        language: this.previewData.currentApp?.detectedLanguage || "unknown",
+        userType: isLoggedIn ? "logged_in" : "guest",
+        loginPromptShown: !isLoggedIn,
+        buttonLabel: this.t("modifyApp"), // This will now be "Make it better"
+      },
+    });
+
     this.previewSectionService.emitAction("modify");
   }
 
   /**
-   * Handle save button click
+   * Handle save to toolbox button click
    */
-  onSaveClick(): void {
+  onSaveToToolboxClick(): void {
     // Log attempt to save app to toolbox
-    if (!this.authService.isLoggedIn()) {
-      // Log guest user trying to save to toolbox
-      this.analytics.logLoginPromptShown("save_to_toolbox");
-    }
-    this.previewSectionService.emitAction("save");
+    this.analytics.logEvent(AnalyticsEventType.APP_MODIFY_ATTEMPTED, {
+      appModifyAttempted: {
+        buttonLabel: "Save to Toolbox",
+        userType: this.authService.isLoggedIn() ? "logged-in" : "guest",
+        loginPromptShown: !this.authService.isLoggedIn(),
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    this.previewSectionService.emitAction("saveToToolbox");
+  }
+
+  /**
+   * Handle add to app store button click
+   */
+  onAddToAppStoreClick(): void {
+    // Log attempt to publish to app store
+    this.analytics.logEvent(AnalyticsEventType.APP_MODIFY_ATTEMPTED, {
+      appModifyAttempted: {
+        buttonLabel: "Add to App Store",
+        userType: this.authService.isLoggedIn() ? "logged-in" : "guest",
+        loginPromptShown: !this.authService.isLoggedIn(),
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    this.previewSectionService.emitAction("addToAppStore");
   }
 
   /**

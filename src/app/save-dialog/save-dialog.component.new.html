@@ -2,11 +2,10 @@
 <div class="modal-overlay" *ngIf="showDialog" (click)="onOverlayClick()">
   <div class="modal-content" (click)="onContentClick($event)">
     <h3>
-      <span class="emoji">{{
-        currentSaveMode === "toolbox" ? "💾" : "🏪"
-      }}</span>
-      {{
-        currentSaveMode === "toolbox" ? "Save to Toolbox" : "Add to App Store"
+      <span class="emoji"
+        >{{ currentSaveMode === 'toolbox' ? '💾' : '🏪' }}</span
+      >
+      {{ currentSaveMode === 'toolbox' ? 'Save to Toolbox' : 'Add to App Store'
       }}
     </h3>
 
@@ -29,16 +28,11 @@
       </div>
 
       <div class="modal-info" *ngIf="dialogData">
-        <p>
-          <strong>{{ t("command") }}:</strong> {{ dialogData.userCommand }}
-        </p>
+        <p><strong>{{ t("command") }}:</strong> {{ dialogData.userCommand }}</p>
         <p>
           <strong>{{ t("language") }}:</strong>
-          {{
-            dialogData.currentApp.detectedLanguage === "de"
-              ? "German"
-              : "English"
-          }}
+          {{ dialogData.currentApp.detectedLanguage === "de" ? "German" :
+          "English" }}
         </p>
       </div>
 
@@ -57,27 +51,17 @@
       <!-- Save Button (adapts based on mode) -->
       <button
         class="btn-appstore"
-        [ngClass]="
-          currentSaveMode === 'toolbox' ? 'btn-toolbox' : 'btn-appstore'
-        "
-        (click)="
-          currentSaveMode === 'toolbox' ? saveToToolbox() : addToAppStore()
-        "
+        [ngClass]="currentSaveMode === 'toolbox' ? 'btn-toolbox' : 'btn-appstore'"
+        (click)="currentSaveMode === 'toolbox' ? saveToToolbox() : addToAppStore()"
         [disabled]="!projectName.trim() || isPublishing"
       >
-        <span class="emoji" *ngIf="!isPublishing">{{
-          currentSaveMode === "toolbox" ? "💾" : "🏪"
-        }}</span>
+        <span class="emoji" *ngIf="!isPublishing"
+          >{{ currentSaveMode === 'toolbox' ? '💾' : '🏪' }}</span
+        >
         <span class="emoji" *ngIf="isPublishing">⏳</span>
-        {{
-          isPublishing
-            ? currentSaveMode === "toolbox"
-              ? "Saving..."
-              : "Publishing..."
-            : currentSaveMode === "toolbox"
-            ? "Save to Toolbox"
-            : t("addToAppStore")
-        }}
+        {{ isPublishing ? (currentSaveMode === 'toolbox' ? 'Saving...' :
+        'Publishing...') : (currentSaveMode === 'toolbox' ? 'Save to Toolbox' :
+        t("addToAppStore")) }}
       </button>
     </div>
   </div>

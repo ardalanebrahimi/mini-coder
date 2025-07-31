@@ -617,13 +617,13 @@ export class AppComponent implements OnInit, OnDestroy {
               this.showBuildChoiceModal();
               break;
             case "saveToToolbox":
-              this.saveToToolboxDirect();
+              this.saveToToolboxDialog();
               break;
             case "addToAppStore":
-              this.saveToAppStore();
+              this.saveToAppStoreDialog();
               break;
             case "save": // Keep for backward compatibility
-              this.saveToToolboxDirect();
+              this.saveToToolboxDialog();
               break;
             case "clear":
               this.clearPreview();
@@ -812,6 +812,64 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Save to toolbox using dialog
+   */
+  saveToToolboxDialog(): void {
+    if (!this.currentApp) {
+      this.errorMessage = "No app to save!";
+      return;
+    }
+
+    // Check authentication before allowing save
+    if (!this.authService.isLoggedIn()) {
+      this.showAuthModalWithMessage(
+        `Please log in or register to save your app.`
+      );
+      return;
+    }
+
+    this.saveDialogService.openDialog({
+      currentApp: this.currentApp,
+      userCommand: this.userCommand,
+      saveMode: "toolbox",
+    });
+  }
+
+  /**
+   * Save to App Store using dialog
+   */
+  saveToAppStoreDialog(): void {
+    if (!this.currentApp) {
+      this.errorMessage = "No app to save!";
+      return;
+    }
+
+    const isLoggedIn = this.authService.isLoggedIn();
+
+    // Log app store publish attempt
+    this.analytics.logEvent(AnalyticsEventType.APPSTORE_PUBLISH_ATTEMPTED, {
+      appstorePublishAttempted: {
+        appName: "unknown", // Will be updated when user enters name
+        language: this.currentApp.detectedLanguage,
+        userType: isLoggedIn ? "logged_in" : "guest",
+        loginPromptShown: !isLoggedIn,
+      },
+    });
+
+    if (!isLoggedIn) {
+      this.showAuthModalForAppStore();
+      return;
+    }
+
+    // Open save dialog for App Store publishing
+    this.saveDialogService.openDialog({
+      currentApp: this.currentApp,
+      userCommand: this.userCommand,
+      saveMode: "appstore",
+    });
+  }
+
+  /**
    * Save current generated app to toolbox
    */
   saveToToolbox(): void {
@@ -831,6 +889,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.saveDialogService.openDialog({
       currentApp: this.currentApp,
       userCommand: this.userCommand,
+      saveMode: "appstore",
     });
   }
 
@@ -929,6 +988,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.saveDialogService.openDialog({
       currentApp: this.currentApp,
       userCommand: this.userCommand,
+      saveMode: "appstore",
     });
   }
 

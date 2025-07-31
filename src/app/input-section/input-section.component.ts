@@ -8,6 +8,7 @@ import {
   CommandInputState,
 } from "../services/command-input.service";
 import { CommandActionsService } from "../services/command-actions.service";
+import { EXAMPLE_COMMANDS } from "../examples";
 
 @Component({
   selector: "app-input-section",
@@ -26,6 +27,11 @@ export class InputSectionComponent implements OnInit, OnDestroy {
     isListening: false,
   };
 
+  // Example suggestions
+  currentSuggestions: string[] = [];
+  showSuggestions = true;
+  suggestionsCollapsed = false; // Track if suggestions are collapsed
+
   constructor(
     private translationService: TranslationService,
     private commandInputService: CommandInputService,
@@ -39,6 +45,19 @@ export class InputSectionComponent implements OnInit, OnDestroy {
       .subscribe((state) => {
         this.state = state;
       });
+
+    // Subscribe to language changes and refresh suggestions
+    this.translationService.selectedLanguage$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((languageCode) => {
+        // Auto-refresh suggestions when language changes
+        if (this.showSuggestions) {
+          this.generateRandomSuggestions();
+        }
+      });
+
+    // Generate initial suggestions
+    this.generateRandomSuggestions();
   }
 
   ngOnDestroy(): void {
@@ -75,5 +94,63 @@ export class InputSectionComponent implements OnInit, OnDestroy {
 
   onTestBlobUrl(): void {
     this.commandActionsService.testBlobUrl();
+  }
+
+  /**
+   * Generate random suggestions based on current language
+   */
+  generateRandomSuggestions(): void {
+    const currentLanguage = this.translationService.getCurrentLanguage();
+    const examples = this.getExampleCommands(currentLanguage);
+
+    // Get 3 random examples
+    const shuffled = [...examples].sort(() => 0.5 - Math.random());
+    this.currentSuggestions = shuffled.slice(0, 3);
+  }
+
+  /**
+   * Get example commands for the given language code, or fall back to English
+   */
+  getExampleCommands(language: string = "en"): string[] {
+    return EXAMPLE_COMMANDS[language] || EXAMPLE_COMMANDS["en"];
+  }
+
+  /**
+   * Handle suggestion click
+   */
+  onSuggestionClick(suggestion: string): void {
+    this.commandInputService.updateUserCommand(suggestion);
+    // Keep suggestions visible but collapse them to save space
+    this.suggestionsCollapsed = true;
+  }
+
+  /**
+   * Refresh suggestions
+   */
+  onRefreshSuggestions(): void {
+    this.generateRandomSuggestions();
+    // Expand suggestions when refreshing
+    this.suggestionsCollapsed = false;
+  }
+
+  /**
+   * Toggle suggestions visibility/expansion
+   */
+  toggleSuggestions(): void {
+    if (this.showSuggestions) {
+      this.suggestionsCollapsed = !this.suggestionsCollapsed;
+    } else {
+      this.showSuggestions = true;
+      this.suggestionsCollapsed = false;
+      this.generateRandomSuggestions();
+    }
+  }
+
+  /**
+   * Hide suggestions completely
+   */
+  hideSuggestions(): void {
+    this.showSuggestions = false;
+    this.suggestionsCollapsed = false;
   }
 }

@@ -4,10 +4,6 @@
     <div class="input-header">
       <h2>{{ t("tellMeWhat") }}</h2>
       <div class="header-actions">
-        <button class="example-btn" (click)="onSetExampleCommand()">
-          <span class="emoji">💡</span>
-          {{ t("tryExample") }}
-        </button>
         <button
           *ngIf="false"
           class="example-btn"
@@ -38,6 +34,64 @@
           {{ state.isListening ? t("listening") : t("voiceInput") }}
         </button>
       </div>
+    </div>
+
+    <!-- App Idea Suggestions -->
+    <div class="suggestions-section" *ngIf="showSuggestions">
+      <div class="suggestions-header">
+        <h3 class="suggestions-title">
+          <span class="emoji">💡</span>
+          Need app ideas?
+          <span class="suggestion-count" *ngIf="suggestionsCollapsed"
+            >(3 suggestions)</span
+          >
+        </h3>
+        <div class="suggestions-controls">
+          <button
+            class="toggle-btn"
+            (click)="toggleSuggestions()"
+            [title]="
+              suggestionsCollapsed
+                ? 'Expand suggestions'
+                : 'Collapse suggestions'
+            "
+          >
+            <span class="emoji">{{ suggestionsCollapsed ? "▼" : "▲" }}</span>
+          </button>
+          <button
+            class="refresh-btn"
+            (click)="onRefreshSuggestions()"
+            title="Get new suggestions"
+            *ngIf="!suggestionsCollapsed"
+          >
+            <span class="emoji">🔄</span>
+          </button>
+          <button
+            class="close-btn"
+            (click)="hideSuggestions()"
+            title="Hide suggestions"
+          >
+            <span class="emoji">✕</span>
+          </button>
+        </div>
+      </div>
+      <div class="suggestions-list" *ngIf="!suggestionsCollapsed">
+        <button
+          *ngFor="let suggestion of currentSuggestions"
+          class="suggestion-item"
+          (click)="onSuggestionClick(suggestion)"
+        >
+          {{ suggestion }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Show suggestions button when hidden -->
+    <div class="show-suggestions-section" *ngIf="!showSuggestions">
+      <button class="show-suggestions-btn" (click)="toggleSuggestions()">
+        <span class="emoji">💡</span>
+        Show app ideas
+      </button>
     </div>
 
     <div class="input-wrapper">

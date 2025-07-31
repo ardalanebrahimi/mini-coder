@@ -5,6 +5,7 @@ import { ProcessedCommand } from "./prompt-processor.service";
 export interface SaveDialogData {
   currentApp: ProcessedCommand;
   userCommand: string;
+  saveMode: "toolbox" | "appstore"; // Add save mode flag
 }
 
 @Injectable({

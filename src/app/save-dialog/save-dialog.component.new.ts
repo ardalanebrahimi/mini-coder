@@ -6,7 +6,7 @@ import {
   SaveDialogService,
   SaveDialogData,
 } from "../services/save-dialog.service";
-import { StorageService, SavedProject } from "../services/storage.service";
+import { StorageService } from "../services/storage.service";
 import { ToolboxService } from "../services/toolbox.service";
 import { TranslationService } from "../services/translation.service";
 import {
@@ -31,7 +31,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   errorMessage = "";
   publishSuccessMessage = "";
   isPublishing = false;
-  currentSaveMode: "toolbox" | "appstore" = "appstore"; // Track current save mode
+  currentSaveMode: "toolbox" | "appstore" = "appstore";
 
   constructor(
     private saveDialogService: SaveDialogService,
@@ -58,7 +58,7 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.dialogData = data;
-        this.currentSaveMode = data?.saveMode || "appstore"; // Set current save mode
+        this.currentSaveMode = data?.saveMode || "appstore";
         // Pre-populate project name if available
         if (data?.currentApp?.projectName) {
           this.projectName = data.currentApp.projectName;
@@ -111,78 +111,6 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Check if a project with the same name and content already exists
-   */
-  private findExistingProject(): SavedProject | null {
-    if (!this.dialogData?.currentApp) return null;
-
-    const currentProjects = this.toolboxService.getSavedProjects();
-    return (
-      currentProjects.find(
-        (project) =>
-          project.name === this.projectName.trim() &&
-          project.code === this.dialogData!.currentApp!.generatedCode
-      ) || null
-    );
-  }
-
-  /**
-   * Update an existing project's publication status
-   */
-  private updateExistingProject(
-    existingProject: SavedProject,
-    isPublished: boolean
-  ): void {
-    this.isPublishing = true;
-    this.errorMessage = "";
-    this.publishSuccessMessage = "";
-
-    // Update the existing project
-    this.storageService
-      .updateProject(existingProject.id, {
-        isPublished: isPublished,
-        command: this.dialogData!.userCommand,
-        language: this.dialogData!.currentApp!.detectedLanguage,
-        code: this.dialogData!.currentApp!.generatedCode,
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (updatedProject) => {
-          if (updatedProject) {
-            // Update the project in toolbox service
-            this.toolboxService.removeProject(existingProject.id);
-            this.toolboxService.addProject(updatedProject);
-
-            const action = isPublished
-              ? "published to App Store"
-              : "updated in toolbox";
-            this.publishSuccessMessage = isPublished
-              ? `🎉 "${updatedProject.name}" is now live in the App Store!`
-              : `💾 "${updatedProject.name}" updated in your toolbox!`;
-
-            this.isPublishing = false;
-
-            // Show success message
-            this.showSuccessMessage(`"${updatedProject.name}" ${action}!`);
-
-            // Close dialog after showing success message briefly
-            setTimeout(() => {
-              this.saveDialogService.closeDialog();
-            }, 2000);
-          } else {
-            this.errorMessage = "Failed to update project. Please try again.";
-            this.isPublishing = false;
-          }
-        },
-        error: (error) => {
-          this.errorMessage = "Failed to update project. Please try again.";
-          console.error("Error updating project:", error);
-          this.isPublishing = false;
-        },
-      });
-  }
-
-  /**
    * Save to toolbox (private)
    */
   saveToToolbox(): void {
@@ -198,14 +126,6 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
     }
 
     const isLoggedIn = this.authService.isLoggedIn();
-
-    // Check if project already exists
-    const existingProject = this.findExistingProject();
-    if (existingProject) {
-      // Update existing project instead of creating duplicate
-      this.updateExistingProject(existingProject, false); // false = not published
-      return;
-    }
 
     // Log toolbox save attempt
     this.analytics.logEvent(AnalyticsEventType.TOOLBOX_SAVED, {
@@ -287,14 +207,6 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
     }
 
     const isLoggedIn = this.authService.isLoggedIn();
-
-    // Check if project already exists
-    const existingProject = this.findExistingProject();
-    if (existingProject) {
-      // Update existing project to be published
-      this.updateExistingProject(existingProject, true); // true = published
-      return;
-    }
 
     // Log app store publish attempt
     this.analytics.logEvent(AnalyticsEventType.APPSTORE_PUBLISH_ATTEMPTED, {

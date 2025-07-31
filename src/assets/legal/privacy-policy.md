@@ -4,7 +4,7 @@
 
 ## Data Controller
 
-Ardalan Ebrahimi  
+Ardiland  
 Email: ardalan.ebrahimi@gmail.com
 
 <!-- TODO: Add physical address when available -->

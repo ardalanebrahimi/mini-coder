@@ -4,7 +4,7 @@
 
 ## Verantwortlich für den Inhalt
 
-**Ardalan Ebrahimi**
+**Ardiland**
 
 <!-- TODO: Vollständige Adresse hinzufügen wenn verfügbar -->
 
@@ -20,7 +20,7 @@ E-Mail: ardalan.ebrahimi@gmail.com
 
 ## Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV
 
-Ardalan Ebrahimi
+Ardiland
 
 <!-- TODO: Adresse hinzufügen -->
 

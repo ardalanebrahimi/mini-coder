@@ -4,7 +4,7 @@
 
 ## Responsible for Content
 
-**Ardalan Ebrahimi**
+**Ardiland**
 
 <!-- TODO: Add complete address when available -->
 
@@ -20,7 +20,7 @@ Email: ardalan.ebrahimi@gmail.com
 
 ## Responsible for Content according to § 55 Abs. 2 RStV
 
-Ardalan Ebrahimi
+Ardiland
 
 <!-- TODO: Add address -->
 

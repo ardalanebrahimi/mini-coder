@@ -4,7 +4,7 @@
 
 ## Verantwortlicher
 
-Ardalan Ebrahimi  
+Ardiland  
 E-Mail: ardalan.ebrahimi@gmail.com
 
 <!-- TODO: Adresse hinzufügen wenn verfügbar -->

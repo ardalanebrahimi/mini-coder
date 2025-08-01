@@ -12,6 +12,7 @@ import { FaqComponent } from "./faq/faq.component";
 import { CtaSectionComponent } from "./cta-section/cta-section.component";
 import { FooterComponent } from "./footer/footer.component";
 import { AuthModalComponent } from "../shared/auth-modal.component";
+import { AppPopupComponent } from "../app-popup/app-popup.component";
 
 @Component({
   selector: "app-landing",
@@ -29,6 +30,7 @@ import { AuthModalComponent } from "../shared/auth-modal.component";
     CtaSectionComponent,
     FooterComponent,
     AuthModalComponent,
+    AppPopupComponent,
   ],
   template: `
     <div class="landing-page">
@@ -70,6 +72,11 @@ import { AuthModalComponent } from "../shared/auth-modal.component";
         (closeModal)="closeAuthModal()"
         (authSuccess)="onAuthSuccess($event)"
       ></app-auth-modal>
+
+      <!-- App Popup -->
+      <app-app-popup
+        (showAuthModalEvent)="showAuthModalWithMessage($event)"
+      ></app-app-popup>
     </div>
   `,
   styleUrls: ["./landing.component.scss"],
@@ -117,5 +124,10 @@ export class LandingComponent {
     this.closeAuthModal();
     // Navigate to home after successful auth
     this.router.navigate(["/home"]);
+  }
+
+  showAuthModalWithMessage(message: string): void {
+    this.authModalMessage = message;
+    this.showAuthModal = true;
   }
 }

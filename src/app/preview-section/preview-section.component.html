@@ -1,6 +1,6 @@
 <!-- Preview Section -->
 <div class="preview-section" *ngIf="previewData.currentApp">
-  <div class="preview-header">
+  <div class="preview-header" *ngIf="!isPopupMode">
     <h3>
       <span class="emoji">📱</span>
       {{ t("livePreview") }}
@@ -8,7 +8,7 @@
         t("readOnly")
       }}</span>
     </h3>
-    <div class="preview-actions" *ngIf="!isReadOnly">
+    <div class="preview-actions" *ngIf="!isReadOnly && showToolboxActions">
       <button class="action-btn modify" (click)="onModifyClick()">
         <span class="emoji">🔧</span>
         {{ t("modifyApp") }}
@@ -21,6 +21,10 @@
         <span class="emoji">🏪</span>
         {{ t("addToAppStore") }}
       </button>
+      <button class="action-btn popup" (click)="onOpenInPopup()">
+        <span class="emoji">🖥️</span>
+        Open in Full View
+      </button>
       <button class="action-btn clear" (click)="onClearClick()">
         <span class="emoji">🗑️</span>
         {{ t("clear") }}
@@ -28,8 +32,8 @@
     </div>
   </div>
 
-  <!-- App Store Project Info (only when previewing from App Store) -->
-  <div class="app-store-info" *ngIf="isAppStorePreview()">
+  <!-- App Store Project Info (only when previewing from App Store and not in popup mode) -->
+  <div class="app-store-info" *ngIf="isAppStorePreview() && !isPopupMode">
     <div class="project-info">
       <h4>{{ previewData.sourceProject?.name }}</h4>
       <p class="author">

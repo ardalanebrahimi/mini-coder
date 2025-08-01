@@ -20,7 +20,8 @@ import { ProfileModalComponent } from "./profile/profile-modal.component";
 import { AppStoreComponent } from "./app-store/app-store.component";
 import { VoiceInputModalComponent } from "./voice-input-modal/voice-input-modal.component";
 import { AnalyticsDashboardComponent } from "./shared/analytics-dashboard.component";
-import { FooterComponent } from "./shared/footer.component";
+import { AppPopupComponent } from "./app-popup/app-popup.component";
+import { FooterComponent } from "./landing/footer/footer.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { PublishedProject } from "./services/app-store.service";
 import { TranslationService } from "./services/translation.service";
@@ -65,6 +66,7 @@ import { EXAMPLE_COMMANDS } from "./examples";
     AppStoreComponent,
     VoiceInputModalComponent,
     AnalyticsDashboardComponent,
+    AppPopupComponent,
     FooterComponent,
   ],
   templateUrl: "./app.component.html",

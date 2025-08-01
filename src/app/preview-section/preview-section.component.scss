@@ -81,6 +81,15 @@
     }
   }
 
+  &.popup {
+    background: #6f42c1; // Purple for popup
+    color: $white;
+
+    &:hover {
+      background: darken(#6f42c1, 10%);
+    }
+  }
+
   &.clear {
     background: #e0e0e0;
     color: $text-dark;

@@ -17,6 +17,7 @@ import {
   AnalyticsService,
   AnalyticsEventType,
 } from "../services/analytics.service";
+import { AppPopupService } from "../services/app-popup.service";
 
 @Component({
   selector: "app-app-store",
@@ -28,7 +29,6 @@ import {
 export class AppStoreComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  @Output() tryProject = new EventEmitter<PublishedProject>();
   @Output() starRequiresAuth = new EventEmitter<string>();
 
   projects: PublishedProject[] = [];
@@ -42,7 +42,8 @@ export class AppStoreComponent implements OnInit, OnDestroy {
   constructor(
     private appStoreService: AppStoreService,
     private authService: AuthService,
-    private analytics: AnalyticsService
+    private analytics: AnalyticsService,
+    private appPopupService: AppPopupService
   ) {}
 
   ngOnInit(): void {
@@ -135,8 +136,8 @@ export class AppStoreComponent implements OnInit, OnDestroy {
             );
           }
 
-          // Emit event to parent component to load project for preview
-          this.tryProject.emit(fullProject);
+          // Open the app in popup instead of emitting to parent
+          this.appPopupService.openAppStoreProject(fullProject);
         },
         error: (error: any) => {
           console.error("Error loading project for preview:", error);

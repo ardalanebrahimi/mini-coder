@@ -4,6 +4,7 @@ import {
   OnDestroy,
   Output,
   EventEmitter,
+  Input,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Subject, takeUntil } from "rxjs";
@@ -18,6 +19,7 @@ import {
   AnalyticsService,
   AnalyticsEventType,
 } from "../services/analytics.service";
+import { AppPopupService } from "../services/app-popup.service";
 
 @Component({
   selector: "app-preview-section",
@@ -30,6 +32,8 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   @Output() showAuthModalEvent = new EventEmitter<string>();
+  @Input() isPopupMode = false; // Whether component is used in popup mode
+  @Input() showToolboxActions = true; // Whether to show save/modify actions
 
   previewData: PreviewData = {
     currentApp: null,
@@ -44,7 +48,8 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
     private translationService: TranslationService,
     private appStoreService: AppStoreService,
     private authService: AuthService,
-    private analytics: AnalyticsService
+    private analytics: AnalyticsService,
+    private appPopupService: AppPopupService
   ) {}
 
   ngOnInit(): void {
@@ -134,6 +139,18 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
    */
   onClearClick(): void {
     this.previewSectionService.emitAction("clear");
+  }
+
+  /**
+   * Open app in popup mode
+   */
+  onOpenInPopup(): void {
+    if (this.previewData.currentApp) {
+      this.appPopupService.openUserApp(
+        this.previewData.currentApp,
+        this.previewData.currentApp.projectName || "Your App"
+      );
+    }
   }
 
   /**

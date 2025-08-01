@@ -59,10 +59,7 @@
 
     <!-- App Store View -->
     <div class="app-store-view" *ngIf="currentView === 'store'">
-      <app-app-store
-        (tryProject)="onTryProject($event)"
-        (starRequiresAuth)="showAuthModalWithMessage($event)"
-      >
+      <app-app-store (starRequiresAuth)="showAuthModalWithMessage($event)">
       </app-app-store>
     </div>
   </main>
@@ -105,6 +102,11 @@
 
   <!-- Analytics Dashboard -->
   <app-analytics-dashboard></app-analytics-dashboard>
+
+  <!-- App Popup -->
+  <app-app-popup
+    (showAuthModalEvent)="showAuthModalWithMessage($event)"
+  ></app-app-popup>
 
   <!-- Footer -->
   <app-footer></app-footer>

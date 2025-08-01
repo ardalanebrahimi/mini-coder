@@ -3,13 +3,98 @@
   box-sizing: border-box;
 }
 
+/* MiniCoder Design System - CSS Variables */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 253 64% 64%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 212 75% 75%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 240 10% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 287 85% 78%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 253 64% 64%;
+
+  /* MiniCoder specific colors */
+  --minicoder-purple: 253 64% 64%;
+  --minicoder-blue: 212 75% 75%;
+  --minicoder-pink: 331 82% 75%;
+  --minicoder-green: 142 76% 57%;
+  --minicoder-orange: 25 95% 63%;
+  --minicoder-yellow: 48 100% 67%;
+
+  /* Gradients */
+  --gradient-hero: linear-gradient(
+    135deg,
+    hsl(var(--minicoder-purple)),
+    hsl(var(--minicoder-blue))
+  );
+  --gradient-card: linear-gradient(
+    135deg,
+    hsl(var(--minicoder-pink) / 0.1),
+    hsl(var(--minicoder-blue) / 0.1)
+  );
+  --gradient-button: linear-gradient(
+    135deg,
+    hsl(var(--minicoder-green)),
+    hsl(var(--minicoder-blue))
+  );
+
+  /* Shadows */
+  --shadow-colorful: 0 10px 30px -5px hsl(var(--minicoder-purple) / 0.3);
+  --shadow-card: 0 4px 20px -2px hsl(var(--minicoder-blue) / 0.15);
+
+  --radius: 0.5rem;
+}
+
+/* Global animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce-slow {
+  0%,
+  100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s infinite;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #f8f9fa;
-  color: #333;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 /* Utility classes */
@@ -43,6 +128,66 @@ body {
 
 .mb-2 {
   margin-bottom: 1rem;
+}
+
+/* Common button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  font-family: inherit;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.btn-hero {
+  background: var(--gradient-button);
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  box-shadow: var(--shadow-colorful);
+
+  &:hover {
+    box-shadow: 0 15px 35px -5px hsl(var(--minicoder-purple) / 0.4);
+  }
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.btn-xl {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.25rem;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 2rem;
+  }
 }
 
 .p-1 {

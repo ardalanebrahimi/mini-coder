@@ -12,6 +12,7 @@ import { RootComponent } from "./app/root.component";
 import { AppComponent } from "./app/app.component";
 import { LoginComponent } from "./app/auth/login.component";
 import { RegisterComponent } from "./app/auth/register.component";
+import { LandingComponent } from "./app/landing/landing.component";
 import { AuthInterceptor } from "./app/services/auth.interceptor";
 import {
   AnalyticsService,
@@ -59,10 +60,11 @@ export class GlobalErrorHandler implements ErrorHandler {
 }
 
 const routes: Routes = [
+  { path: "landing", component: LandingComponent },
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterComponent },
   { path: "home", component: AppComponent },
-  { path: "", redirectTo: "/home", pathMatch: "full" },
+  { path: "", redirectTo: "/landing", pathMatch: "full" },
 ];
 
 bootstrapApplication(RootComponent, {

@@ -752,12 +752,13 @@ export class AnalyticsService {
    * Enhanced session tracking for landing pages
    */
   logSessionMetrics(): void {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const sessionDuration = Date.now() - new Date(this.sessionId).getTime();
       const scrollDepth = Math.round(
-        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+          100
       );
-      
+
       this.logEvent(AnalyticsEventType.SESSION_END, {
         sessionEnd: {
           duration: sessionDuration,
@@ -774,13 +775,16 @@ export class AnalyticsService {
    * Track performance metrics
    */
   logPerformanceMetrics(): void {
-    if (typeof window !== 'undefined' && 'performance' in window) {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    if (typeof window !== "undefined" && "performance" in window) {
+      const navigation = performance.getEntriesByType(
+        "navigation"
+      )[0] as PerformanceNavigationTiming;
       if (navigation) {
-        this.logEvent('performance_metrics' as AnalyticsEventType, {
+        this.logEvent("performance_metrics" as AnalyticsEventType, {
           performanceMetrics: {
             pageLoadTime: navigation.loadEventEnd - navigation.fetchStart,
-            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
+            domContentLoaded:
+              navigation.domContentLoadedEventEnd - navigation.fetchStart,
             firstContentfulPaint: this.getFirstContentfulPaint(),
             userType: this.userId ? "logged_in" : "guest",
           },
@@ -791,8 +795,10 @@ export class AnalyticsService {
 
   private getFirstContentfulPaint(): number {
     try {
-      const paintEntries = performance.getEntriesByType('paint');
-      const fcpEntry = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+      const paintEntries = performance.getEntriesByType("paint");
+      const fcpEntry = paintEntries.find(
+        (entry) => entry.name === "first-contentful-paint"
+      );
       return fcpEntry ? fcpEntry.startTime : 0;
     } catch {
       return 0;
@@ -871,7 +877,10 @@ export class AnalyticsService {
   /**
    * Log auth modal close
    */
-  logAuthModalClosed(modalType: "login" | "register", completed: boolean): void {
+  logAuthModalClosed(
+    modalType: "login" | "register",
+    completed: boolean
+  ): void {
     this.logEvent(AnalyticsEventType.AUTH_MODAL_CLOSED, {
       authModalClosed: {
         location: "header",

@@ -1,4 +1,12 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild } from "@angular/core";
+import {
+  Component,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+  ElementRef,
+  ViewChild,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
 import { HeroComponent } from "./hero/hero.component";
@@ -114,7 +122,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Log session metrics before component is destroyed
     this.analytics.logSessionMetrics();
-    
+
     // Clean up observers
     if (this.sectionObserver) {
       this.sectionObserver.disconnect();
@@ -122,14 +130,14 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   private setupBeforeUnloadTracking(): void {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('beforeunload', () => {
+    if (typeof window !== "undefined") {
+      window.addEventListener("beforeunload", () => {
         this.analytics.logSessionMetrics();
       });
 
       // Also track visibility changes (user switching tabs)
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
           this.analytics.logSessionMetrics();
         }
       });
@@ -142,13 +150,20 @@ export class LandingComponent implements OnInit, OnDestroy {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const sectionName = entry.target.id || entry.target.tagName.toLowerCase();
+            const sectionName =
+              entry.target.id || entry.target.tagName.toLowerCase();
             const timeOnPage = Date.now() - this.pageStartTime;
             const scrollPosition = Math.round(
-              (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+              (window.scrollY /
+                (document.body.scrollHeight - window.innerHeight)) *
+                100
             );
 
-            this.analytics.logSectionViewed(sectionName, scrollPosition, timeOnPage);
+            this.analytics.logSectionViewed(
+              sectionName,
+              scrollPosition,
+              timeOnPage
+            );
           }
         });
       },
@@ -162,7 +177,9 @@ export class LandingComponent implements OnInit, OnDestroy {
 
     // Observe sections after a short delay to ensure DOM is ready
     setTimeout(() => {
-      const sections = document.querySelectorAll('section, app-hero, app-features, app-how-it-works, app-video-section, app-app-gallery, app-safety-section, app-faq, app-cta-section');
+      const sections = document.querySelectorAll(
+        "section, app-hero, app-features, app-how-it-works, app-video-section, app-app-gallery, app-safety-section, app-faq, app-cta-section"
+      );
       sections.forEach((section) => {
         if (this.sectionObserver) {
           this.sectionObserver.observe(section);
@@ -172,18 +189,22 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   private setupClickTracking(): void {
-    if (typeof document !== 'undefined') {
+    if (typeof document !== "undefined") {
       // Track all button clicks with analytics
-      document.addEventListener('click', (event) => {
+      document.addEventListener("click", (event) => {
         const target = event.target as HTMLElement;
-        
+
         // Track button clicks
-        if (target.tagName === 'BUTTON' || target.closest('button')) {
-          const button = target.tagName === 'BUTTON' ? target : target.closest('button');
-          const buttonText = button?.textContent?.trim() || '';
-          const section = button?.closest('section')?.id || button?.closest('[class*="section"]')?.className || 'unknown';
-          
-          this.analytics.logEvent('button_clicked' as any, {
+        if (target.tagName === "BUTTON" || target.closest("button")) {
+          const button =
+            target.tagName === "BUTTON" ? target : target.closest("button");
+          const buttonText = button?.textContent?.trim() || "";
+          const section =
+            button?.closest("section")?.id ||
+            button?.closest('[class*="section"]')?.className ||
+            "unknown";
+
+          this.analytics.logEvent("button_clicked" as any, {
             buttonClicked: {
               buttonText,
               section,
@@ -193,12 +214,12 @@ export class LandingComponent implements OnInit, OnDestroy {
         }
 
         // Track link clicks
-        if (target.tagName === 'A' || target.closest('a')) {
-          const link = target.tagName === 'A' ? target : target.closest('a');
-          const href = link?.getAttribute('href') || '';
-          const linkText = link?.textContent?.trim() || '';
-          
-          this.analytics.logEvent('link_clicked' as any, {
+        if (target.tagName === "A" || target.closest("a")) {
+          const link = target.tagName === "A" ? target : target.closest("a");
+          const href = link?.getAttribute("href") || "";
+          const linkText = link?.textContent?.trim() || "";
+
+          this.analytics.logEvent("link_clicked" as any, {
             linkClicked: {
               href,
               linkText,
@@ -213,7 +234,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   onTryItFree(): void {
     // Log hero CTA click
     this.analytics.logHeroCTAClicked("try_it_free");
-    
+
     // Show auth modal for try it free
     this.authModalMessage = "Welcome! Sign up to start creating amazing apps!";
     this.showAuthModal = true;
@@ -222,7 +243,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   onBrowseCommunity(): void {
     // Log hero browse click
     this.analytics.logHeroCTAClicked("browse_community");
-    
+
     // Scroll to app gallery section
     setTimeout(() => {
       const appGalleryElement = document.getElementById("app-gallery");
@@ -239,7 +260,7 @@ export class LandingComponent implements OnInit, OnDestroy {
       `Sample App ${appId}`,
       appId // Using appId as position for now
     );
-    
+
     // Show auth modal for trying apps
     this.authModalMessage = "Log in to try this awesome app!";
     this.showAuthModal = true;
@@ -248,7 +269,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   onExploreMore(): void {
     // Log as a browse action
     this.analytics.logCTASectionClicked("browse_apps");
-    
+
     // Show auth modal for exploring more apps
     this.authModalMessage = "Log in to explore more community creations!";
     this.showAuthModal = true;
@@ -278,7 +299,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   showAuthModalWithMessage(message: string): void {
     // Log login prompt shown
     this.analytics.logLoginPromptShown("app_popup_interaction");
-    
+
     this.authModalMessage = message;
     this.showAuthModal = true;
   }

@@ -6,7 +6,10 @@ import { AuthService } from "../services/auth.service";
 import { TranslationService } from "../services/translation.service";
 import { ToolboxService } from "../services/toolbox.service";
 import { StorageService } from "../services/storage.service";
-import { AnalyticsService, AnalyticsEventType } from "../services/analytics.service";
+import {
+  AnalyticsService,
+  AnalyticsEventType,
+} from "../services/analytics.service";
 import { Observable, map, catchError, of } from "rxjs";
 import { AuthModalComponent } from "./auth-modal.component";
 
@@ -64,8 +67,11 @@ export class HeaderComponent implements OnInit {
 
   changeLanguage(languageCode: string): void {
     // Log language change
-    this.analytics.logHeaderLanguageChanged(this.selectedLanguage, languageCode);
-    
+    this.analytics.logHeaderLanguageChanged(
+      this.selectedLanguage,
+      languageCode
+    );
+
     this.translationService.setLanguage(languageCode);
   }
 
@@ -73,7 +79,7 @@ export class HeaderComponent implements OnInit {
   toggleToolbox(): void {
     // Log toolbox toggle
     this.analytics.logHeaderToolboxClicked(this.router.url);
-    
+
     // Always allow toolbox to open, but content will differ based on auth status
     this.toolboxService.toggle();
   }
@@ -86,7 +92,7 @@ export class HeaderComponent implements OnInit {
   logout(): void {
     // Log logout action
     this.analytics.logHeaderLogoutClicked(this.router.url);
-    
+
     this.authService.logout();
     this.router.navigate(["/login"]);
   }
@@ -103,7 +109,7 @@ export class HeaderComponent implements OnInit {
     } else {
       this.analytics.logHeaderRegisterClicked(this.router.url);
     }
-    
+
     this.isLogin = isLogin;
     this.authModalMessage = isLogin
       ? "Welcome Back! Please log in to continue."
@@ -115,11 +121,11 @@ export class HeaderComponent implements OnInit {
     // Log auth modal closing (if it was closed without completing auth)
     if (this.showAuthModal) {
       this.analytics.logAuthModalClosed(
-        this.isLogin ? 'login' : 'register',
+        this.isLogin ? "login" : "register",
         false // closed without completion
       );
     }
-    
+
     this.showAuthModal = false;
     this.authModalMessage = "";
   }
@@ -128,19 +134,19 @@ export class HeaderComponent implements OnInit {
     // Log successful authentication
     this.analytics.logEvent(AnalyticsEventType.AUTH_LOGIN, {
       authLogin: {
-        location: 'header',
-        loginMethod: this.isLogin ? 'login' : 'register',
-        userType: 'logged_in',
-        success: true
-      }
+        location: "header",
+        loginMethod: this.isLogin ? "login" : "register",
+        userType: "logged_in",
+        success: true,
+      },
     });
-    
+
     // Also log modal completion
     this.analytics.logAuthModalClosed(
-      this.isLogin ? 'login' : 'register',
+      this.isLogin ? "login" : "register",
       true // completed successfully
     );
-    
+
     this.closeAuthModal();
     // Navigate to home after successful auth
     this.router.navigate(["/home"]);
@@ -151,10 +157,10 @@ export class HeaderComponent implements OnInit {
     this.analytics.logEvent(AnalyticsEventType.NAVIGATION_CHANGED, {
       navigationChanged: {
         fromView: this.router.url,
-        toView: '/landing',
-        userType: this.authService.isLoggedIn() ? 'logged_in' : 'guest',
-        trigger: 'header_logo'
-      }
+        toView: "/landing",
+        userType: this.authService.isLoggedIn() ? "logged_in" : "guest",
+        trigger: "header_logo",
+      },
     });
   }
 
@@ -162,10 +168,10 @@ export class HeaderComponent implements OnInit {
     this.analytics.logEvent(AnalyticsEventType.NAVIGATION_CHANGED, {
       navigationChanged: {
         fromView: this.router.url,
-        toView: '/home',
-        userType: this.authService.isLoggedIn() ? 'logged_in' : 'guest',
-        trigger: 'header_app_button'
-      }
+        toView: "/home",
+        userType: this.authService.isLoggedIn() ? "logged_in" : "guest",
+        trigger: "header_app_button",
+      },
     });
   }
 }

@@ -24,7 +24,11 @@
         >
           <!-- Navigation Links (non-app routes) -->
           <div class="nav-actions" *ngIf="!isAppRoute">
-            <a routerLink="/home" class="action-btn primary" (click)="onAppButtonClick()">
+            <a
+              routerLink="/home"
+              class="action-btn primary"
+              (click)="onAppButtonClick()"
+            >
               <span class="btn-icon">🚀</span>
               App
             </a>

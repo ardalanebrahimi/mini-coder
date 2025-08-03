@@ -126,13 +126,9 @@ export class AppGalleryComponent implements OnInit, OnDestroy {
     // Log gallery app click
     const app = this.sampleApps.find((a) => a.id === appId);
     const appName = app ? this.t(app.titleKey) : `Sample App ${appId}`;
-    const position = this.sampleApps.findIndex(a => a.id === appId) + 1;
-    
-    this.analytics.logGalleryAppClicked(
-      appId.toString(),
-      appName,
-      position
-    );
+    const position = this.sampleApps.findIndex((a) => a.id === appId) + 1;
+
+    this.analytics.logGalleryAppClicked(appId.toString(), appName, position);
 
     // Find the app details from our sample apps
     if (app) {

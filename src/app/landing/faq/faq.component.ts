@@ -141,7 +141,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   toggleFaq(faq: any): void {
     const wasOpen = faq.isOpen;
     faq.isOpen = !faq.isOpen;
-    
+
     // Log FAQ expansion (only when opening, not closing)
     if (!wasOpen && faq.isOpen) {
       this.analytics.logFAQSectionExpanded(

@@ -117,7 +117,7 @@ export class VideoSectionComponent implements OnInit, OnDestroy {
   onVideoClick(): void {
     // Log video play event
     this.analytics.logVideoPlayed("minicoder_demo_video", "video_section");
-    
+
     // Hide the overlay when clicked
     this.showPlayOverlay = false;
   }

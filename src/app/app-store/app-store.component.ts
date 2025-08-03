@@ -18,6 +18,7 @@ import {
   AnalyticsEventType,
 } from "../services/analytics.service";
 import { AppPopupService } from "../services/app-popup.service";
+import { TranslationService } from "../services/translation.service";
 
 @Component({
   selector: "app-app-store",
@@ -43,7 +44,8 @@ export class AppStoreComponent implements OnInit, OnDestroy {
     private appStoreService: AppStoreService,
     private authService: AuthService,
     private analytics: AnalyticsService,
-    private appPopupService: AppPopupService
+    private appPopupService: AppPopupService,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -74,7 +76,7 @@ export class AppStoreComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error: any) => {
-          this.error = "Failed to load projects. Please try again.";
+          this.error = this.translationService.t("failedToLoadProjects");
           this.isLoading = false;
           console.error("Error loading app store projects:", error);
         },
@@ -100,7 +102,7 @@ export class AppStoreComponent implements OnInit, OnDestroy {
           this.isLoadingMore = false;
         },
         error: (error: any) => {
-          this.error = "Failed to load more projects.";
+          this.error = this.translationService.t("failedToLoadProjects");
           this.isLoadingMore = false;
           this.currentPage--; // Revert page increment
           console.error("Error loading more projects:", error);
@@ -219,5 +221,12 @@ export class AppStoreComponent implements OnInit, OnDestroy {
    */
   trackByProjectId(index: number, project: PublishedProject): number {
     return project.id;
+  }
+
+  /**
+   * Translation helper method
+   */
+  t(key: string): string {
+    return this.translationService.t(key);
   }
 }

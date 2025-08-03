@@ -4,6 +4,7 @@ import { Subject, takeUntil } from "rxjs";
 import { SavedProject } from "../services/storage.service";
 import { ToolboxService } from "../services/toolbox.service";
 import { StorageService } from "../services/storage.service";
+import { TranslationService } from "../services/translation.service";
 
 @Component({
   selector: "app-toolbox-project-item",
@@ -23,7 +24,8 @@ export class ToolboxProjectItemComponent implements OnInit, OnDestroy {
 
   constructor(
     private toolboxService: ToolboxService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -91,5 +93,12 @@ export class ToolboxProjectItemComponent implements OnInit, OnDestroy {
           // Optionally show error message to user
         },
       });
+  }
+
+  /**
+   * Translation helper method
+   */
+  t(key: string): string {
+    return this.translationService.t(key);
   }
 }

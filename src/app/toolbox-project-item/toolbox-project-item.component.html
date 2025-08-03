@@ -10,7 +10,7 @@
       <span
         *ngIf="project.isPublished"
         class="published-badge"
-        title="Published to App Store"
+        title="{{ t('publishedToAppStore') }}"
       >
         📱 Public
       </span>
@@ -30,7 +30,7 @@
       class="publish-btn"
       (click)="onPublishClick($event)"
       [disabled]="isPublishing"
-      title="Publish to App Store"
+      title="{{ t('publishToAppStore') }}"
     >
       {{ isPublishing ? "⏳" : "🌐" }}
     </button>

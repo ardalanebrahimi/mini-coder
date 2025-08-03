@@ -1,5 +1,13 @@
-import { Component, Output, EventEmitter } from "@angular/core";
+import {
+  Component,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { Subscription } from "rxjs";
+import { TranslationService } from "../../services/translation.service";
 
 @Component({
   selector: "app-cta-section",
@@ -8,18 +16,17 @@ import { CommonModule } from "@angular/common";
   template: `
     <section class="cta-section">
       <div class="container">
-        <h2 class="cta-title">Ready to Start Creating?</h2>
+        <h2 class="cta-title">{{ t("landing.cta.title") }}</h2>
         <p class="cta-subtitle">
-          Join thousands of young creators building amazing games and tools with
-          MiniCoder
+          {{ t("landing.cta.subtitle") }}
         </p>
         <div class="cta-buttons">
           <button class="btn btn-primary btn-lg" (click)="onStartCreating()">
             <span class="btn-icon">✨</span>
-            Start Creating for Free
+            {{ t("landing.cta.startCreating") }}
           </button>
           <button class="btn btn-secondary btn-lg" (click)="onBrowseApps()">
-            Browse Community Apps
+            {{ t("landing.cta.browseApps") }}
           </button>
         </div>
       </div>
@@ -27,9 +34,28 @@ import { CommonModule } from "@angular/common";
   `,
   styleUrls: ["./cta-section.component.scss"],
 })
-export class CtaSectionComponent {
+export class CtaSectionComponent implements OnInit, OnDestroy {
+  private subscription = new Subscription();
   @Output() startCreating = new EventEmitter<void>();
   @Output() browseApps = new EventEmitter<void>();
+
+  constructor(private translationService: TranslationService) {}
+
+  ngOnInit() {
+    this.subscription.add(
+      this.translationService.selectedLanguage$.subscribe(() => {
+        // Component will automatically update when language changes
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  t(key: string): string {
+    return this.translationService.translate(key);
+  }
 
   onStartCreating(): void {
     this.startCreating.emit();

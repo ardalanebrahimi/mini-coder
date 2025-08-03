@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { TranslationService } from "../../services/translation.service";
 
 @Component({
   selector: "app-hero",
@@ -29,27 +30,25 @@ import { CommonModule } from "@angular/common";
 
           <!-- Headline -->
           <h2 class="headline">
-            Build amazing games and tools just by talking or typing!
+            {{ t("landing.hero.headline") }}
           </h2>
 
           <!-- Subheading -->
           <p class="subheading">
-            A playful, AI-powered platform where kids aged 7-12 create, play,
-            and share their own mini games and apps. No coding required – just
-            imagination!
+            {{ t("landing.hero.subheading") }}
           </p>
 
           <!-- CTA Buttons -->
           <div class="cta-buttons">
             <button class="btn btn-hero btn-xl" (click)="onTryItFree()">
               <span class="button-icon">🚀</span>
-              Try it Free!
+              {{ t("landing.hero.tryItFree") }}
             </button>
             <button
               class="btn btn-outline btn-xl"
               (click)="onBrowseCommunity()"
             >
-              Browse Community Apps
+              {{ t("landing.hero.browseCommunity") }}
             </button>
           </div>
 
@@ -69,6 +68,15 @@ import { CommonModule } from "@angular/common";
 export class HeroComponent {
   @Output() tryItFree = new EventEmitter<void>();
   @Output() browseCommunity = new EventEmitter<void>();
+
+  constructor(private translationService: TranslationService) {}
+
+  /**
+   * Translation helper method
+   */
+  t(key: string): string {
+    return this.translationService.t(key);
+  }
 
   onTryItFree(): void {
     this.tryItFree.emit();

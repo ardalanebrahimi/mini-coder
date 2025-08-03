@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { TranslationService } from "../services/translation.service";
 
 @Component({
   selector: "app-footer",
@@ -14,7 +15,7 @@ import { CommonModule } from "@angular/common";
             target="_blank"
             class="footer-link"
           >
-            Privacy Policy
+            {{ t("privacyPolicy") }}
           </a>
           <span class="separator">|</span>
           <a
@@ -30,7 +31,7 @@ import { CommonModule } from "@angular/common";
             target="_blank"
             class="footer-link"
           >
-            Legal Notice
+            {{ t("legalNotice") }}
           </a>
           <span class="separator">|</span>
           <a
@@ -136,4 +137,13 @@ import { CommonModule } from "@angular/common";
     `,
   ],
 })
-export class FooterComponent {}
+export class FooterComponent {
+  constructor(private translationService: TranslationService) {}
+
+  /**
+   * Translation helper method
+   */
+  t(key: string): string {
+    return this.translationService.t(key);
+  }
+}

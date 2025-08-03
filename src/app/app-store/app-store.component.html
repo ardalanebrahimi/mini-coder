@@ -3,13 +3,13 @@
   <div class="app-store-header">
     <h2 class="store-title">
       <span class="emoji">🏪</span>
-      App Store
+      {{ t("appStore") }}
     </h2>
-    <p class="store-subtitle">Discover amazing apps created by the community</p>
+    <p class="store-subtitle">{{ t("appStoreSubtitle") }}</p>
 
     <button class="refresh-btn" (click)="refresh()" [disabled]="isLoading">
       <span class="emoji">{{ isLoading ? "⏳" : "🔄" }}</span>
-      Refresh
+      {{ t("refresh") }}
     </button>
   </div>
 
@@ -17,13 +17,13 @@
   <div class="error-message" *ngIf="error">
     <span class="emoji">❌</span>
     {{ error }}
-    <button class="retry-btn" (click)="refresh()">Try Again</button>
+    <button class="retry-btn" (click)="refresh()">{{ t("tryAgain") }}</button>
   </div>
 
   <!-- Loading state -->
   <div class="loading-state" *ngIf="isLoading && projects.length === 0">
     <span class="emoji">⏳</span>
-    <p>Loading amazing apps...</p>
+    <p>{{ t("loadingAmazingApps") }}</p>
   </div>
 
   <!-- Projects grid -->
@@ -64,17 +64,17 @@
       <div class="project-actions">
         <button class="try-btn" (click)="onTryProject(project)">
           <span class="emoji">▶️</span>
-          Try It
+          {{ t("tryIt") }}
         </button>
 
         <button
           class="star-btn"
           [class.starred]="project.starred"
           (click)="onStarProject(project)"
-          [title]="project.starred ? 'Remove star' : 'Star this app'"
+          [title]="project.starred ? t('removeStar') : t('starThisApp')"
         >
           <span class="emoji">{{ project.starred ? "⭐" : "☆" }}</span>
-          {{ project.starred ? "Starred" : "Star" }}
+          {{ project.starred ? t("starred") : t("star") }}
         </button>
       </div>
     </div>
@@ -82,8 +82,8 @@
     <!-- Empty state -->
     <div class="empty-state" *ngIf="projects.length === 0 && !isLoading">
       <span class="emoji">📱</span>
-      <h3>No apps published yet</h3>
-      <p>Be the first to publish an app to the store!</p>
+      <h3>{{ t("noAppsPublished") }}</h3>
+      <p>{{ t("beTheFirst") }}</p>
     </div>
   </div>
 
@@ -95,12 +95,15 @@
       [disabled]="isLoadingMore"
     >
       <span class="emoji">{{ isLoadingMore ? "⏳" : "⬇️" }}</span>
-      {{ isLoadingMore ? "Loading..." : "Load More" }}
+      {{ isLoadingMore ? t("loading") : t("loadMore") }}
     </button>
   </div>
 
   <!-- Stats footer -->
   <div class="stats-footer" *ngIf="total > 0">
-    <p>Showing {{ projects.length }} of {{ total }} apps</p>
+    <p>
+      {{ t("showingApps").replace("{{count}}",
+      projects.length.toString()).replace("{{ total }}", total.toString()) }}
+    </p>
   </div>
 </div>

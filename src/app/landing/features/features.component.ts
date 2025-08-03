@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { TranslationService } from "../../services/translation.service";
 
 @Component({
   selector: "app-features",
@@ -9,10 +10,9 @@ import { CommonModule } from "@angular/common";
     <section class="features-section">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Why Kids Love MiniCoder</h2>
+          <h2 class="section-title">{{ t("landing.features.title") }}</h2>
           <p class="section-subtitle">
-            We've built the perfect platform for young creators to bring their
-            ideas to life safely and easily
+            {{ t("landing.features.subtitle") }}
           </p>
         </div>
 
@@ -32,48 +32,53 @@ import { CommonModule } from "@angular/common";
   styleUrls: ["./features.component.scss"],
 })
 export class FeaturesComponent {
-  features = [
-    {
-      icon: "⚡",
-      title: "AI-Powered Creation",
-      description:
-        "Build games and tools instantly with our smart AI that understands what kids want to create",
-      colorClass: "bg-yellow",
-    },
-    {
-      icon: "🛡️",
-      title: "Safe & Secure",
-      description:
-        "Privacy-first design with no personal data collection. Parents can trust us with their kids",
-      colorClass: "bg-green",
-    },
-    {
-      icon: "❤️",
-      title: "Kid-Friendly Design",
-      description:
-        "Colorful, intuitive interface designed specifically for children aged 7-12 years old",
-      colorClass: "bg-pink",
-    },
-    {
-      icon: "👥",
-      title: "Community Sharing",
-      description:
-        "Discover and play thousands of games created by other young developers around the world",
-      colorClass: "bg-blue",
-    },
-    {
-      icon: "🎮",
-      title: "Instant Play",
-      description:
-        "No downloads or installations - play any game directly right away",
-      colorClass: "bg-purple",
-    },
-    {
-      icon: "🎨",
-      title: "Creative Freedom",
-      description:
-        "From simple memory games to complex adventures - the only limit is your imagination",
-      colorClass: "bg-orange",
-    },
-  ];
+  constructor(private translationService: TranslationService) {}
+
+  /**
+   * Translation helper method
+   */
+  t(key: string): string {
+    return this.translationService.t(key);
+  }
+
+  get features() {
+    return [
+      {
+        icon: "⚡",
+        title: this.t("landing.features.aiPowered"),
+        description: this.t("landing.features.aiPoweredDesc"),
+        colorClass: "bg-yellow",
+      },
+      {
+        icon: "🛡️",
+        title: this.t("landing.features.safeSecure"),
+        description: this.t("landing.features.safeSecureDesc"),
+        colorClass: "bg-green",
+      },
+      {
+        icon: "🚫",
+        title: this.t("landing.features.noCode"),
+        description: this.t("landing.features.noCodeDesc"),
+        colorClass: "bg-pink",
+      },
+      {
+        icon: "�",
+        title: this.t("landing.features.instantShare"),
+        description: this.t("landing.features.instantShareDesc"),
+        colorClass: "bg-blue",
+      },
+      {
+        icon: "♾️",
+        title: this.t("landing.features.unlimitedCreation"),
+        description: this.t("landing.features.unlimitedCreationDesc"),
+        colorClass: "bg-purple",
+      },
+      {
+        icon: "💻",
+        title: this.t("landing.features.realCode"),
+        description: this.t("landing.features.realCodeDesc"),
+        colorClass: "bg-orange",
+      },
+    ];
+  }
 }

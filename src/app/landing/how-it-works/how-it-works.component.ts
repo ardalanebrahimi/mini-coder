@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { TranslationService } from "../../services/translation.service";
 
 @Component({
   selector: "app-how-it-works",
@@ -9,10 +10,9 @@ import { CommonModule } from "@angular/common";
     <section class="how-it-works-section">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">How It Works</h2>
+          <h2 class="section-title">{{ t("landing.howItWorks.title") }}</h2>
           <p class="section-subtitle">
-            Creating your own games and tools is as easy as having a
-            conversation!
+            {{ t("landing.howItWorks.subtitle") }}
           </p>
         </div>
 
@@ -77,30 +77,41 @@ import { CommonModule } from "@angular/common";
   styleUrls: ["./how-it-works.component.scss"],
 })
 export class HowItWorksComponent {
-  steps = [
-    {
-      icon: "message",
-      title: "Tell us your idea",
-      description: "Simply type or talk about the game you want to create",
-      color: "color-purple",
-    },
-    {
-      icon: "wand",
-      title: "Watch the magic",
-      description: "Our AI builds your game instantly - no coding needed!",
-      color: "color-pink",
-    },
-    {
-      icon: "play",
-      title: "Play & improve",
-      description: "Test your game and ask for changes until it's perfect",
-      color: "color-green",
-    },
-    {
-      icon: "share",
-      title: "Share with friends",
-      description: "Publish your creation for others to discover and play",
-      color: "color-blue",
-    },
-  ];
+  constructor(private translationService: TranslationService) {}
+
+  /**
+   * Translation helper method
+   */
+  t(key: string): string {
+    return this.translationService.t(key);
+  }
+
+  get steps() {
+    return [
+      {
+        icon: "message",
+        title: this.t("landing.howItWorks.step1"),
+        description: this.t("landing.howItWorks.step1Desc"),
+        color: "color-purple",
+      },
+      {
+        icon: "wand",
+        title: this.t("landing.howItWorks.step2"),
+        description: this.t("landing.howItWorks.step2Desc"),
+        color: "color-pink",
+      },
+      {
+        icon: "play",
+        title: this.t("landing.howItWorks.step3"),
+        description: this.t("landing.howItWorks.step3Desc"),
+        color: "color-green",
+      },
+      {
+        icon: "share",
+        title: this.t("landing.howItWorks.step4"),
+        description: this.t("landing.howItWorks.step4Desc"),
+        color: "color-blue",
+      },
+    ];
+  }
 }

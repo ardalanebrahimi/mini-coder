@@ -1,6 +1,8 @@
-import { Component } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { Subscription } from "rxjs";
+import { TranslationService } from "../../services/translation.service";
 
 @Component({
   selector: "app-video-section",
@@ -10,10 +12,9 @@ import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
     <section class="video-section">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">See MiniCoder in Action</h2>
+          <h2 class="section-title">{{ t("landing.video.title") }}</h2>
           <p class="section-subtitle">
-            Watch how kids create amazing games in just minutes with our
-            AI-powered platform
+            {{ t("landing.video.subtitle") }}
           </p>
         </div>
 
@@ -42,7 +43,7 @@ import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
             >
               <div class="play-button">
                 <span class="play-icon">▶️</span>
-                <span class="play-text">Watch Demo</span>
+                <span class="play-text">{{ t("landing.video.playText") }}</span>
               </div>
             </div>
           </div>
@@ -59,15 +60,15 @@ import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
         <div class="video-features">
           <div class="feature-item">
             <span class="feature-emoji">🎯</span>
-            <span class="feature-text">Real kids, real creations</span>
+            <span class="feature-text">{{ t("landing.video.feature1") }}</span>
           </div>
           <div class="feature-item">
             <span class="feature-emoji">⚡</span>
-            <span class="feature-text">No coding required</span>
+            <span class="feature-text">{{ t("landing.video.feature2") }}</span>
           </div>
           <div class="feature-item">
             <span class="feature-emoji">🎉</span>
-            <span class="feature-text">Instant results</span>
+            <span class="feature-text">{{ t("landing.video.feature3") }}</span>
           </div>
         </div>
       </div>
@@ -75,7 +76,8 @@ import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
   `,
   styleUrls: ["./video-section.component.scss"],
 })
-export class VideoSectionComponent {
+export class VideoSectionComponent implements OnInit, OnDestroy {
+  private subscription = new Subscription();
   showPlayOverlay = false; // Set to true if you want a custom play button
   safeVideoUrl: SafeResourceUrl;
 
@@ -83,14 +85,30 @@ export class VideoSectionComponent {
   private videoUrl =
     "https://www.youtube.com/embed/rFaQmeCv50A?autoplay=1&mute=1&loop=1&playlist=rFaQmeCv50A&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&start=0&fs=0&disablekb=1&cc_load_policy=0&color=white&theme=light";
 
-  // Alternative with minimal controls (if you want users to be able to play/pause)
-  // private videoUrl = "https://www.youtube.com/embed/rFaQmeCv50A?autoplay=1&mute=1&loop=1&playlist=rFaQmeCv50A&controls=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&start=0&fs=0&disablekb=1&cc_load_policy=0&color=white&theme=light";
-
-  constructor(private sanitizer: DomSanitizer) {
+  constructor(
+    private sanitizer: DomSanitizer,
+    private translationService: TranslationService
+  ) {
     // Sanitize the YouTube URL for security
     this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
       this.videoUrl
     );
+  }
+
+  ngOnInit() {
+    this.subscription.add(
+      this.translationService.selectedLanguage$.subscribe(() => {
+        // Component will automatically update when language changes
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  t(key: string): string {
+    return this.translationService.translate(key);
   }
 
   onVideoClick(): void {

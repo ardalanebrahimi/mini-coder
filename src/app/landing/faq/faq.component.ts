@@ -1,5 +1,7 @@
-import { Component } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { Subscription } from "rxjs";
+import { TranslationService } from "../../services/translation.service";
 
 @Component({
   selector: "app-faq",
@@ -9,7 +11,8 @@ import { CommonModule } from "@angular/common";
     <section class="faq-section">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Frequently Asked Questions</h2>
+          <h2 class="section-title">{{ t("landing.faq.title") }}</h2>
+          <p class="section-subtitle">{{ t("landing.faq.subtitle") }}</p>
         </div>
 
         <div class="faq-list">
@@ -32,93 +35,104 @@ import { CommonModule } from "@angular/common";
   `,
   styleUrls: ["./faq.component.scss"],
 })
-export class FaqComponent {
-  faqs = [
-    {
-      question: "Is MiniCoder really safe for my child?",
-      answer:
-        "Absolutely! We use privacy-first design with no personal data collection. All content is moderated, and parents have full control over their child's account.",
-      isOpen: false,
-    },
-    {
-      question: "What age group is MiniCoder designed for?",
-      answer:
-        "MiniCoder is specifically designed for children aged 7-12 years old, with an intuitive interface and age-appropriate content.",
-      isOpen: false,
-    },
-    {
-      question: "Do kids need to know how to code?",
-      answer:
-        "Not at all! Our AI-powered platform lets kids create games and tools just by describing what they want in plain language.",
-      isOpen: false,
-    },
-    {
-      question: "How much does MiniCoder cost?",
-      answer:
-        "We offer a free tier with basic features, and affordable premium plans for families who want advanced features and more storage.",
-      isOpen: false,
-    },
-    {
-      question: "Can my child share their creations?",
-      answer:
-        "Yes! Kids can safely share their games with friends and the community. All shared content goes through our moderation system first.",
-      isOpen: false,
-    },
-    {
-      question: "What kind of games can kids create?",
-      answer:
-        "Kids can create puzzle games, adventure games, educational tools, art projects, and much more. The only limit is their imagination!",
-      isOpen: false,
-    },
-    {
-      question: "Is there parental supervision?",
-      answer:
-        "Yes! Parents can review all projects, control sharing settings, and monitor their child's activity through our parent dashboard.",
-      isOpen: false,
-    },
-    {
-      question: "Does MiniCoder work on tablets and phones?",
-      answer:
-        "MiniCoder works best on computers but is also compatible with tablets. We're working on a mobile app coming soon!",
-      isOpen: false,
-    },
-    {
-      question: "How long does it take to create a game?",
-      answer:
-        "Simple games can be created in just a few minutes! More complex projects might take an hour or two, depending on the child's vision.",
-      isOpen: false,
-    },
-    {
-      question: "Can multiple kids work together on a project?",
-      answer:
-        "Currently, each project is created by one child, but kids can definitely inspire each other by sharing and remixing games!",
-      isOpen: false,
-    },
-    {
-      question: "What if my child gets frustrated or stuck?",
-      answer:
-        "Our AI assistant is designed to be patient and helpful. We also provide step-by-step tutorials and a supportive community of young creators.",
-      isOpen: false,
-    },
-    {
-      question: "Can kids learn real programming skills?",
-      answer:
-        "While kids start with natural language, they gradually learn programming concepts like loops, conditions, and logic through our visual tools.",
-      isOpen: false,
-    },
-    {
-      question: "Is there a time limit for using MiniCoder?",
-      answer:
-        "Parents can set usage limits through parental controls. We also encourage healthy breaks with built-in reminders.",
-      isOpen: false,
-    },
-    {
-      question: "What devices and browsers are supported?",
-      answer:
-        "MiniCoder works on Windows, Mac, and Chromebooks with modern browsers like Chrome, Firefox, Safari, and Edge.",
-      isOpen: false,
-    },
-  ];
+export class FaqComponent implements OnInit, OnDestroy {
+  private subscription = new Subscription();
+  faqs: any[] = [];
+
+  constructor(private translationService: TranslationService) {}
+
+  ngOnInit() {
+    this.initializeFaqs();
+    this.subscription.add(
+      this.translationService.selectedLanguage$.subscribe(() => {
+        // Reinitialize FAQs when language changes
+        this.initializeFaqs();
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  t(key: string): string {
+    return this.translationService.translate(key);
+  }
+
+  initializeFaqs(): void {
+    this.faqs = [
+      {
+        question: this.t("landing.faq.q1"),
+        answer: this.t("landing.faq.a1"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q2"),
+        answer: this.t("landing.faq.a2"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q3"),
+        answer: this.t("landing.faq.a3"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q4"),
+        answer: this.t("landing.faq.a4"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q5"),
+        answer: this.t("landing.faq.a5"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q6"),
+        answer: this.t("landing.faq.a6"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q7"),
+        answer: this.t("landing.faq.a7"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q8"),
+        answer: this.t("landing.faq.a8"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q9"),
+        answer: this.t("landing.faq.a9"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q10"),
+        answer: this.t("landing.faq.a10"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q11"),
+        answer: this.t("landing.faq.a11"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q12"),
+        answer: this.t("landing.faq.a12"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q13"),
+        answer: this.t("landing.faq.a13"),
+        isOpen: false,
+      },
+      {
+        question: this.t("landing.faq.q14"),
+        answer: this.t("landing.faq.a14"),
+        isOpen: false,
+      },
+    ];
+  }
 
   toggleFaq(faq: any): void {
     faq.isOpen = !faq.isOpen;

@@ -81,11 +81,24 @@
                 {{ lang.flag }} {{ lang.name }}
               </option>
             </select>
-            <a routerLink="/login" class="action-btn">Login</a>
-            <a routerLink="/register" class="action-btn primary">Register</a>
+            <button class="action-btn" (click)="openAuthModal(true)">
+              Login
+            </button>
+            <button class="action-btn" (click)="openAuthModal(false)">
+              Register
+            </button>
           </div>
         </ng-template>
       </nav>
     </div>
   </div>
 </header>
+
+<!-- Auth Modal -->
+<app-auth-modal
+  [isOpen]="showAuthModal"
+  [isLogin]="isLogin"
+  [message]="authModalMessage"
+  (closeModal)="closeAuthModal()"
+  (authSuccess)="onAuthSuccess($event)"
+></app-auth-modal>

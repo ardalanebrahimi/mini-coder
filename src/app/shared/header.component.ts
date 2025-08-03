@@ -7,16 +7,20 @@ import { TranslationService } from "../services/translation.service";
 import { ToolboxService } from "../services/toolbox.service";
 import { StorageService } from "../services/storage.service";
 import { Observable, map, catchError, of } from "rxjs";
+import { AuthModalComponent } from "./auth-modal.component";
 
 @Component({
   selector: "app-header",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AuthModalComponent],
   templateUrl: "./header.component.html",
   styleUrls: ["./header.component.scss"],
 })
 export class HeaderComponent implements OnInit {
   currentUser$: Observable<any>;
+  showAuthModal = false;
+  authModalMessage = "";
+  isLogin = false;
   // savedProjectsCount$: Observable<number>;
 
   constructor(
@@ -79,5 +83,24 @@ export class HeaderComponent implements OnInit {
   // Check if current route is the main app
   get isAppRoute(): boolean {
     return this.router.url === "/home";
+  }
+
+  openAuthModal(isLogin: boolean): void {
+    this.isLogin = isLogin;
+    this.authModalMessage = isLogin
+      ? "Welcome Back! Please log in to continue."
+      : "Welcome! Sign up to start creating amazing apps!";
+    this.showAuthModal = true;
+  }
+
+  closeAuthModal(): void {
+    this.showAuthModal = false;
+    this.authModalMessage = "";
+  }
+
+  onAuthSuccess(user: any): void {
+    this.closeAuthModal();
+    // Navigate to home after successful auth
+    this.router.navigate(["/home"]);
   }
 }

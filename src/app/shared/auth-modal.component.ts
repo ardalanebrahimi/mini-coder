@@ -40,8 +40,15 @@ import { AuthService } from "../services/auth.service";
                 (click)="onGoogleSignIn()"
                 [disabled]="isLoading"
               >
-                <span class="google-icon">🔑</span>
-                <span *ngIf="!isLoading">Sign up with Google</span>
+                <span *ngIf="!isLoading"
+                  ><img
+                    src="/assets/icons/Google_Favicon_2025.svg.png"
+                    alt="Google G Logo"
+                    class="benefit-icon"
+                    style="width: 16px;"
+                  />
+                  Sign up with Google</span
+                >
                 <span *ngIf="isLoading" class="spinner"></span>
               </button>
 
@@ -136,8 +143,15 @@ import { AuthService } from "../services/auth.service";
                 (click)="onGoogleSignIn()"
                 [disabled]="isLoading"
               >
-                <span class="google-icon">🔑</span>
-                <span *ngIf="!isLoading">Sign in with Google</span>
+                <span *ngIf="!isLoading">
+                  <img
+                    src="/assets/icons/Google_Favicon_2025.svg.png"
+                    alt="Google G Logo"
+                    class="benefit-icon"
+                    style="width: 16px;"
+                  />
+                  Sign in with Google</span
+                >
                 <span *ngIf="isLoading" class="spinner"></span>
               </button>
 
@@ -236,10 +250,15 @@ import { AuthService } from "../services/auth.service";
                 >
               </div>
               <div class="benefit-item">
-                <span class="benefit-emoji">🔑</span>
-                <span class="benefit-text"
-                  >Sign up with Google or with a username</span
-                >
+                <img
+                  src="/assets/icons/Google_Favicon_2025.svg.png"
+                  alt="Google G Logo"
+                  class="benefit-icon"
+                  style="width: 16px;"
+                />
+                <span class="benefit-text">
+                  Sign up with Google or with a username
+                </span>
               </div>
               <div class="benefit-item">
                 <span class="benefit-emoji">📱</span>
@@ -775,10 +794,10 @@ import { AuthService } from "../services/auth.service";
 export class AuthModalComponent implements OnInit {
   @Input() isOpen = false;
   @Input() message = "";
+  @Input() isLogin = false; // Start with registration form
   @Output() closeModal = new EventEmitter<void>();
   @Output() authSuccess = new EventEmitter<any>();
 
-  isLogin = false; // Start with registration form
   isLoading = false;
   error = "";
 

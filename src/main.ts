@@ -63,7 +63,7 @@ const routes: Routes = [
   { path: "landing", component: LandingComponent },
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterComponent },
-  { path: "home", component: AppComponent },
+  { path: "home", component: AppComponent, canActivate: [AuthGuard] },
   { path: "", redirectTo: "/landing", pathMatch: "full" },
 ];
 

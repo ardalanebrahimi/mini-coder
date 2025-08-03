@@ -30,7 +30,7 @@ export class InputSectionComponent implements OnInit, OnDestroy {
   // Example suggestions
   currentSuggestions: string[] = [];
   showSuggestions = true;
-  suggestionsCollapsed = false; // Track if suggestions are collapsed
+  suggestionsCollapsed = true; // Track if suggestions are collapsed
 
   constructor(
     private translationService: TranslationService,
@@ -77,6 +77,7 @@ export class InputSectionComponent implements OnInit, OnDestroy {
   }
 
   onProcessCommand(): void {
+    this.showSuggestions = false; // Hide suggestions when processing command
     this.commandActionsService.processCommand();
   }
 

@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { TranslationService } from "../../services/translation.service";
+import { AnalyticsService } from "../../services/analytics.service";
 
 @Component({
   selector: "app-hero",
@@ -69,7 +70,10 @@ export class HeroComponent {
   @Output() tryItFree = new EventEmitter<void>();
   @Output() browseCommunity = new EventEmitter<void>();
 
-  constructor(private translationService: TranslationService) {}
+  constructor(
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
+  ) {}
 
   /**
    * Translation helper method
@@ -79,10 +83,14 @@ export class HeroComponent {
   }
 
   onTryItFree(): void {
+    // Log the button click before emitting
+    this.analytics.logHeroCTAClicked("try_it_free");
     this.tryItFree.emit();
   }
 
   onBrowseCommunity(): void {
+    // Log the button click before emitting
+    this.analytics.logHeroCTAClicked("browse_community");
     this.browseCommunity.emit();
   }
 }

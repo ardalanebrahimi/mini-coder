@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Subscription } from "rxjs";
 import { TranslationService } from "../../services/translation.service";
+import { AnalyticsService } from "../../services/analytics.service";
 
 @Component({
   selector: "app-faq",
@@ -39,7 +40,10 @@ export class FaqComponent implements OnInit, OnDestroy {
   private subscription = new Subscription();
   faqs: any[] = [];
 
-  constructor(private translationService: TranslationService) {}
+  constructor(
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
+  ) {}
 
   ngOnInit() {
     this.initializeFaqs();
@@ -135,6 +139,15 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   toggleFaq(faq: any): void {
+    const wasOpen = faq.isOpen;
     faq.isOpen = !faq.isOpen;
+    
+    // Log FAQ expansion (only when opening, not closing)
+    if (!wasOpen && faq.isOpen) {
+      this.analytics.logFAQSectionExpanded(
+        `faq_${this.faqs.indexOf(faq) + 1}`,
+        faq.question
+      );
+    }
   }
 }

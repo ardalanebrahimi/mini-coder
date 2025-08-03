@@ -6,6 +6,7 @@ import { AuthService } from "../services/auth.service";
 import { TranslationService } from "../services/translation.service";
 import { ToolboxService } from "../services/toolbox.service";
 import { StorageService } from "../services/storage.service";
+import { AnalyticsService, AnalyticsEventType } from "../services/analytics.service";
 import { Observable, map, catchError, of } from "rxjs";
 import { AuthModalComponent } from "./auth-modal.component";
 
@@ -28,7 +29,8 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     private translationService: TranslationService,
     public toolboxService: ToolboxService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private analytics: AnalyticsService
   ) {
     this.currentUser$ = this.authService.currentUser$;
     // this.savedProjectsCount$ = of(0); // Initialize with 0
@@ -61,11 +63,17 @@ export class HeaderComponent implements OnInit {
   }
 
   changeLanguage(languageCode: string): void {
+    // Log language change
+    this.analytics.logHeaderLanguageChanged(this.selectedLanguage, languageCode);
+    
     this.translationService.setLanguage(languageCode);
   }
 
   // Toolbox methods
   toggleToolbox(): void {
+    // Log toolbox toggle
+    this.analytics.logHeaderToolboxClicked(this.router.url);
+    
     // Always allow toolbox to open, but content will differ based on auth status
     this.toolboxService.toggle();
   }
@@ -76,6 +84,9 @@ export class HeaderComponent implements OnInit {
 
   // Auth methods
   logout(): void {
+    // Log logout action
+    this.analytics.logHeaderLogoutClicked(this.router.url);
+    
     this.authService.logout();
     this.router.navigate(["/login"]);
   }
@@ -86,6 +97,13 @@ export class HeaderComponent implements OnInit {
   }
 
   openAuthModal(isLogin: boolean): void {
+    // Log auth modal opening
+    if (isLogin) {
+      this.analytics.logHeaderLoginClicked(this.router.url);
+    } else {
+      this.analytics.logHeaderRegisterClicked(this.router.url);
+    }
+    
     this.isLogin = isLogin;
     this.authModalMessage = isLogin
       ? "Welcome Back! Please log in to continue."
@@ -94,13 +112,60 @@ export class HeaderComponent implements OnInit {
   }
 
   closeAuthModal(): void {
+    // Log auth modal closing (if it was closed without completing auth)
+    if (this.showAuthModal) {
+      this.analytics.logAuthModalClosed(
+        this.isLogin ? 'login' : 'register',
+        false // closed without completion
+      );
+    }
+    
     this.showAuthModal = false;
     this.authModalMessage = "";
   }
 
   onAuthSuccess(user: any): void {
+    // Log successful authentication
+    this.analytics.logEvent(AnalyticsEventType.AUTH_LOGIN, {
+      authLogin: {
+        location: 'header',
+        loginMethod: this.isLogin ? 'login' : 'register',
+        userType: 'logged_in',
+        success: true
+      }
+    });
+    
+    // Also log modal completion
+    this.analytics.logAuthModalClosed(
+      this.isLogin ? 'login' : 'register',
+      true // completed successfully
+    );
+    
     this.closeAuthModal();
     // Navigate to home after successful auth
     this.router.navigate(["/home"]);
+  }
+
+  // Navigation tracking methods
+  onLogoClick(): void {
+    this.analytics.logEvent(AnalyticsEventType.NAVIGATION_CHANGED, {
+      navigationChanged: {
+        fromView: this.router.url,
+        toView: '/landing',
+        userType: this.authService.isLoggedIn() ? 'logged_in' : 'guest',
+        trigger: 'header_logo'
+      }
+    });
+  }
+
+  onAppButtonClick(): void {
+    this.analytics.logEvent(AnalyticsEventType.NAVIGATION_CHANGED, {
+      navigationChanged: {
+        fromView: this.router.url,
+        toView: '/home',
+        userType: this.authService.isLoggedIn() ? 'logged_in' : 'guest',
+        trigger: 'header_app_button'
+      }
+    });
   }
 }

@@ -9,6 +9,7 @@ import { CommonModule } from "@angular/common";
 import { AppPopupService } from "../../services/app-popup.service";
 import { AppStoreService } from "../../services/app-store.service";
 import { TranslationService } from "../../services/translation.service";
+import { AnalyticsService } from "../../services/analytics.service";
 import { catchError, of, Subscription } from "rxjs";
 
 @Component({
@@ -75,7 +76,8 @@ export class AppGalleryComponent implements OnInit, OnDestroy {
   constructor(
     private appPopupService: AppPopupService,
     private appStoreService: AppStoreService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -121,8 +123,18 @@ export class AppGalleryComponent implements OnInit, OnDestroy {
   }
 
   onTryApp(appId: number): void {
-    // Find the app details from our sample apps
+    // Log gallery app click
     const app = this.sampleApps.find((a) => a.id === appId);
+    const appName = app ? this.t(app.titleKey) : `Sample App ${appId}`;
+    const position = this.sampleApps.findIndex(a => a.id === appId) + 1;
+    
+    this.analytics.logGalleryAppClicked(
+      appId.toString(),
+      appName,
+      position
+    );
+
+    // Find the app details from our sample apps
     if (app) {
       // For sample apps, we could either:
       // 1. Load from app store if they have real IDs
@@ -152,6 +164,8 @@ export class AppGalleryComponent implements OnInit, OnDestroy {
   }
 
   onExploreMore(): void {
+    // Log explore more click
+    this.analytics.logCTASectionClicked("browse_apps");
     this.exploreMore.emit();
   }
 }

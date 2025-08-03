@@ -8,6 +8,7 @@ import {
 import { CommonModule } from "@angular/common";
 import { Subscription } from "rxjs";
 import { TranslationService } from "../../services/translation.service";
+import { AnalyticsService } from "../../services/analytics.service";
 
 @Component({
   selector: "app-cta-section",
@@ -39,7 +40,10 @@ export class CtaSectionComponent implements OnInit, OnDestroy {
   @Output() startCreating = new EventEmitter<void>();
   @Output() browseApps = new EventEmitter<void>();
 
-  constructor(private translationService: TranslationService) {}
+  constructor(
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
+  ) {}
 
   ngOnInit() {
     this.subscription.add(
@@ -58,10 +62,14 @@ export class CtaSectionComponent implements OnInit, OnDestroy {
   }
 
   onStartCreating(): void {
+    // Log CTA section click
+    this.analytics.logCTASectionClicked("start_creating");
     this.startCreating.emit();
   }
 
   onBrowseApps(): void {
+    // Log CTA section click
+    this.analytics.logCTASectionClicked("browse_apps");
     this.browseApps.emit();
   }
 }

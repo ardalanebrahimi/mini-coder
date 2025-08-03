@@ -52,6 +52,24 @@ export enum AnalyticsEventType {
   TOOLBOX_SAVED = "toolbox_saved",
   APPSTORE_PUBLISH_ATTEMPTED = "appstore_publish_attempted",
   APP_MODIFY_ATTEMPTED = "app_modify_attempted",
+
+  // Landing page events
+  LANDING_PAGE_VISITED = "landing_page_visited",
+  HERO_CTA_CLICKED = "hero_cta_clicked",
+  HERO_BROWSE_CLICKED = "hero_browse_clicked",
+  GALLERY_APP_CLICKED = "gallery_app_clicked",
+  CTA_SECTION_CLICKED = "cta_section_clicked",
+  FAQ_SECTION_EXPANDED = "faq_section_expanded",
+  VIDEO_PLAYED = "video_played",
+  SECTION_VIEWED = "section_viewed",
+
+  // Header events
+  HEADER_LOGIN_CLICKED = "header_login_clicked",
+  HEADER_REGISTER_CLICKED = "header_register_clicked",
+  HEADER_LOGOUT_CLICKED = "header_logout_clicked",
+  HEADER_TOOLBOX_CLICKED = "header_toolbox_clicked",
+  HEADER_LANGUAGE_CHANGED = "header_language_changed",
+  AUTH_MODAL_CLOSED = "auth_modal_closed",
 }
 
 /**
@@ -172,6 +190,7 @@ export interface EventDetails {
     fromView: string;
     toView: string;
     userType: "guest" | "logged_in";
+    trigger?: string; // header_logo, header_app_button, etc.
   };
 
   guestAppViewed?: {
@@ -219,6 +238,88 @@ export interface EventDetails {
     userType: "guest" | "logged_in";
     loginPromptShown: boolean;
     buttonLabel: string; // "Modify This App" or "Make it better"
+  };
+
+  // Landing page events
+  landingPageVisited?: {
+    userType: "guest" | "logged_in";
+    referrer?: string;
+    timestamp: string;
+  };
+
+  heroCTAClicked?: {
+    buttonType: "try_it_free" | "browse_community";
+    userType: "guest" | "logged_in";
+    section: "hero";
+  };
+
+  galleryAppClicked?: {
+    appId: string;
+    appName: string;
+    position: number; // position in gallery
+    userType: "guest" | "logged_in";
+  };
+
+  ctaSectionClicked?: {
+    buttonType: "start_creating" | "browse_apps";
+    userType: "guest" | "logged_in";
+    section: "cta";
+  };
+
+  faqSectionExpanded?: {
+    questionId: string;
+    questionText: string;
+    userType: "guest" | "logged_in";
+  };
+
+  videoPlayed?: {
+    videoId: string;
+    section: "video_section" | "hero" | "features";
+    userType: "guest" | "logged_in";
+  };
+
+  sectionViewed?: {
+    sectionName: string;
+    scrollPosition: number;
+    timeOnPage: number;
+    userType: "guest" | "logged_in";
+  };
+
+  // Header events
+  headerLoginClicked?: {
+    location: "header";
+    userType: "guest";
+    currentRoute: string;
+  };
+
+  headerRegisterClicked?: {
+    location: "header";
+    userType: "guest";
+    currentRoute: string;
+  };
+
+  headerLogoutClicked?: {
+    location: "header";
+    userType: "logged_in";
+    currentRoute: string;
+  };
+
+  headerToolboxClicked?: {
+    location: "header";
+    userType: "guest" | "logged_in";
+    currentRoute: string;
+  };
+
+  headerLanguageChanged?: {
+    fromLanguage: string;
+    toLanguage: string;
+    location: "header";
+  };
+
+  authModalClosed?: {
+    location: "header";
+    modalType: "login" | "register";
+    completed: boolean;
   };
 }
 
@@ -541,6 +642,243 @@ export class AnalyticsService {
         },
       });
     }
+  }
+
+  /**
+   * Landing page analytics methods
+   */
+
+  /**
+   * Log landing page visit
+   */
+  logLandingPageVisited(referrer?: string): void {
+    this.logEvent(AnalyticsEventType.LANDING_PAGE_VISITED, {
+      landingPageVisited: {
+        userType: this.userId ? "logged_in" : "guest",
+        referrer: referrer || document.referrer,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  /**
+   * Log hero CTA button clicks
+   */
+  logHeroCTAClicked(buttonType: "try_it_free" | "browse_community"): void {
+    this.logEvent(AnalyticsEventType.HERO_CTA_CLICKED, {
+      heroCTAClicked: {
+        buttonType,
+        userType: this.userId ? "logged_in" : "guest",
+        section: "hero",
+      },
+    });
+  }
+
+  /**
+   * Log gallery app clicks
+   */
+  logGalleryAppClicked(appId: string, appName: string, position: number): void {
+    this.logEvent(AnalyticsEventType.GALLERY_APP_CLICKED, {
+      galleryAppClicked: {
+        appId,
+        appName,
+        position,
+        userType: this.userId ? "logged_in" : "guest",
+      },
+    });
+  }
+
+  /**
+   * Log CTA section button clicks
+   */
+  logCTASectionClicked(buttonType: "start_creating" | "browse_apps"): void {
+    this.logEvent(AnalyticsEventType.CTA_SECTION_CLICKED, {
+      ctaSectionClicked: {
+        buttonType,
+        userType: this.userId ? "logged_in" : "guest",
+        section: "cta",
+      },
+    });
+  }
+
+  /**
+   * Log FAQ section expansion
+   */
+  logFAQSectionExpanded(questionId: string, questionText: string): void {
+    this.logEvent(AnalyticsEventType.FAQ_SECTION_EXPANDED, {
+      faqSectionExpanded: {
+        questionId,
+        questionText,
+        userType: this.userId ? "logged_in" : "guest",
+      },
+    });
+  }
+
+  /**
+   * Log video play events
+   */
+  logVideoPlayed(
+    videoId: string,
+    section: "video_section" | "hero" | "features"
+  ): void {
+    this.logEvent(AnalyticsEventType.VIDEO_PLAYED, {
+      videoPlayed: {
+        videoId,
+        section,
+        userType: this.userId ? "logged_in" : "guest",
+      },
+    });
+  }
+
+  /**
+   * Log section viewing (for scroll tracking)
+   */
+  logSectionViewed(
+    sectionName: string,
+    scrollPosition: number,
+    timeOnPage: number
+  ): void {
+    this.logEvent(AnalyticsEventType.SECTION_VIEWED, {
+      sectionViewed: {
+        sectionName,
+        scrollPosition,
+        timeOnPage,
+        userType: this.userId ? "logged_in" : "guest",
+      },
+    });
+  }
+
+  /**
+   * Enhanced session tracking for landing pages
+   */
+  logSessionMetrics(): void {
+    if (typeof window !== 'undefined') {
+      const sessionDuration = Date.now() - new Date(this.sessionId).getTime();
+      const scrollDepth = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+      );
+      
+      this.logEvent(AnalyticsEventType.SESSION_END, {
+        sessionEnd: {
+          duration: sessionDuration,
+          scrollDepth: scrollDepth,
+          userType: this.userId ? "logged_in" : "guest",
+          pageUrl: window.location.href,
+          referrer: document.referrer,
+        },
+      });
+    }
+  }
+
+  /**
+   * Track performance metrics
+   */
+  logPerformanceMetrics(): void {
+    if (typeof window !== 'undefined' && 'performance' in window) {
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navigation) {
+        this.logEvent('performance_metrics' as AnalyticsEventType, {
+          performanceMetrics: {
+            pageLoadTime: navigation.loadEventEnd - navigation.fetchStart,
+            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
+            firstContentfulPaint: this.getFirstContentfulPaint(),
+            userType: this.userId ? "logged_in" : "guest",
+          },
+        });
+      }
+    }
+  }
+
+  private getFirstContentfulPaint(): number {
+    try {
+      const paintEntries = performance.getEntriesByType('paint');
+      const fcpEntry = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+      return fcpEntry ? fcpEntry.startTime : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
+   * Header analytics methods
+   */
+
+  /**
+   * Log header login button click
+   */
+  logHeaderLoginClicked(currentRoute: string): void {
+    this.logEvent(AnalyticsEventType.HEADER_LOGIN_CLICKED, {
+      headerLoginClicked: {
+        location: "header",
+        userType: "guest",
+        currentRoute,
+      },
+    });
+  }
+
+  /**
+   * Log header register button click
+   */
+  logHeaderRegisterClicked(currentRoute: string): void {
+    this.logEvent(AnalyticsEventType.HEADER_REGISTER_CLICKED, {
+      headerRegisterClicked: {
+        location: "header",
+        userType: "guest",
+        currentRoute,
+      },
+    });
+  }
+
+  /**
+   * Log header logout button click
+   */
+  logHeaderLogoutClicked(currentRoute: string): void {
+    this.logEvent(AnalyticsEventType.HEADER_LOGOUT_CLICKED, {
+      headerLogoutClicked: {
+        location: "header",
+        userType: "logged_in",
+        currentRoute,
+      },
+    });
+  }
+
+  /**
+   * Log header toolbox button click
+   */
+  logHeaderToolboxClicked(currentRoute: string): void {
+    this.logEvent(AnalyticsEventType.HEADER_TOOLBOX_CLICKED, {
+      headerToolboxClicked: {
+        location: "header",
+        userType: this.userId ? "logged_in" : "guest",
+        currentRoute,
+      },
+    });
+  }
+
+  /**
+   * Log header language change
+   */
+  logHeaderLanguageChanged(fromLanguage: string, toLanguage: string): void {
+    this.logEvent(AnalyticsEventType.HEADER_LANGUAGE_CHANGED, {
+      headerLanguageChanged: {
+        fromLanguage,
+        toLanguage,
+        location: "header",
+      },
+    });
+  }
+
+  /**
+   * Log auth modal close
+   */
+  logAuthModalClosed(modalType: "login" | "register", completed: boolean): void {
+    this.logEvent(AnalyticsEventType.AUTH_MODAL_CLOSED, {
+      authModalClosed: {
+        location: "header",
+        modalType,
+        completed,
+      },
+    });
   }
 
   /**

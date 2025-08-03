@@ -6,7 +6,7 @@
         <!-- App Title for home route -->
         <div class="app-title-section logo">
           <h1 class="app-title">
-            <a routerLink="/landing">
+            <a routerLink="/landing" (click)="onLogoClick()">
               <span class="emoji">🚀</span>
               {{ t("appTitle") }}
               <span class="emoji">✨</span>
@@ -24,7 +24,7 @@
         >
           <!-- Navigation Links (non-app routes) -->
           <div class="nav-actions" *ngIf="!isAppRoute">
-            <a routerLink="/home" class="action-btn primary">
+            <a routerLink="/home" class="action-btn primary" (click)="onAppButtonClick()">
               <span class="btn-icon">🚀</span>
               App
             </a>

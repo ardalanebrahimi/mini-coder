@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { Subscription } from "rxjs";
 import { TranslationService } from "../../services/translation.service";
+import { AnalyticsService } from "../../services/analytics.service";
 
 @Component({
   selector: "app-video-section",
@@ -28,6 +29,7 @@ import { TranslationService } from "../../services/translation.service";
               referrerpolicy="strict-origin-when-cross-origin"
               allowfullscreen
               class="video-iframe"
+              (click)="onVideoIframeClick()"
             ></iframe>
 
             <!-- Custom branded overlay to minimize YouTube branding -->
@@ -87,7 +89,8 @@ export class VideoSectionComponent implements OnInit, OnDestroy {
 
   constructor(
     private sanitizer: DomSanitizer,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private analytics: AnalyticsService
   ) {
     // Sanitize the YouTube URL for security
     this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -112,7 +115,15 @@ export class VideoSectionComponent implements OnInit, OnDestroy {
   }
 
   onVideoClick(): void {
+    // Log video play event
+    this.analytics.logVideoPlayed("minicoder_demo_video", "video_section");
+    
     // Hide the overlay when clicked
     this.showPlayOverlay = false;
+  }
+
+  onVideoIframeClick(): void {
+    // Log video interaction
+    this.analytics.logVideoPlayed("minicoder_demo_video", "video_section");
   }
 }

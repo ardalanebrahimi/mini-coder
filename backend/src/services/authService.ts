@@ -1,13 +1,14 @@
 import bcrypt from "bcryptjs";
-import { User } from "@prisma/client";
 import { prisma } from "../config/database";
 import { generateToken } from "../middleware/auth";
 
 export interface RegisterUserDto {
   username: string;
   email?: string;
-  password: string;
+  password?: string;
   name?: string;
+  googleId?: string; // Google OAuth ID
+  profilePicture?: string; // Google profile picture URL
 }
 
 export interface LoginUserDto {
@@ -30,14 +31,12 @@ export class AuthService {
   private readonly saltRounds = 12;
 
   async register(data: RegisterUserDto): Promise<AuthResponse> {
-    const { username, email, password, name } = data;
+    const { username, email, password, name, googleId, profilePicture } = data;
     console.log("Registering user:", username, email);
 
     // Check if email is provided and if user already exists by email
     if (email) {
-      const existingUserByEmail = await prisma.user.findUnique({
-        where: { email },
-      });
+      const existingUserByEmail = await this.findUserByEmail(email);
 
       if (existingUserByEmail) {
         throw new Error("User with this email already exists");
@@ -45,16 +44,17 @@ export class AuthService {
     }
 
     // Check if user already exists by username
-    const existingUserByUsername = await prisma.user.findUnique({
-      where: { username },
-    });
+    const existingUserByUsername = await this.findUserByUsername(username);
 
     if (existingUserByUsername) {
       throw new Error("User with this username already exists");
     }
 
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, this.saltRounds);
+    let passwordHash;
+    if (password) {
+      // Hash password
+      passwordHash = await bcrypt.hash(password, this.saltRounds);
+    }
 
     // Prepare user data for creation
     const userData: any = {
@@ -67,6 +67,14 @@ export class AuthService {
     // Only include email if it's provided
     if (email) {
       userData.email = email;
+    }
+
+    // Include Google OAuth data if provided
+    if (googleId) {
+      userData.googleId = googleId;
+    }
+    if (profilePicture) {
+      userData.profilePicture = profilePicture;
     }
 
     // Create user with 100 tokens
@@ -82,7 +90,7 @@ export class AuthService {
     });
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email || "");
+    const token = this.generateUserToken(user);
 
     const userResponse: AuthResponse["user"] = {
       id: user.id,
@@ -99,6 +107,25 @@ export class AuthService {
       user: userResponse,
       token,
     };
+  }
+
+  public generateUserToken(user: {
+    name: string | null;
+    id: number;
+    username: string;
+    email: string | null;
+    tokens: number;
+  }) {
+    return generateToken(user.id, user.email || "");
+  }
+
+  public async findUserByEmail(email: string | undefined) {
+    if (!email) {
+      return null;
+    }
+    return await prisma.user.findUnique({
+      where: { email },
+    });
   }
 
   async login(data: LoginUserDto): Promise<AuthResponse> {
@@ -116,6 +143,10 @@ export class AuthService {
       throw new Error("Invalid email/username or password");
     }
 
+    if (!user.passwordHash) {
+      throw new Error("Invalid email/username or password");
+    }
+
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
@@ -124,7 +155,7 @@ export class AuthService {
     }
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email || "");
+    const token = this.generateUserToken(user);
 
     const userResponse: AuthResponse["user"] = {
       id: user.id,
@@ -143,36 +174,16 @@ export class AuthService {
     };
   }
 
-  async getCurrentUser(userId: number): Promise<User | null> {
+  async getCurrentUser(userId: number) {
     return await prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        tokens: true,
-        createdAt: true,
-        updatedAt: true,
-        passwordHash: true,
-      },
     });
   }
 
-  async updateTokens(userId: number, tokens: number): Promise<User> {
+  async updateTokens(userId: number, tokens: number) {
     return await prisma.user.update({
       where: { id: userId },
       data: { tokens },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        tokens: true,
-        createdAt: true,
-        updatedAt: true,
-        passwordHash: true,
-      },
     });
   }
 
@@ -191,9 +202,7 @@ export class AuthService {
     }
 
     if (data.email) {
-      const existingUserByEmail = await prisma.user.findUnique({
-        where: { email: data.email },
-      });
+      const existingUserByEmail = await this.findUserByEmail(data.email);
       result.emailAvailable = !existingUserByEmail;
     }
 
@@ -233,6 +242,10 @@ export class AuthService {
         throw new Error("Current password is required to change password");
       }
 
+      if (!currentUser.passwordHash) {
+        throw new Error("User has no password set");
+      }
+
       const isCurrentPasswordValid = await bcrypt.compare(
         currentPassword,
         currentUser.passwordHash
@@ -244,9 +257,7 @@ export class AuthService {
 
     // Check for uniqueness if username or email is being changed
     if (username && username !== currentUser.username) {
-      const existingUserByUsername = await prisma.user.findUnique({
-        where: { username },
-      });
+      const existingUserByUsername = await this.findUserByUsername(username);
 
       if (existingUserByUsername) {
         throw new Error("User with this username already exists");
@@ -254,10 +265,7 @@ export class AuthService {
     }
 
     if (email && email !== currentUser.email) {
-      const existingUserByEmail = await prisma.user.findUnique({
-        where: { email },
-      });
-
+      const existingUserByEmail = await this.findUserByEmail(email);
       if (existingUserByEmail) {
         throw new Error("User with this email already exists");
       }
@@ -307,5 +315,37 @@ export class AuthService {
     }
 
     return result;
+  }
+
+  /**
+   * Generates a unique username based on a base string.
+   * If the base username is taken, appends a number until a unique username is found.
+   */
+  async generateUniqueUsername(base: string): Promise<string> {
+    let username = base.replace(/\s+/g, "_").toLowerCase();
+    let suffix = 0;
+    while (await this.findUserByUsername(username + (suffix ? suffix : ""))) {
+      suffix++;
+    }
+    return username + (suffix ? suffix : "");
+  }
+
+  private async findUserByUsername(username: string) {
+    return await prisma.user.findUnique({
+      where: { username },
+    });
+  }
+
+  /**
+   * Update user with specific fields
+   */
+  async updateUser(
+    userId: number,
+    data: { googleId?: string; profilePicture?: string }
+  ) {
+    return await prisma.user.update({
+      where: { id: userId },
+      data,
+    });
   }
 }

@@ -7,6 +7,8 @@ export interface User {
   tokens: number;
   createdAt: Date;
   updatedAt: Date;
+  googleId?: string; // Google OAuth ID
+  profilePicture?: string | null; // Google profile picture URL
 }
 
 export interface CreateUserDto {
@@ -29,4 +31,6 @@ export interface UserResponse {
   tokens: number;
   createdAt: Date;
   updatedAt: Date;
+  googleId?: string; // Google OAuth ID
+  profilePicture?: string | null; // Google profile picture URL
 }

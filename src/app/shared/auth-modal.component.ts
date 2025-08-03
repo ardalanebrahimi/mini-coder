@@ -33,6 +33,23 @@ import { AuthService } from "../services/auth.service";
             <form *ngIf="!isLogin" (ngSubmit)="onRegister()" class="auth-form">
               <h3 class="form-title">Create Your Account</h3>
 
+              <!-- Google Sign-in Button (Prominent) -->
+              <button
+                type="button"
+                class="google-signin-btn"
+                (click)="onGoogleSignIn()"
+                [disabled]="isLoading"
+              >
+                <span class="google-icon">🔑</span>
+                <span *ngIf="!isLoading">Sign up with Google</span>
+                <span *ngIf="isLoading" class="spinner"></span>
+              </button>
+
+              <!-- Divider -->
+              <div class="auth-divider">
+                <span>or sign up with a username</span>
+              </div>
+
               <!-- Parental Assurance - Prominent -->
               <div class="parental-assurance">
                 <div class="assurance-content">
@@ -111,6 +128,23 @@ import { AuthService } from "../services/auth.service";
             <!-- Login Form -->
             <form *ngIf="isLogin" (ngSubmit)="onLogin()" class="auth-form">
               <h3 class="form-title">Sign In to Continue</h3>
+
+              <!-- Google Sign-in Button (Prominent) -->
+              <button
+                type="button"
+                class="google-signin-btn"
+                (click)="onGoogleSignIn()"
+                [disabled]="isLoading"
+              >
+                <span class="google-icon">🔑</span>
+                <span *ngIf="!isLoading">Sign in with Google</span>
+                <span *ngIf="isLoading" class="spinner"></span>
+              </button>
+
+              <!-- Divider -->
+              <div class="auth-divider">
+                <span>or sign in with your account</span>
+              </div>
 
               <div class="form-group">
                 <label for="email">Email or Username</label>
@@ -202,13 +236,13 @@ import { AuthService } from "../services/auth.service";
                 >
               </div>
               <div class="benefit-item">
-                <span class="benefit-emoji">�</span>
+                <span class="benefit-emoji">🔑</span>
                 <span class="benefit-text"
-                  >Many other cool features on the way</span
+                  >Sign up with Google or with a username</span
                 >
               </div>
               <div class="benefit-item">
-                <span class="benefit-emoji">�</span>
+                <span class="benefit-emoji">📱</span>
                 <span class="benefit-text"
                   >Use your account across devices (web, Android, iOS coming
                   soon!)</span
@@ -333,6 +367,69 @@ import { AuthService } from "../services/auth.service";
         color: #333;
         margin: 0 0 1.5rem 0;
         text-align: center;
+      }
+
+      /* Google Sign-in Button */
+      .google-signin-btn {
+        width: 100%;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+      }
+
+      .google-signin-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(66, 133, 244, 0.4);
+      }
+
+      .google-signin-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .google-icon {
+        font-size: 1.25rem;
+      }
+
+      /* Auth Divider */
+      .auth-divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        position: relative;
+      }
+
+      .auth-divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e8e8e8;
+        z-index: 1;
+      }
+
+      .auth-divider span {
+        background: white;
+        color: #888;
+        padding: 0 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        position: relative;
+        z-index: 2;
       }
 
       /* Parental Assurance Section */
@@ -722,6 +819,24 @@ export class AuthModalComponent implements OnInit {
   switchToRegister(): void {
     this.isLogin = false;
     this.error = "";
+  }
+
+  onGoogleSignIn(): void {
+    this.isLoading = true;
+    this.error = "";
+
+    this.authService.googleSignIn().subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.authSuccess.emit(response.user);
+        this.onClose();
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.error =
+          error.message || "Google sign-in failed. Please try again.";
+      },
+    });
   }
 
   onLogin(): void {

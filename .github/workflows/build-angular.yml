@@ -34,6 +34,7 @@ jobs:
       #     system_prompt=$(echo "${{ secrets.SYSTEM_PROMPT }}" | sed 's/\\n/\'$'\n''/g')
       #     openai_fix_instructions=$(echo "${{ secrets.OPENAI_FIX_INSTRUCTIONS }}" | sed 's/\\n/\'$'\n''/g')
       #     sed -e "s|\${API_URL}|${{ secrets.API_URL }}|g" \
+      #         -e "s|\${GOOGLE_CLIENT_ID}|${{ secrets.GOOGLE_CLIENT_ID }}|g" \
       #         -e "s|\${OPENAI_API_KEY}|${{ secrets.OPENAI_API_KEY }}|g" \
       #         -e "s|\${SYSTEM_PROMPT}|$system_prompt|g" \
       #         -e "s|\${OPENAI_FIX_INSTRUCTIONS}|$openai_fix_instructions|g" \
@@ -50,6 +51,7 @@ jobs:
 
           # Replace apiUrl and openaiApiKey
           sed -i "s#__API_URL__#${{ secrets.API_URL }}#g" src/environments/environment.ts
+          sed -i "s#__GOOGLE_CLIENT_ID__#${{ secrets.GOOGLE_CLIENT_ID }}#g" src/environments/environment.ts
           sed -i "s#__OPENAI_API_KEY__#${{ secrets.OPENAI_API_KEY }}#g" src/environments/environment.ts
 
           # Replace systemPrompt (multiline)

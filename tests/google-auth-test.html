@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Authentication Test - MiniCoder</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 2rem;
+      }
+
+      .section {
+        background: #f8f9ff;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+        border-left: 4px solid #667eea;
+      }
+
+      .status {
+        background: #fff3cd;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #ffeaa7;
+        margin: 1rem 0;
+        color: #856404;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0.5rem;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .google-btn {
+        background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 300px;
+        justify-content: center;
+      }
+
+      .google-btn:hover {
+        box-shadow: 0 8px 25px rgba(66, 133, 244, 0.4);
+      }
+
+      .steps {
+        background: #e8f5e8;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+        border-left: 4px solid #28a745;
+      }
+
+      .config-note {
+        background: #f8d7da;
+        padding: 1rem;
+        border-radius: 8px;
+        color: #721c24;
+        margin: 1rem 0;
+        border: 1px solid #f5c6cb;
+      }
+
+      code {
+        background: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+      }
+
+      .demo-section {
+        text-align: center;
+        margin: 2rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔑 Google Authentication Integration - MiniCoder</h1>
+
+      <div class="status">
+        <strong>Current Status:</strong> Google authentication UI has been
+        integrated but requires OAuth configuration to be fully functional.
+      </div>
+
+      <div class="section">
+        <h2>✨ What's Been Implemented</h2>
+        <ul>
+          <li>
+            <strong>🎨 Updated Auth Modal:</strong> Added prominent "Sign up
+            with Google" and "Sign in with Google" buttons
+          </li>
+          <li>
+            <strong>🎯 Visual Design:</strong> Google-style button with gradient
+            colors and smooth animations
+          </li>
+          <li>
+            <strong>📝 Updated Benefits:</strong> Added "Sign up with Google or
+            with a username" to benefits list
+          </li>
+          <li>
+            <strong>🔄 Clean Separation:</strong> Divider between Google auth
+            and traditional username/password
+          </li>
+          <li>
+            <strong>🛡️ Maintained Privacy:</strong> Parental assurance messages
+            remain prominent
+          </li>
+          <li>
+            <strong>📱 Responsive Design:</strong> Works seamlessly on mobile
+            devices
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>🔧 Backend Preparation</h2>
+        <ul>
+          <li>
+            <strong>API Endpoints:</strong> Added <code>/auth/google</code> and
+            <code>/auth/google/callback</code> routes
+          </li>
+          <li>
+            <strong>Controller Methods:</strong> Placeholder methods ready for
+            OAuth implementation
+          </li>
+          <li>
+            <strong>Error Handling:</strong> Graceful fallback messages when
+            OAuth isn't configured
+          </li>
+          <li>
+            <strong>Analytics Integration:</strong> Ready to track Google
+            authentication events
+          </li>
+        </ul>
+      </div>
+
+      <div class="config-note">
+        <h3>🔐 Google OAuth Configuration Required</h3>
+        <p>To make Google authentication fully functional, you need to:</p>
+        <ol>
+          <li>
+            Create a Google Cloud Project at
+            <a href="https://console.cloud.google.com" target="_blank"
+              >Google Cloud Console</a
+            >
+          </li>
+          <li>Enable the Google+ API or Google Identity services</li>
+          <li>Create OAuth 2.0 credentials (Client ID and Client Secret)</li>
+          <li>Add authorized redirect URIs for your domains</li>
+          <li>
+            Install required dependencies:
+            <code>npm install google-auth-library</code>
+          </li>
+          <li>Configure environment variables for Google OAuth credentials</li>
+        </ol>
+      </div>
+
+      <div class="steps">
+        <h3>📋 Complete Setup Instructions</h3>
+
+        <h4>Frontend Configuration:</h4>
+        <p>Add to your environment files:</p>
+        <pre><code>// src/environments/environment.ts
+export const environment = {
+  googleClientId: 'your-google-client-id.googleusercontent.com'
+};</code></pre>
+
+        <h4>Backend Configuration:</h4>
+        <p>Add to your <code>.env</code> file:</p>
+        <pre><code>GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret</code></pre>
+
+        <h4>Install Dependencies:</h4>
+        <pre><code>cd backend
+npm install google-auth-library</code></pre>
+      </div>
+
+      <div class="demo-section">
+        <h2>🚀 Test the Current Implementation</h2>
+        <p>
+          The Google authentication buttons are now visible in the registration
+          modal:
+        </p>
+
+        <button
+          class="btn"
+          onclick="window.open('http://localhost:4200', '_blank')"
+        >
+          🎮 Open MiniCoder App
+        </button>
+
+        <div style="margin: 1rem 0">
+          <button class="btn google-btn" onclick="showGoogleDemo()">
+            <span style="font-size: 1.25rem">🔑</span>
+            <span>Demo Google Button (Non-functional)</span>
+          </button>
+        </div>
+
+        <p>
+          <em
+            >Click on any action that requires login to see the new
+            authentication modal</em
+          >
+        </p>
+      </div>
+
+      <div class="section">
+        <h2>🎯 User Experience Improvements</h2>
+        <ul>
+          <li>
+            <strong>📍 Prominent Placement:</strong> Google sign-in appears
+            first, making it the primary option
+          </li>
+          <li>
+            <strong>🎨 Visual Hierarchy:</strong> Google button uses Google
+            brand colors (blue to green gradient)
+          </li>
+          <li>
+            <strong>⚡ Quick Access:</strong> One-click sign-in for users with
+            Google accounts
+          </li>
+          <li>
+            <strong>🔄 Seamless Fallback:</strong> Traditional registration
+            remains easily accessible
+          </li>
+          <li>
+            <strong>👶 Kid-Friendly:</strong> Simple language and clear visual
+            separation
+          </li>
+          <li>
+            <strong>🛡️ Privacy Focus:</strong> Maintains privacy-first messaging
+            for parents
+          </li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>📱 Cross-Platform Ready</h2>
+        <p>This implementation is designed to work across:</p>
+        <ul>
+          <li><strong>🌐 Web:</strong> Standard OAuth 2.0 flow</li>
+          <li>
+            <strong>📱 Android:</strong> Google Sign-In SDK integration ready
+          </li>
+          <li>
+            <strong>🍎 iOS:</strong> Google Sign-In for iOS integration ready
+          </li>
+          <li><strong>💻 Desktop:</strong> Capacitor-compatible OAuth flow</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      function showGoogleDemo() {
+        alert(
+          '🔑 Google Authentication Demo\n\nThis button shows the visual design for Google sign-in.\n\nTo make it functional:\n1. Configure Google OAuth credentials\n2. Implement OAuth flow in backend\n3. Update frontend service methods\n\nCurrently shows: "Google authentication is being configured"'
+        );
+      }
+
+      // Show current implementation status
+      console.log("🔑 Google Authentication Integration Status:");
+      console.log("✅ UI Components: Implemented");
+      console.log("✅ Backend Routes: Prepared");
+      console.log("✅ Error Handling: Ready");
+      console.log("⏳ OAuth Configuration: Needed");
+      console.log("⏳ Token Validation: Needed");
+      console.log("⏳ User Creation Flow: Needed");
+    </script>
+  </body>
+</html>

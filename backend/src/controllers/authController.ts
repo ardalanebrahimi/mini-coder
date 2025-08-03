@@ -2,8 +2,15 @@ import { Response } from "express";
 import { AuthService } from "../services/authService";
 import { asyncHandler } from "../middleware/errorHandler";
 import { AuthenticatedRequest } from "../middleware/auth";
+import { OAuth2Client } from "google-auth-library";
 
 const authService = new AuthService();
+
+const googleClient = new OAuth2Client(
+  process.env["GOOGLE_CLIENT_ID"],
+  process.env["GOOGLE_CLIENT_SECRET"],
+  process.env["GOOGLE_REDIRECT_URI"]
+);
 
 /**
  * @swagger
@@ -445,6 +452,136 @@ export const updateProfile = asyncHandler(
         }
       }
       throw error;
+    }
+  }
+);
+
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: Initiate Google OAuth authentication
+ *     tags: [Authentication]
+ *     responses:
+ *       302:
+ *         description: Redirect to Google OAuth
+ */
+export const googleAuth = asyncHandler(
+  async (_req: AuthenticatedRequest, res: Response) => {
+    const authUrl = googleClient.generateAuthUrl({
+      access_type: "offline",
+      scope: ["profile", "email"],
+      prompt: "consent",
+    });
+
+    res.redirect(authUrl);
+  }
+);
+
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   post:
+ *     summary: Handle Google OAuth callback
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: Google OAuth token
+ *     responses:
+ *       200:
+ *         description: User authenticated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
+ *                   description: JWT access token
+ *       400:
+ *         description: Invalid Google token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
+export const googleCallback = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { token } = req.body;
+
+    try {
+      // Verify the Google token
+      const audience = process.env["GOOGLE_CLIENT_ID"] as string;
+      const ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) {
+        return res.status(400).json({ error: "Invalid Google token" });
+      }
+
+      const { sub: googleId, email, name, picture } = payload;
+
+      // Check if user exists
+      let user = await authService.findUserByEmail(email!);
+
+      if (!user) {
+        // Create new user from Google profile
+        const username = await authService.generateUniqueUsername(
+          (typeof name === "string" && name) ||
+            (typeof email === "string" && email.split("@")[0]) ||
+            "user"
+        );
+        const registerResult = await authService.register({
+          username,
+          email: email!,
+          name: name!,
+          password: "", // No password for OAuth users
+          googleId,
+          profilePicture: picture ?? "",
+        });
+        user = await authService.getCurrentUser(registerResult.user.id);
+      } else {
+        // Update existing user with Google ID if not set
+        // For now, we'll always update to ensure the Google ID is set
+        await authService.updateUser(user.id, { googleId });
+        // Refresh user data after update
+        user = await authService.getCurrentUser(user.id);
+      }
+
+      if (!user) {
+        return res
+          .status(500)
+          .json({ error: "Failed to create or update user" });
+      }
+
+      // Generate JWT token
+      const jwtToken = await authService.generateUserToken(user);
+      return res.json({
+        token: jwtToken,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          name: user.name,
+        },
+      });
+    } catch (error) {
+      return res.status(400).json({ error: "Google authentication failed" });
     }
   }
 );

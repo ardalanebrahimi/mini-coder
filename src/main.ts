@@ -13,6 +13,7 @@ import { AppComponent } from "./app/app.component";
 import { LoginComponent } from "./app/auth/login.component";
 import { RegisterComponent } from "./app/auth/register.component";
 import { LandingComponent } from "./app/landing/landing.component";
+import { SharedPreviewComponent } from "./app/shared-preview/shared-preview.component";
 import { AuthInterceptor } from "./app/services/auth.interceptor";
 import {
   AnalyticsService,
@@ -64,6 +65,7 @@ const routes: Routes = [
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterComponent },
   { path: "home", component: AppComponent, canActivate: [AuthGuard] },
+  { path: "shared/:shareId", component: SharedPreviewComponent },
   { path: "", redirectTo: "/landing", pathMatch: "full" },
 ];
 

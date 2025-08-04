@@ -10,6 +10,7 @@ import { environment } from "../../environments/environment";
 import { CodeMinifierService } from "./code-minifier.service";
 
 export interface ProcessedCommand {
+  id?: number;
   userCommand?: string;
   detectedLanguage: string;
   generatedCode: string;

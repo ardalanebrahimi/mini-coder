@@ -20,7 +20,6 @@
       </button>
     </nav>
   </header>
-
   <!-- Main Content -->
   <main class="main-content">
     <!-- App Creator View -->
@@ -40,19 +39,31 @@
         {{ errorMessage }}
       </div>
 
-      <!-- Preview Section -->
-      <app-preview-section
-        *ngIf="currentApp"
-        (showAuthModalEvent)="showAuthModalWithMessage($event)"
-      >
-      </app-preview-section>
+      <!-- Preview Section with Loading Overlay -->
+      <div class="preview-container" *ngIf="currentApp">
+        <!-- Preview Section -->
+        <app-preview-section
+          (showAuthModalEvent)="showAuthModalWithMessage($event)"
+        >
+        </app-preview-section>
 
-      <!-- Loading State -->
-      <div class="loading-state" *ngIf="isProcessing">
-        <div class="loading-content">
-          <div class="loading-spinner"></div>
-          <p>Creating your awesome app...</p>
-          <p class="loading-subtext">This might take a few seconds ⏳</p>
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" *ngIf="isProcessing">
+          <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Creating your awesome app...</p>
+            <p class="loading-subtext">This might take a few seconds ⏳</p>
+          </div>
+        </div>
+      </div>
+      <div class="preview-container" *ngIf="!currentApp">
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" *ngIf="isProcessing">
+          <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Creating your awesome app...</p>
+            <p class="loading-subtext">This might take a few seconds ⏳</p>
+          </div>
         </div>
       </div>
     </div>
@@ -107,6 +118,9 @@
   <app-app-popup
     (showAuthModalEvent)="showAuthModalWithMessage($event)"
   ></app-app-popup>
+
+  <!-- App Sharing Modal -->
+  <app-app-sharing-modal></app-app-sharing-modal>
 
   <!-- Footer -->
   <app-footer></app-footer>

@@ -20,6 +20,7 @@ import {
   AnalyticsEventType,
 } from "../services/analytics.service";
 import { AppPopupService } from "../services/app-popup.service";
+import { AppSharingService } from "../services/app-sharing.service";
 
 @Component({
   selector: "app-preview-section",
@@ -49,7 +50,8 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
     private appStoreService: AppStoreService,
     private authService: AuthService,
     private analytics: AnalyticsService,
-    private appPopupService: AppPopupService
+    private appPopupService: AppPopupService,
+    private appSharingService: AppSharingService
   ) {}
 
   ngOnInit(): void {
@@ -151,6 +153,22 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
         this.previewData.currentApp.projectName || "Your App"
       );
     }
+  }
+
+  /**
+   * Share the current app
+   */
+  onShareApp(): void {
+    if (this.previewData.currentApp) {
+      this.appSharingService.openSharingModal(this.previewData.currentApp);
+    }
+  }
+
+  /**
+   * Check if the current app can be shared (must be saved)
+   */
+  canShareApp(): boolean {
+    return !!(this.previewData.currentApp && this.previewData.currentApp.id);
   }
 
   /**

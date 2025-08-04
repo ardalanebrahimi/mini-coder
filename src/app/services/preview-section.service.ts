@@ -4,6 +4,7 @@ import { ProcessedCommand } from "./prompt-processor.service";
 import { PublishedProject } from "./app-store.service";
 
 export interface PreviewData {
+  id?: number; // Unique ID for the preview
   currentApp: ProcessedCommand | null;
   previewHtml: string;
   previewUrl: string;

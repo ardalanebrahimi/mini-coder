@@ -22,6 +22,7 @@ export enum AnalyticsEventType {
   APP_DELETED = "app_deleted",
   APP_PLAYED = "app_played",
   APP_PRIVACY_CHANGED = "app_privacy_changed",
+  APP_SHARED = "app_shared",
 
   // User interaction events
   TOKEN_SPENT = "token_spent",
@@ -131,6 +132,13 @@ export interface EventDetails {
     appName: string;
     fromPrivacy: "public" | "private";
     toPrivacy: "public" | "private";
+  };
+
+  appShared?: {
+    appName: string;
+    language: string;
+    shareMethod: "link" | "download";
+    userType: "guest" | "logged_in";
   };
 
   // Voice events

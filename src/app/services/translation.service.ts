@@ -27,6 +27,20 @@ export class TranslationService {
       readOnly: "Read Only",
       saveToToolbox: "Save to Toolbox",
       addToAppStore: "Add to App Store",
+      shareApp: "Share App",
+      "sharing.title": "Share Your App",
+      "sharing.generating": "Generating your shareable app...",
+      "sharing.appReady": "Your app is ready to share!",
+      "sharing.saveFirst":
+        "Please save your app first before sharing. Apps must be saved to generate shareable links.",
+      "sharing.preview": "Preview",
+      "sharing.shareLink": "Share Link",
+      "sharing.copy": "Copy",
+      "sharing.copied": "Copied!",
+      "sharing.customText": "Share Message",
+      "sharing.textPlaceholder": "Customize your share message...",
+      "sharing.deviceShare": "Share via Device",
+      "sharing.shareButton": "Share App",
       makeItBetter: "Make it better",
       toolboxTitle: "Save to Toolbox",
       appStoreTitle: "Publish to App Store",
@@ -172,7 +186,7 @@ export class TranslationService {
       "landing.hero.headline":
         "Build amazing games and tools just by talking or typing!",
       "landing.hero.subheading":
-        "A playful, AI-powered platform where kids aged 7-12 create, play, and share their own mini games and apps. No coding required – just imagination!",
+        "A playful, AI-powered platform where kids create, play, and share their own mini games and apps. No coding required – just imagination!",
       "landing.hero.tryItFree": "Try it Free!",
       "landing.hero.browseCommunity": "Browse Community Apps",
       "landing.features.title": "Why Kids Love MiniCoder",
@@ -218,7 +232,7 @@ export class TranslationService {
         "Absolutely! We don't collect personal data, all content is moderated, and we follow strict privacy guidelines designed for children.",
       "landing.faq.q2": "What age group is this for?",
       "landing.faq.a2":
-        "MiniCoder is designed for kids aged 7-12, but curious older kids and even adults enjoy creating with it too!",
+        "MiniCoder is designed for kids, but curious older kids and even adults enjoy creating with it too!",
       "landing.faq.q3": "Does my child need to know coding?",
       "landing.faq.a3":
         "Not at all! Kids just describe what they want to build in plain language, and our AI does all the technical work.",
@@ -354,6 +368,20 @@ export class TranslationService {
       readOnly: "Nur Lesen",
       saveToToolbox: "In Werkzeugkasten speichern",
       addToAppStore: "Zum App Store hinzufügen",
+      shareApp: "App teilen",
+      "sharing.title": "Teile deine App",
+      "sharing.generating": "Erstelle deine teilbare App...",
+      "sharing.appReady": "Deine App ist bereit zum Teilen!",
+      "sharing.saveFirst":
+        "Bitte speichere deine App zuerst, bevor du sie teilst. Apps müssen gespeichert werden, um teilbare Links zu erstellen.",
+      "sharing.preview": "Vorschau",
+      "sharing.shareLink": "Link teilen",
+      "sharing.copy": "Kopieren",
+      "sharing.copied": "Kopiert!",
+      "sharing.customText": "Teilen-Nachricht",
+      "sharing.textPlaceholder": "Passe deine Teilen-Nachricht an...",
+      "sharing.deviceShare": "Über Gerät teilen",
+      "sharing.shareButton": "App teilen",
       toolboxTitle: "In Werkzeugkasten speichern",
       appStoreTitle: "Im App Store veröffentlichen",
       clear: "Löschen",
@@ -407,7 +435,7 @@ export class TranslationService {
       "landing.hero.headline":
         "Baue tolle Spiele und Tools - einfach sprechen oder tippen!",
       "landing.hero.subheading":
-        "Eine spielerische, KI-gesteuerte Plattform, auf der Kinder im Alter von 7-12 Jahren ihre eigenen Mini-Spiele und Apps erstellen, spielen und teilen können. Kein Programmieren erforderlich – nur Fantasie!",
+        "Eine spielerische, KI-gesteuerte Plattform, auf der Kinder ihre eigenen Mini-Spiele und Apps erstellen, spielen und teilen können. Kein Programmieren erforderlich – nur Fantasie!",
       "landing.hero.tryItFree": "Kostenlos ausprobieren!",
       "landing.hero.browseCommunity": "Community-Apps durchstöbern",
       "landing.features.title": "Warum Kinder MiniCoder lieben",
@@ -453,7 +481,7 @@ export class TranslationService {
         "Absolut! Wir sammeln keine persönlichen Daten, alle Inhalte werden moderiert und wir befolgen strenge Datenschutzrichtlinien für Kinder.",
       "landing.faq.q2": "Für welche Altersgruppe ist das gedacht?",
       "landing.faq.a2":
-        "MiniCoder ist für Kinder im Alter von 7-12 Jahren konzipiert, aber auch neugierige ältere Kinder und sogar Erwachsene haben Spaß beim Erstellen!",
+        "MiniCoder ist für Kinder konzipiert, aber auch neugierige ältere Kinder und sogar Erwachsene haben Spaß beim Erstellen!",
       "landing.faq.q3": "Muss mein Kind programmieren können?",
       "landing.faq.a3":
         "Überhaupt nicht! Kinder beschreiben einfach in normaler Sprache, was sie bauen möchten, und unsere KI erledigt die ganze technische Arbeit.",

@@ -11,6 +11,7 @@ export interface ModifyDialogData {
   mode: ModifyMode;
   currentApp: ProcessedCommand | null;
   userCommand: string;
+  isProcessing?: boolean; // Add processing state
 }
 
 export interface ModifyResult {
@@ -100,5 +101,27 @@ export class ModifyAppDialogService {
    */
   getCurrentDialogData(): ModifyDialogData | null {
     return this.dialogDataSubject.value;
+  }
+
+  /**
+   * Set processing state for the dialog
+   */
+  setProcessing(isProcessing: boolean): void {
+    const currentData = this.dialogDataSubject.value;
+    if (currentData) {
+      this.dialogDataSubject.next({
+        ...currentData,
+        isProcessing,
+      });
+    }
+  }
+
+  /**
+   * Close dialog after processing completion
+   */
+  closeAfterProcessing(): void {
+    // Reset processing state and close
+    this.setProcessing(false);
+    this.closeDialog();
   }
 }

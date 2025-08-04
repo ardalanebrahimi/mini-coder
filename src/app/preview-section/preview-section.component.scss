@@ -90,6 +90,16 @@
     }
   }
 
+  &.share {
+    background: #ff6b35; // Orange for sharing
+    color: $white;
+
+    &:hover {
+      background: darken(#ff6b35, 10%);
+      transform: translateY(-2px);
+    }
+  }
+
   &.clear {
     background: #e0e0e0;
     color: $text-dark;
@@ -97,6 +107,13 @@
     &:hover {
       background: #d0d0d0;
     }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none !important;
   }
 }
 

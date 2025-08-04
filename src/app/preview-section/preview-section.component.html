@@ -25,6 +25,19 @@
         <span class="emoji">🖥️</span>
         Open in Full View
       </button>
+      <button
+        class="action-btn share"
+        (click)="onShareApp()"
+        [disabled]="!canShareApp()"
+        [title]="
+          !canShareApp()
+            ? 'Please save your app first before sharing'
+            : 'Share this app with others'
+        "
+      >
+        <span class="emoji">🚀</span>
+        {{ t("shareApp") || "Share App" }}
+      </button>
       <button class="action-btn clear" (click)="onClearClick()">
         <span class="emoji">🗑️</span>
         {{ t("clear") }}

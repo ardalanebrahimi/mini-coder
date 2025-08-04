@@ -21,6 +21,7 @@ import { AppStoreComponent } from "./app-store/app-store.component";
 import { VoiceInputModalComponent } from "./voice-input-modal/voice-input-modal.component";
 import { AnalyticsDashboardComponent } from "./shared/analytics-dashboard.component";
 import { AppPopupComponent } from "./app-popup/app-popup.component";
+import { AppSharingModalComponent } from "./app-sharing-modal/app-sharing-modal.component";
 import { FooterComponent } from "./landing/footer/footer.component";
 import { ToolboxService } from "./services/toolbox.service";
 import { PublishedProject } from "./services/app-store.service";
@@ -67,6 +68,7 @@ import { EXAMPLE_COMMANDS } from "./examples";
     VoiceInputModalComponent,
     AnalyticsDashboardComponent,
     AppPopupComponent,
+    AppSharingModalComponent,
     FooterComponent,
   ],
   templateUrl: "./app.component.html",
@@ -85,6 +87,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // Generated app state
   currentApp: ProcessedCommand | null = null;
   previewHtml = "";
+  previewId = 0;
   previewUrl = ""; // For blob URL
   safePreviewUrl: any = null; // For sanitized blob URL
 
@@ -172,6 +175,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentApp = null;
     this.sourceProject = null;
     this.previewHtml = "";
+    this.previewId = 0;
     this.previewUrl = "";
     this.safePreviewUrl = null;
     this.userCommand = "";
@@ -209,6 +213,7 @@ export class AppComponent implements OnInit, OnDestroy {
       detectedLanguage: project.language,
       generatedCode: project.code,
       projectName: project.name,
+      id: project.id,
       isReadOnly: true, // Mark as read-only
       sanitizedCode: this.sanitizer.bypassSecurityTrustHtml(project.code),
     } as ProcessedCommand;
@@ -261,7 +266,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private commandActionsService: CommandActionsService,
     private saveDialogService: SaveDialogService,
     private buildChoiceDialogService: BuildChoiceDialogService,
-    private modifyAppDialogService: ModifyAppDialogService,
+    public modifyAppDialogService: ModifyAppDialogService,
     private previewSectionService: PreviewSectionService,
     private profileService: ProfileService,
     private voiceActionService: VoiceActionService,
@@ -319,6 +324,7 @@ export class AppComponent implements OnInit, OnDestroy {
         previewUrl: this.previewUrl,
         safePreviewUrl: this.safePreviewUrl,
         userCommand: this.userCommand,
+        id: this.previewId,
       });
     }
   }
@@ -371,6 +377,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isModifying = true;
     this.errorMessage = "";
 
+    // Set processing state in the modify dialog
+    this.modifyAppDialogService.setProcessing(true);
+    this.isProcessing = true;
     // For rebuild mode, use the standard processCommand method
     if (isRebuilding) {
       this.promptProcessor.processCommand(command).subscribe({
@@ -409,6 +418,12 @@ export class AppComponent implements OnInit, OnDestroy {
     command: string,
     isRebuilding: boolean
   ): void {
+    this.isProcessing = false;
+    // Preserve the original app ID when modifying (not rebuilding)
+    if (!isRebuilding && this.currentApp?.id) {
+      result.id = this.currentApp.id;
+    }
+
     // Update current app with modified/rebuilt version
     this.currentApp = result;
     this.previewHtml = result.generatedCode;
@@ -425,6 +440,9 @@ export class AppComponent implements OnInit, OnDestroy {
     );
 
     this.isModifying = false;
+
+    // Close the modify dialog after processing
+    this.modifyAppDialogService.closeAfterProcessing();
 
     // Update preview service
     this.updatePreviewService();
@@ -456,11 +474,15 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param isRebuilding - Whether this was a rebuild operation
    */
   private handleModifyError(error: any, isRebuilding: boolean): void {
+    this.isProcessing = false;
     console.error("Error modifying/rebuilding app:", error);
     this.errorMessage = isRebuilding
       ? `${this.t("rebuildApp")} failed. Please try again.`
       : `${this.t("modifyApp")} failed. Please try again.`;
     this.isModifying = false;
+
+    // Close the modify dialog after processing (even on error)
+    this.modifyAppDialogService.closeAfterProcessing();
 
     // Track failed modification/rebuild
     if (isRebuilding) {
@@ -1015,6 +1037,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (!project) return;
       this.userCommand = project.command || "";
       this.previewHtml = project.code;
+      this.previewId = project.id;
       // Create blob URL for iframe
       this.previewUrl = this.createBlobUrl(project.code);
       // Sanitize the blob URL for Angular
@@ -1028,6 +1051,7 @@ export class AppComponent implements OnInit, OnDestroy {
         generatedCode: project.code,
         sanitizedCode: this.sanitizer.bypassSecurityTrustHtml(project.code),
         projectName: project.name,
+        id: project.id,
       };
 
       // Update preview service
@@ -1107,6 +1131,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentApp = null;
     this.sourceProject = null;
     this.previewHtml = "";
+    this.previewId = 0;
     this.previewUrl = "";
     this.safePreviewUrl = null;
     this.commandInputService.updateUserCommand("");

@@ -27,7 +27,9 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
   showDialog = false;
   dialogData: ModifyDialogData | null = null;
   modifyCommand = "";
-  isProcessing = false;
+  get isProcessing(): boolean {
+    return this.dialogData?.isProcessing || false;
+  }
   errorMessage = "";
 
   // Voice input properties - simplified for new system
@@ -167,7 +169,7 @@ export class ModifyAppDialogComponent implements OnInit, OnDestroy {
   private resetForm(): void {
     this.modifyCommand = "";
     this.errorMessage = "";
-    this.isProcessing = false;
+    // Note: isProcessing is now managed by the dialog service
   }
 
   /**

@@ -3,8 +3,6 @@ import { BehaviorSubject, Observable, map } from "rxjs";
 import { ProcessedCommand } from "./prompt-processor.service";
 import { AuthService } from "./auth.service";
 import { AnalyticsService, AnalyticsEventType } from "./analytics.service";
-import { environment } from "../../environments/environment";
-import { ProjectService } from "backend/dist/services/projectService";
 import { AppStoreService, PublishedProject } from "./app-store.service";
 import { TranslationService } from "./translation.service";
 
@@ -156,41 +154,6 @@ export class AppSharingService {
     }
   }
 
-  //   /**
-  //    * Store shared app data for route-based sharing
-  //    */
-  //   private async storeSharedApp(
-  //     shareId: string,
-  //     app: ProcessedCommand,
-  //     currentUser: any
-  //   ): Promise<void> {
-  //     const sharedAppData = {
-  //       id: shareId,
-  //       generatedCode: app.generatedCode,
-  //       projectName: app.projectName || "Untitled App",
-  //       detectedLanguage: app.detectedLanguage || "html",
-  //       creatorUsername: currentUser?.username || "Anonymous",
-  //       creatorName: currentUser?.name,
-  //       createdAt: new Date().toISOString(),
-  //       // Store any other relevant app data
-  //       prompt: (app as any).originalPrompt || "",
-  //       buildChoice: (app as any).buildChoice || "",
-  //     };
-
-  //     // Store in localStorage for now (in production, you'd store this in a database)
-  //     localStorage.setItem(
-  //       `shared_app_${shareId}`,
-  //       JSON.stringify(sharedAppData)
-  //     );
-
-  //     // Optional: Also store a list of all shared apps for cleanup
-  //     const sharedApps = JSON.parse(
-  //       localStorage.getItem("shared_apps_list") || "[]"
-  //     );
-  //     sharedApps.push({ id: shareId, createdAt: sharedAppData.createdAt });
-  //     localStorage.setItem("shared_apps_list", JSON.stringify(sharedApps));
-  //   }
-
   /**
    * Get shared app data by ID (for the shared route)
    */
@@ -311,13 +274,6 @@ export class AppSharingService {
 
     return modifiedHtml;
   }
-
-  //   /**
-  //    * Generate a unique share ID
-  //    */
-  //   private generateShareId(): string {
-  //     return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  //   }
 
   /**
    * Generate share URL for route-based sharing

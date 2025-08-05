@@ -285,7 +285,7 @@ import { AuthService } from "../services/auth.service";
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 25000; // Higher z-index to appear above app popups
+        z-index: 1000; // Reduced z-index to not interfere with OAuth popups
         backdrop-filter: blur(5px);
         animation: fadeIn 0.3s ease-out;
       }
@@ -844,6 +844,10 @@ export class AuthModalComponent implements OnInit {
     this.isLoading = true;
     this.error = "";
 
+    // Temporarily hide the modal to prevent z-index conflicts with OAuth popup
+    const originalIsOpen = this.isOpen;
+    this.isOpen = false;
+
     this.authService.googleSignIn().subscribe({
       next: (response) => {
         this.isLoading = false;
@@ -852,6 +856,8 @@ export class AuthModalComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
+        // Restore modal visibility on error
+        this.isOpen = originalIsOpen;
         this.error =
           error.message || "Google sign-in failed. Please try again.";
       },

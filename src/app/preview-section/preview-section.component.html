@@ -23,50 +23,63 @@
         </span>
       </div>
 
-      <button class="action-btn modify" (click)="onModifyClick()">
-        <span class="emoji">🔧</span>
-        {{ t("modifyApp") }}
+      <!-- Modify Button - Always visible -->
+      <button 
+        class="action-btn modify icon-only" 
+        (click)="onModifyClick()"
+        title="Make it better! ✨"
+      >
+        <span class="action-icon">✨</span>
       </button>
+      
+      <!-- Save/Update Button - Always visible -->
       <button
-        class="action-btn save-toolbox"
+        class="action-btn save-toolbox icon-only"
         (click)="onSaveToToolboxClick()"
-        [title]="isAppSaved() ? 'Update app in toolbox' : 'Save app to toolbox'"
+        [title]="isAppSaved() ? 'Update in My Toolbox 📦' : 'Save to My Toolbox 📦'"
       >
-        <span class="emoji">🧰</span>
-        {{ isAppSaved() ? "Update in Toolbox" : t("saveToToolbox") }}
+        <span class="action-icon">📦</span>
       </button>
+      
+      <!-- Publish Button - Always visible -->
       <button
-        class="action-btn save-appstore"
+        class="action-btn save-appstore icon-only"
         (click)="onAddToAppStoreClick()"
-        [title]="
-          isAppSaved()
-            ? 'Publish saved app to App Store'
-            : 'Save and publish to App Store'
-        "
+        title="Publish for Everyone 🌍"
       >
-        <span class="emoji">🏪</span>
-        {{ isAppSaved() ? "Publish to App Store" : t("addToAppStore") }}
+        <span class="action-icon">🌍</span>
       </button>
-      <button class="action-btn popup" (click)="onOpenInPopup()">
-        <span class="emoji">🖥️</span>
-        Open in Full View
+      
+      <!-- Full View Button -->
+      <button 
+        class="action-btn popup icon-only" 
+        (click)="onOpenInPopup()"
+        title="Make it Bigger! 🔍"
+      >
+        <span class="action-icon">🔍</span>
       </button>
+      
+      <!-- Share Button - Only enabled if app can be shared -->
       <button
-        class="action-btn share"
+        class="action-btn share icon-only"
         (click)="onShareApp()"
         [disabled]="!canShareApp()"
         [title]="
           !canShareApp()
-            ? 'Please save your app first before sharing'
-            : 'Share this app with others'
+            ? 'Save first, then share! 💾'
+            : 'Share This Cool App! 🚀'
         "
       >
-        <span class="emoji">🚀</span>
-        {{ t("shareApp") || "Share App" }}
+        <span class="action-icon">🚀</span>
       </button>
-      <button class="action-btn clear" (click)="onClearClick()">
-        <span class="emoji">🗑️</span>
-        {{ t("clear") }}
+      
+      <!-- Clear Button -->
+      <button 
+        class="action-btn clear icon-only" 
+        (click)="onClearClick()"
+        title="Start Over Fresh! 🗑️"
+      >
+        <span class="action-icon">🗑️</span>
       </button>
     </div>
   </div>
@@ -78,43 +91,37 @@
   >
     <div class="action-buttons-row">
       <button
-        class="action-btn modify"
+        class="action-btn modify icon-only"
         (click)="onModifyClick()"
-        title="{{ t('modifyApp') }}"
+        title="Make it better! ✨"
       >
-        <span class="emoji">🔧</span>
-        {{ t("modifyApp") }}
+        <span class="action-icon">✨</span>
       </button>
       <button
-        class="action-btn save-toolbox"
+        class="action-btn save-toolbox icon-only"
         (click)="onSaveToToolboxClick()"
-        [title]="isAppSaved() ? 'Update app in toolbox' : t('saveToToolbox')"
+        [title]="isAppSaved() ? 'Update in My Toolbox 📦' : 'Save to My Toolbox 📦'"
       >
-        <span class="emoji">🧰</span>
-        {{ isAppSaved() ? "Update in Toolbox" : t("saveToToolbox") }}
+        <span class="action-icon">📦</span>
       </button>
       <button
-        class="action-btn save-appstore"
+        class="action-btn save-appstore icon-only"
         (click)="onAddToAppStoreClick()"
-        [title]="
-          isAppSaved() ? 'Publish saved app to App Store' : t('addToAppStore')
-        "
+        title="Publish for Everyone 🌍"
       >
-        <span class="emoji">🏪</span>
-        {{ isAppSaved() ? "Publish to App Store" : t("addToAppStore") }}
+        <span class="action-icon">🌍</span>
       </button>
       <button
-        class="action-btn share"
+        class="action-btn share icon-only"
         (click)="onShareApp()"
         [disabled]="!canShareApp()"
         [title]="
           !canShareApp()
-            ? 'Please save your app first before sharing'
-            : 'Share this app with others'
+            ? 'Save first, then share! 💾'
+            : 'Share This Cool App! 🚀'
         "
       >
-        <span class="emoji">🚀</span>
-        {{ t("shareApp") || "Share App" }}
+        <span class="action-icon">🚀</span>
       </button>
       <!-- Note: "Open in Full View" button is excluded as we're already in popup mode -->
       <!-- Note: "Clear" button is excluded as it would close the popup unexpectedly -->

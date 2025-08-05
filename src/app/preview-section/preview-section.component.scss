@@ -43,10 +43,16 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-wrap: wrap;
 
   @media (max-width: 768px) {
     width: 100%;
     justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 0.5rem;
   }
 }
 
@@ -86,24 +92,18 @@
 
   .action-buttons-row {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
     justify-content: center;
     flex-wrap: wrap;
     max-width: 800px;
     margin: 0 auto;
 
     @media (max-width: 768px) {
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
     @media (max-width: 480px) {
-      flex-direction: column;
       gap: 0.5rem;
-
-      .action-btn {
-        width: 100%;
-        justify-content: center;
-      }
     }
   }
 
@@ -127,59 +127,152 @@
   @include button-base;
   padding: 0.75rem 1.5rem;
   font-size: 0.9rem;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  // Kid-friendly icon-only style
+  &.icon-only {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    .action-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+    
+    &:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+    
+    // Custom tooltip using CSS
+    &::after {
+      content: attr(title);
+      position: absolute;
+      bottom: -45px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 1000;
+      font-weight: 500;
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+    
+    &:hover::after,
+    &:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-5px);
+    }
+  }
 
   &.modify {
-    background: $warning-color;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: $white;
 
     &:hover {
-      background: darken($warning-color, 10%);
+      background: linear-gradient(135deg, darken(#667eea, 10%) 0%, darken(#764ba2, 10%) 100%);
+    }
+    
+    &.icon-only:hover {
+      background: linear-gradient(135deg, darken(#667eea, 5%) 0%, darken(#764ba2, 5%) 100%);
     }
   }
 
   &.save-toolbox {
-    background: #28a745; // Green for toolbox saves
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     color: $white;
 
     &:hover {
-      background: darken(#28a745, 10%);
+      background: linear-gradient(135deg, darken(#4facfe, 10%) 0%, darken(#00f2fe, 10%) 100%);
+    }
+    
+    &.icon-only:hover {
+      background: linear-gradient(135deg, darken(#4facfe, 5%) 0%, darken(#00f2fe, 5%) 100%);
     }
   }
 
   &.save-appstore {
-    background: #007bff; // Blue for app store
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
     color: $white;
 
     &:hover {
-      background: darken(#007bff, 10%);
+      background: linear-gradient(135deg, darken(#43e97b, 10%) 0%, darken(#38f9d7, 10%) 100%);
+    }
+    
+    &.icon-only:hover {
+      background: linear-gradient(135deg, darken(#43e97b, 5%) 0%, darken(#38f9d7, 5%) 100%);
     }
   }
 
   &.popup {
-    background: #6f42c1; // Purple for popup
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
     color: $white;
 
     &:hover {
-      background: darken(#6f42c1, 10%);
+      background: linear-gradient(135deg, darken(#fa709a, 10%) 0%, darken(#fee140, 10%) 100%);
+    }
+    
+    &.icon-only:hover {
+      background: linear-gradient(135deg, darken(#fa709a, 5%) 0%, darken(#fee140, 5%) 100%);
     }
   }
 
   &.share {
-    background: #ff6b35; // Orange for sharing
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
     color: $white;
 
     &:hover {
-      background: darken(#ff6b35, 10%);
+      background: linear-gradient(135deg, darken(#ff6b6b, 10%) 0%, darken(#ffa500, 10%) 100%);
       transform: translateY(-2px);
+    }
+    
+    &.icon-only:hover {
+      background: linear-gradient(135deg, darken(#ff6b6b, 5%) 0%, darken(#ffa500, 5%) 100%);
+      transform: translateY(-3px) scale(1.05);
     }
   }
 
   &.clear {
-    background: #e0e0e0;
+    background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
     color: $text-dark;
 
     &:hover {
-      background: #d0d0d0;
+      background: linear-gradient(135deg, darken(#e0e0e0, 10%) 0%, darken(#f5f5f5, 10%) 100%);
+    }
+    
+    &.icon-only:hover {
+      background: linear-gradient(135deg, darken(#e0e0e0, 5%) 0%, darken(#f5f5f5, 5%) 100%);
     }
   }
 
@@ -188,6 +281,27 @@
     cursor: not-allowed;
     pointer-events: none;
     transform: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+    
+    &::after,
+    &::before {
+      display: none;
+    }
+    
+    // Subtle pulse animation for feedback
+    &.icon-only {
+      animation: disabled-pulse 2s ease-in-out infinite;
+    }
+  }
+}
+
+// Animations
+@keyframes disabled-pulse {
+  0%, 100% {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 }
 

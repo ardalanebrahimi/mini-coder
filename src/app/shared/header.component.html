@@ -7,7 +7,7 @@
         <div class="app-title-section logo">
           <h1 class="app-title">
             <a routerLink="/landing" (click)="onLogoClick()">
-              <span class="emoji">🚀</span>
+              <img src="assets/icons/icon.png" alt="MiniCoder Robot" class="app-logo" />
               {{ t("appTitle") }}
               <span class="emoji">✨</span>
             </a>
@@ -29,7 +29,7 @@
               class="action-btn primary"
               (click)="onAppButtonClick()"
             >
-              <span class="btn-icon">🚀</span>
+              <span class="btn-icon">🎨</span>
               App
             </a>
           </div>
@@ -50,7 +50,7 @@
               (click)="toggleToolbox()"
               [class.active]="showToolbox"
             >
-              <span class="btn-icon">🧰</span>
+              <span class="btn-icon">📦</span>
               {{ t("myToolbox") }}
               <span *ngIf="currentUser$ | async">
                 ({{ (toolboxService.savedProjects$ | async)?.length || 0 }})
@@ -64,7 +64,7 @@
               >Welcome, {{ user.name || user.email || "User" }}</span
             >
             <button class="action-btn logout-btn" (click)="logout()">
-              <span class="btn-icon">🚪</span>
+              <span class="btn-icon">�</span>
               Logout
             </button>
           </div>

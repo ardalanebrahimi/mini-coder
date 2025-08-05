@@ -31,9 +31,11 @@ export class PreviewSectionService {
   });
 
   private actionSubject = new BehaviorSubject<PreviewAction | null>(null);
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
 
   previewData$ = this.previewDataSubject.asObservable();
   action$ = this.actionSubject.asObservable();
+  isLoading$ = this.isLoadingSubject.asObservable();
 
   constructor() {}
 
@@ -112,5 +114,19 @@ export class PreviewSectionService {
    */
   hasPreviewContent(): boolean {
     return this.previewDataSubject.value.currentApp !== null;
+  }
+
+  /**
+   * Set loading state
+   */
+  setLoading(loading: boolean): void {
+    this.isLoadingSubject.next(loading);
+  }
+
+  /**
+   * Get current loading state
+   */
+  isLoading(): boolean {
+    return this.isLoadingSubject.value;
   }
 }

@@ -48,6 +48,7 @@ import {
 } from "./services/analytics.service";
 import { PreviewSectionService } from "./services/preview-section.service";
 import { VoiceActionService } from "./services/voice-action.service";
+import { AppPopupService } from "./services/app-popup.service";
 import { EXAMPLE_COMMANDS } from "./examples";
 
 @Component({
@@ -270,7 +271,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private previewSectionService: PreviewSectionService,
     private profileService: ProfileService,
     private voiceActionService: VoiceActionService,
-    private analytics: AnalyticsService
+    private analytics: AnalyticsService,
+    private appPopupService: AppPopupService
   ) {}
 
   /**
@@ -380,6 +382,9 @@ export class AppComponent implements OnInit, OnDestroy {
     // Set processing state in the modify dialog
     this.modifyAppDialogService.setProcessing(true);
     this.isProcessing = true;
+    
+    // Set loading state in preview section
+    this.previewSectionService.setLoading(true);
     // For rebuild mode, use the standard processCommand method
     if (isRebuilding) {
       this.promptProcessor.processCommand(command).subscribe({
@@ -443,9 +448,22 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Close the modify dialog after processing
     this.modifyAppDialogService.closeAfterProcessing();
+    
+    // Clear loading state in preview section
+    this.previewSectionService.setLoading(false);
 
     // Update preview service
     this.updatePreviewService();
+
+    // Switch to app view to show the preview
+    this.currentView = "app";
+
+    // Automatically open the modified/rebuilt app in full-screen popup modal
+    this.appPopupService.openUserApp(
+      result,
+      result.projectName ||
+        (isRebuilding ? "Your Rebuilt App" : "Your Modified App")
+    );
 
     // Show success message
     const successMessage = isRebuilding
@@ -483,6 +501,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Close the modify dialog after processing (even on error)
     this.modifyAppDialogService.closeAfterProcessing();
+    
+    // Clear loading state in preview section
+    this.previewSectionService.setLoading(false);
 
     // Track failed modification/rebuild
     if (isRebuilding) {
@@ -767,6 +788,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.errorMessage = "";
     this.currentApp = null;
     this.sourceProject = null;
+    
+    // Set loading state in preview section
+    this.previewSectionService.setLoading(true);
 
     // For debugging: bypass OpenAI and use static HTML
     if (
@@ -775,6 +799,9 @@ export class AppComponent implements OnInit, OnDestroy {
     ) {
       this.testStaticPreview();
       this.commandInputService.setProcessing(false);
+      
+      // Clear loading state in preview section
+      this.previewSectionService.setLoading(false);
       return;
     }
 
@@ -790,9 +817,21 @@ export class AppComponent implements OnInit, OnDestroy {
           this.previewUrl
         );
         this.commandInputService.setProcessing(false);
+        
+        // Clear loading state in preview section
+        this.previewSectionService.setLoading(false);
 
         // Update preview service
         this.updatePreviewService();
+
+        // Switch to app view to show the preview
+        this.currentView = "app";
+
+        // Automatically open the app in full-screen popup modal
+        this.appPopupService.openUserApp(
+          result,
+          result.projectName || "Your New App"
+        );
 
         // Show success message
         this.showSuccessMessage(
@@ -812,6 +851,9 @@ export class AppComponent implements OnInit, OnDestroy {
           error.message ||
           "Failed to generate app. Please try again with a more specific command.";
         this.commandInputService.setProcessing(false);
+        
+        // Clear loading state in preview section
+        this.previewSectionService.setLoading(false);
 
         // Track failed app creation
         this.analytics.logAppCreated(
@@ -1056,6 +1098,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
       // Update preview service
       this.updatePreviewService();
+
+      // Switch to app view to show the preview
+      this.currentView = "app";
+
+      // Automatically open the project in full-screen popup modal
+      this.appPopupService.openUserApp(this.currentApp, project.name);
 
       // Close toolbox
       this.toolboxService.close();

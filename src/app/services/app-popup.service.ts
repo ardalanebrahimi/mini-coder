@@ -31,7 +31,8 @@ export class AppPopupService {
    */
   openAppStoreProject(
     project: PublishedProject,
-    currentApp?: ProcessedCommand
+    currentApp?: ProcessedCommand,
+    fullscreen = true
   ): void {
     this.popupDataSubject.next({
       isOpen: true,
@@ -40,20 +41,24 @@ export class AppPopupService {
       sourceProject: project,
       title: project.name,
       showToolboxActions: false,
-      isFullscreen: false,
+      isFullscreen: fullscreen,
     });
   }
 
   /**
    * Open popup for a user-created app (with toolbox actions)
    */
-  openUserApp(currentApp: ProcessedCommand, title?: string): void {
+  openUserApp(
+    currentApp: ProcessedCommand,
+    title?: string,
+    fullscreen = true
+  ): void {
     this.popupDataSubject.next({
       isOpen: true,
       currentApp,
       title: title || "Your App",
       showToolboxActions: true,
-      isFullscreen: false,
+      isFullscreen: fullscreen,
     });
   }
 

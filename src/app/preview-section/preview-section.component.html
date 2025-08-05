@@ -1,5 +1,9 @@
 <!-- Preview Section -->
-<div class="preview-section" *ngIf="previewData.currentApp">
+<div
+  class="preview-section"
+  [class.has-popup-actions]="isPopupMode && !isReadOnly && showToolboxActions"
+  *ngIf="previewData.currentApp"
+>
   <div class="preview-header" *ngIf="!isPopupMode">
     <h3>
       <span class="emoji">📱</span>
@@ -45,6 +49,54 @@
     </div>
   </div>
 
+  <!-- Popup Mode Actions - Show action buttons when in popup mode -->
+  <div
+    class="popup-actions"
+    *ngIf="isPopupMode && !isReadOnly && showToolboxActions"
+  >
+    <div class="action-buttons-row">
+      <button
+        class="action-btn modify"
+        (click)="onModifyClick()"
+        title="{{ t('modifyApp') }}"
+      >
+        <span class="emoji">🔧</span>
+        {{ t("modifyApp") }}
+      </button>
+      <button
+        class="action-btn save-toolbox"
+        (click)="onSaveToToolboxClick()"
+        title="{{ t('saveToToolbox') }}"
+      >
+        <span class="emoji">🧰</span>
+        {{ t("saveToToolbox") }}
+      </button>
+      <button
+        class="action-btn save-appstore"
+        (click)="onAddToAppStoreClick()"
+        title="{{ t('addToAppStore') }}"
+      >
+        <span class="emoji">🏪</span>
+        {{ t("addToAppStore") }}
+      </button>
+      <button
+        class="action-btn share"
+        (click)="onShareApp()"
+        [disabled]="!canShareApp()"
+        [title]="
+          !canShareApp()
+            ? 'Please save your app first before sharing'
+            : 'Share this app with others'
+        "
+      >
+        <span class="emoji">🚀</span>
+        {{ t("shareApp") || "Share App" }}
+      </button>
+      <!-- Note: "Open in Full View" button is excluded as we're already in popup mode -->
+      <!-- Note: "Clear" button is excluded as it would close the popup unexpectedly -->
+    </div>
+  </div>
+
   <!-- App Store Project Info (only when previewing from App Store and not in popup mode) -->
   <div class="app-store-info" *ngIf="isAppStorePreview() && !isPopupMode">
     <div class="project-info">
@@ -83,5 +135,13 @@
       (error)="onIframeError($event)"
     >
     </iframe>
+    
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p class="loading-text">{{ t("modifyingApp") || "Modifying your app..." }}</p>
+      </div>
+    </div>
   </div>
 </div>

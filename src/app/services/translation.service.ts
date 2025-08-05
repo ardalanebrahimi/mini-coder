@@ -58,6 +58,7 @@ export class TranslationService {
       placeholderText:
         'Be specific! Examples: "Create a working calculator with all basic operations" or "Make an interactive quiz about animals"',
       modifyApp: "Make it better",
+      modifyingApp: "Modifying your app...",
       modifyPlaceholder:
         'What would you like to change? e.g., "Change background to blue" or "Add 5 more colors"',
       rebuildApp: "Rebuild from Scratch",
@@ -621,6 +622,7 @@ export class TranslationService {
       placeholderText:
         'Sei spezifisch! Beispiele: "Erstelle einen funktionierenden Taschenrechner mit allen Grundrechenarten" oder "Mache ein interaktives Quiz über Tiere"',
       modifyApp: "Besser machen",
+      modifyingApp: "Ändere deine App...",
       modifyPlaceholder:
         'Was möchtest du ändern? z.B. "Hintergrund zu blau ändern" oder "5 weitere Farben hinzufügen"',
       rebuildApp: "Neu von Grund auf erstellen",

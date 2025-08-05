@@ -285,7 +285,7 @@ import { AuthService } from "../services/auth.service";
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 1000;
+        z-index: 25000; // Higher z-index to appear above app popups
         backdrop-filter: blur(5px);
         animation: fadeIn 0.3s ease-out;
       }

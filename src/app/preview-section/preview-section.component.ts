@@ -44,6 +44,8 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
     userCommand: "",
   };
 
+  isLoading = false; // Loading state for modification overlay
+
   constructor(
     private previewSectionService: PreviewSectionService,
     private translationService: TranslationService,
@@ -60,6 +62,13 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.previewData = data;
+      });
+
+    // Subscribe to loading state changes
+    this.previewSectionService.isLoading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((loading) => {
+        this.isLoading = loading;
       });
   }
 
@@ -150,7 +159,8 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
     if (this.previewData.currentApp) {
       this.appPopupService.openUserApp(
         this.previewData.currentApp,
-        this.previewData.currentApp.projectName || "Your App"
+        this.previewData.currentApp.projectName || "Your App",
+        false // User manually clicks, so don't force fullscreen
       );
     }
   }

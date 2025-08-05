@@ -409,7 +409,7 @@ export class AnalyticsService {
   constructor() {
     this.sessionId = this.generateSessionId();
     this.loadEventsFromStorage();
-    this.startSession();
+    // this.startSession();
     this.setupFlushTimer();
     this.setupNetworkListeners();
 
@@ -420,7 +420,7 @@ export class AnalyticsService {
 
     // Listen for page unload to flush events
     window.addEventListener("beforeunload", () => {
-      this.endSession();
+      // this.endSession();
       this.flushEventsSync(); // Synchronous flush on page unload
     });
 
@@ -760,6 +760,7 @@ export class AnalyticsService {
    * Enhanced session tracking for landing pages
    */
   logSessionMetrics(): void {
+    if (true) return;
     if (typeof window !== "undefined") {
       const sessionDuration = Date.now() - new Date(this.sessionId).getTime();
       const scrollDepth = Math.round(
@@ -1014,9 +1015,8 @@ export class AnalyticsService {
     return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private startSession(): void {
+  public startSession(): void {
     const isReturning = !!localStorage.getItem(this.config.localStorageKey);
-
     this.logEvent(AnalyticsEventType.SESSION_START, {
       sessionStart: {
         userAgent: navigator.userAgent,
@@ -1026,7 +1026,7 @@ export class AnalyticsService {
     });
   }
 
-  private endSession(): void {
+  public endSession(): void {
     this.logEvent(AnalyticsEventType.SESSION_END, {});
   }
 

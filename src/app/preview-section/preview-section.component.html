@@ -24,23 +24,25 @@
       </div>
 
       <!-- Modify Button - Always visible -->
-      <button 
-        class="action-btn modify icon-only" 
+      <button
+        class="action-btn modify icon-only"
         (click)="onModifyClick()"
         title="Make it better! ✨"
       >
         <span class="action-icon">✨</span>
       </button>
-      
+
       <!-- Save/Update Button - Always visible -->
       <button
         class="action-btn save-toolbox icon-only"
         (click)="onSaveToToolboxClick()"
-        [title]="isAppSaved() ? 'Update in My Toolbox 📦' : 'Save to My Toolbox 📦'"
+        [title]="
+          isAppSaved() ? 'Update in My Toolbox 📦' : 'Save to My Toolbox 📦'
+        "
       >
         <span class="action-icon">📦</span>
       </button>
-      
+
       <!-- Publish Button - Always visible -->
       <button
         class="action-btn save-appstore icon-only"
@@ -49,16 +51,16 @@
       >
         <span class="action-icon">🌍</span>
       </button>
-      
+
       <!-- Full View Button -->
-      <button 
-        class="action-btn popup icon-only" 
+      <button
+        class="action-btn popup icon-only"
         (click)="onOpenInPopup()"
         title="Make it Bigger! 🔍"
       >
         <span class="action-icon">🔍</span>
       </button>
-      
+
       <!-- Share Button - Only enabled if app can be shared -->
       <button
         class="action-btn share icon-only"
@@ -72,10 +74,10 @@
       >
         <span class="action-icon">🚀</span>
       </button>
-      
+
       <!-- Clear Button -->
-      <button 
-        class="action-btn clear icon-only" 
+      <button
+        class="action-btn clear icon-only"
         (click)="onClearClick()"
         title="Start Over Fresh! 🗑️"
       >
@@ -100,7 +102,9 @@
       <button
         class="action-btn save-toolbox icon-only"
         (click)="onSaveToToolboxClick()"
-        [title]="isAppSaved() ? 'Update in My Toolbox 📦' : 'Save to My Toolbox 📦'"
+        [title]="
+          isAppSaved() ? 'Update in My Toolbox 📦' : 'Save to My Toolbox 📦'
+        "
       >
         <span class="action-icon">📦</span>
       </button>

@@ -50,7 +50,7 @@
     justify-content: center;
     gap: 0.75rem;
   }
-  
+
   @media (max-width: 480px) {
     gap: 0.5rem;
   }
@@ -129,7 +129,7 @@
   font-size: 0.9rem;
   transition: all 0.3s ease;
   position: relative;
-  
+
   // Kid-friendly icon-only style
   &.icon-only {
     width: 56px;
@@ -140,21 +140,21 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    
+
     .action-icon {
       font-size: 24px;
       line-height: 1;
     }
-    
+
     &:hover {
       transform: translateY(-3px) scale(1.05);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
-    
+
     &:active {
       transform: translateY(-1px) scale(1.02);
     }
-    
+
     // Custom tooltip using CSS
     &::after {
       content: attr(title);
@@ -174,9 +174,9 @@
       z-index: 1000;
       font-weight: 500;
     }
-    
+
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       bottom: -35px;
       left: 50%;
@@ -188,7 +188,7 @@
       transition: opacity 0.3s ease;
       z-index: 1000;
     }
-    
+
     &:hover::after,
     &:hover::before {
       opacity: 1;
@@ -201,11 +201,19 @@
     color: $white;
 
     &:hover {
-      background: linear-gradient(135deg, darken(#667eea, 10%) 0%, darken(#764ba2, 10%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#667eea, 10%) 0%,
+        darken(#764ba2, 10%) 100%
+      );
     }
-    
+
     &.icon-only:hover {
-      background: linear-gradient(135deg, darken(#667eea, 5%) 0%, darken(#764ba2, 5%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#667eea, 5%) 0%,
+        darken(#764ba2, 5%) 100%
+      );
     }
   }
 
@@ -214,11 +222,19 @@
     color: $white;
 
     &:hover {
-      background: linear-gradient(135deg, darken(#4facfe, 10%) 0%, darken(#00f2fe, 10%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#4facfe, 10%) 0%,
+        darken(#00f2fe, 10%) 100%
+      );
     }
-    
+
     &.icon-only:hover {
-      background: linear-gradient(135deg, darken(#4facfe, 5%) 0%, darken(#00f2fe, 5%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#4facfe, 5%) 0%,
+        darken(#00f2fe, 5%) 100%
+      );
     }
   }
 
@@ -227,11 +243,19 @@
     color: $white;
 
     &:hover {
-      background: linear-gradient(135deg, darken(#43e97b, 10%) 0%, darken(#38f9d7, 10%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#43e97b, 10%) 0%,
+        darken(#38f9d7, 10%) 100%
+      );
     }
-    
+
     &.icon-only:hover {
-      background: linear-gradient(135deg, darken(#43e97b, 5%) 0%, darken(#38f9d7, 5%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#43e97b, 5%) 0%,
+        darken(#38f9d7, 5%) 100%
+      );
     }
   }
 
@@ -240,11 +264,19 @@
     color: $white;
 
     &:hover {
-      background: linear-gradient(135deg, darken(#fa709a, 10%) 0%, darken(#fee140, 10%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#fa709a, 10%) 0%,
+        darken(#fee140, 10%) 100%
+      );
     }
-    
+
     &.icon-only:hover {
-      background: linear-gradient(135deg, darken(#fa709a, 5%) 0%, darken(#fee140, 5%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#fa709a, 5%) 0%,
+        darken(#fee140, 5%) 100%
+      );
     }
   }
 
@@ -253,12 +285,20 @@
     color: $white;
 
     &:hover {
-      background: linear-gradient(135deg, darken(#ff6b6b, 10%) 0%, darken(#ffa500, 10%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#ff6b6b, 10%) 0%,
+        darken(#ffa500, 10%) 100%
+      );
       transform: translateY(-2px);
     }
-    
+
     &.icon-only:hover {
-      background: linear-gradient(135deg, darken(#ff6b6b, 5%) 0%, darken(#ffa500, 5%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#ff6b6b, 5%) 0%,
+        darken(#ffa500, 5%) 100%
+      );
       transform: translateY(-3px) scale(1.05);
     }
   }
@@ -268,11 +308,19 @@
     color: $text-dark;
 
     &:hover {
-      background: linear-gradient(135deg, darken(#e0e0e0, 10%) 0%, darken(#f5f5f5, 10%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#e0e0e0, 10%) 0%,
+        darken(#f5f5f5, 10%) 100%
+      );
     }
-    
+
     &.icon-only:hover {
-      background: linear-gradient(135deg, darken(#e0e0e0, 5%) 0%, darken(#f5f5f5, 5%) 100%);
+      background: linear-gradient(
+        135deg,
+        darken(#e0e0e0, 5%) 0%,
+        darken(#f5f5f5, 5%) 100%
+      );
     }
   }
 
@@ -282,12 +330,12 @@
     pointer-events: none;
     transform: none !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-    
+
     &::after,
     &::before {
       display: none;
     }
-    
+
     // Subtle pulse animation for feedback
     &.icon-only {
       animation: disabled-pulse 2s ease-in-out infinite;
@@ -297,7 +345,8 @@
 
 // Animations
 @keyframes disabled-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
   50% {

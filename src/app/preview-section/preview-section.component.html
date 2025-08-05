@@ -135,12 +135,14 @@
       (error)="onIframeError($event)"
     >
     </iframe>
-    
+
     <!-- Loading overlay -->
     <div class="loading-overlay" *ngIf="isLoading">
       <div class="loading-spinner">
         <div class="spinner"></div>
-        <p class="loading-text">{{ t("modifyingApp") || "Modifying your app..." }}</p>
+        <p class="loading-text">
+          {{ t("modifyingApp") || "Modifying your app..." }}
+        </p>
       </div>
     </div>
   </div>

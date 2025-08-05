@@ -382,7 +382,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // Set processing state in the modify dialog
     this.modifyAppDialogService.setProcessing(true);
     this.isProcessing = true;
-    
+
     // Set loading state in preview section
     this.previewSectionService.setLoading(true);
     // For rebuild mode, use the standard processCommand method
@@ -448,7 +448,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Close the modify dialog after processing
     this.modifyAppDialogService.closeAfterProcessing();
-    
+
     // Clear loading state in preview section
     this.previewSectionService.setLoading(false);
 
@@ -501,7 +501,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Close the modify dialog after processing (even on error)
     this.modifyAppDialogService.closeAfterProcessing();
-    
+
     // Clear loading state in preview section
     this.previewSectionService.setLoading(false);
 
@@ -788,7 +788,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.errorMessage = "";
     this.currentApp = null;
     this.sourceProject = null;
-    
+
     // Set loading state in preview section
     this.previewSectionService.setLoading(true);
 
@@ -799,7 +799,7 @@ export class AppComponent implements OnInit, OnDestroy {
     ) {
       this.testStaticPreview();
       this.commandInputService.setProcessing(false);
-      
+
       // Clear loading state in preview section
       this.previewSectionService.setLoading(false);
       return;
@@ -817,7 +817,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.previewUrl
         );
         this.commandInputService.setProcessing(false);
-        
+
         // Clear loading state in preview section
         this.previewSectionService.setLoading(false);
 
@@ -851,7 +851,7 @@ export class AppComponent implements OnInit, OnDestroy {
           error.message ||
           "Failed to generate app. Please try again with a more specific command.";
         this.commandInputService.setProcessing(false);
-        
+
         // Clear loading state in preview section
         this.previewSectionService.setLoading(false);
 

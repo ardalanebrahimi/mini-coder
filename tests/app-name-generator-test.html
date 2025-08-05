@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App Name Generator Test</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .test-section {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 20px;
+      }
+      .test-title {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #fff;
+      }
+      .test-description {
+        margin-bottom: 20px;
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+      .code-block {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        margin: 10px 0;
+        overflow-x: auto;
+      }
+      .success {
+        color: #4ade80;
+        font-weight: bold;
+      }
+      .warning {
+        color: #fbbf24;
+        font-weight: bold;
+      }
+      .error {
+        color: #f87171;
+        font-weight: bold;
+      }
+      .feature-list {
+        margin: 15px 0;
+      }
+      .feature-list li {
+        margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎯 App Name Generator Test</h1>
+        <p>Testing the new AI-powered app name generation feature</p>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">✨ What's New</div>
+        <div class="test-description">
+          The app name generator now uses OpenAI to create catchy, kid-friendly
+          names based on the user's original prompt.
+        </div>
+        <ul class="feature-list">
+          <li>
+            <span class="success">✓</span> Generates names using OpenAI API in
+            parallel with code generation
+          </li>
+          <li>
+            <span class="success">✓</span> Kid-friendly and descriptive names
+          </li>
+          <li>
+            <span class="success">✓</span> Properly localized (English/German)
+          </li>
+          <li>
+            <span class="success">✓</span> Only generates once when app is first
+            created
+          </li>
+          <li>
+            <span class="success">✓</span> Preserves original name during
+            modifications
+          </li>
+          <li>
+            <span class="success">✓</span> Fallback to simple name generation if
+            AI fails
+          </li>
+        </ul>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">🧪 Test Scenarios</div>
+        <div class="test-description">
+          To test the new app name generation feature:
+        </div>
+        <ol>
+          <li>
+            Create a new app with a descriptive prompt (e.g., "Create a color
+            guessing game for kids")
+          </li>
+          <li>
+            Observe the generated app name (should be something like "Color
+            Quest" or "Rainbow Game")
+          </li>
+          <li>Modify the app (e.g., "Change the background color to blue")</li>
+          <li>Verify the app name remains unchanged during modification</li>
+          <li>Try with German prompts (e.g., "Erstelle ein Tier-Quiz")</li>
+          <li>
+            Verify German names are generated (e.g., "Tier Quiz" or "Tierarten
+            Spiel")
+          </li>
+        </ol>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">🔧 Technical Implementation</div>
+        <div class="test-description">
+          <strong>New Service:</strong> <code>AppNameGeneratorService</code>
+        </div>
+        <div class="code-block">
+          generateAppName(userPrompt: string, language: string):
+          Observable&lt;string&gt;
+        </div>
+        <div class="test-description">
+          <strong>Integration:</strong> Called in parallel with code generation
+          in <code>PromptProcessorService.processCommand()</code>
+        </div>
+        <div class="code-block">
+          forkJoin({ codeResponse: this.callOpenAI(prompt), appName:
+          this.appNameGenerator.generateAppName(command, detectedLanguage) })
+        </div>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">📝 Example Name Generations</div>
+        <div class="test-description">
+          <strong>English Examples:</strong>
+        </div>
+        <ul class="feature-list">
+          <li>
+            "Create a calculator" → <span class="success">"Math Master"</span>
+          </li>
+          <li>
+            "Make a memory game" → <span class="success">"Memory Match"</span>
+          </li>
+          <li>
+            "Build a color guessing game" →
+            <span class="success">"Color Quest"</span>
+          </li>
+          <li>
+            "Create an animal quiz" → <span class="success">"Animal Quiz"</span>
+          </li>
+        </ul>
+        <div class="test-description">
+          <strong>German Examples:</strong>
+        </div>
+        <ul class="feature-list">
+          <li>
+            "Erstelle einen Rechner" →
+            <span class="success">"Rechner Pro"</span>
+          </li>
+          <li>
+            "Mache ein Memory-Spiel" →
+            <span class="success">"Memory Master"</span>
+          </li>
+          <li>
+            "Baue ein Farben-Ratespiel" →
+            <span class="success">"Farben Spiel"</span>
+          </li>
+          <li>
+            "Erstelle ein Tier-Quiz" → <span class="success">"Tier Quiz"</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">⚡ Performance & Reliability</div>
+        <div class="test-description">Key optimizations and safeguards:</div>
+        <ul class="feature-list">
+          <li>
+            <span class="success">✓</span> Uses faster gpt-4o-mini model for
+            name generation
+          </li>
+          <li>
+            <span class="success">✓</span> Parallel API calls to avoid delays
+          </li>
+          <li>
+            <span class="success">✓</span> Limited to 20 tokens for name
+            generation
+          </li>
+          <li>
+            <span class="success">✓</span> Automatic fallback if AI generation
+            fails
+          </li>
+          <li>
+            <span class="success">✓</span> Input validation and sanitization
+          </li>
+          <li>
+            <span class="success">✓</span> Preserves names during app
+            modifications
+          </li>
+        </ul>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">🎯 Testing Instructions</div>
+        <div class="test-description">
+          <ol>
+            <li>Open the main Mini Coder application</li>
+            <li>
+              Try these test prompts:
+              <div class="code-block">
+                "Create a simple calculator for kids"<br />
+                "Make a memory matching game with animals"<br />
+                "Build a drawing app with colors"<br />
+                "Erstelle ein Tier-Quiz mit Bildern"<br />
+                "Mache einen Zahlen-Rechner"
+              </div>
+            </li>
+            <li>Check the generated app names in the preview section</li>
+            <li>Modify each app and verify names don't change</li>
+            <li>Check browser console for any name generation logs</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <div class="test-title">🐛 Troubleshooting</div>
+        <div class="test-description">If you encounter issues:</div>
+        <ul class="feature-list">
+          <li>
+            <span class="warning">⚠</span> Check OpenAI API key configuration
+          </li>
+          <li>
+            <span class="warning">⚠</span> Verify API rate limits aren't
+            exceeded
+          </li>
+          <li>
+            <span class="warning">⚠</span> Check browser console for error
+            messages
+          </li>
+          <li>
+            <span class="warning">⚠</span> Fallback names should still work if
+            AI fails
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

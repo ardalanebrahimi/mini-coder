@@ -399,9 +399,10 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       // For modify mode, use the new processModifyCommand method with current app code
       const currentAppCode = this.currentApp?.generatedCode || "";
+      const currentAppName = this.currentApp?.projectName;
 
       this.promptProcessor
-        .processModifyCommand(command, currentAppCode)
+        .processModifyCommand(command, currentAppCode, currentAppName)
         .subscribe({
           next: (result: ProcessedCommand) => {
             this.handleModifySuccess(result, command, false);

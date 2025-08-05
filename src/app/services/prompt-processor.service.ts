@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Observable, of, throwError } from "rxjs";
+import { Observable, of, throwError, forkJoin } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
@@ -8,6 +8,7 @@ import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { franc } from "franc-min";
 import { environment } from "../../environments/environment";
 import { CodeMinifierService } from "./code-minifier.service";
+import { AppNameGeneratorService } from "./app-name-generator.service";
 
 export interface ProcessedCommand {
   id?: number;
@@ -29,7 +30,8 @@ export class PromptProcessorService {
   constructor(
     private http: HttpClient,
     private sanitizer: DomSanitizer,
-    private codeMinifierService: CodeMinifierService
+    private codeMinifierService: CodeMinifierService,
+    private appNameGenerator: AppNameGeneratorService
   ) {}
 
   /**
@@ -45,23 +47,23 @@ export class PromptProcessorService {
     // Detect language using franc-min
     const detectedLanguage = this.detectLanguage(command);
 
-    // Generate project name from command
-    const projectName = this.generateProjectName(command);
-
     // Create OpenAI prompt based on detected language
     const prompt = this.createOpenAIPrompt(command, detectedLanguage);
 
-    // Call OpenAI API
-    return this.callOpenAI(prompt).pipe(
-      map((response) => {
-        const generatedCode = this.extractCodeFromResponse(response);
+    // Call both OpenAI API for code generation and name generation in parallel
+    return forkJoin({
+      codeResponse: this.callOpenAI(prompt),
+      appName: this.appNameGenerator.generateAppName(command, detectedLanguage),
+    }).pipe(
+      map(({ codeResponse, appName }) => {
+        const generatedCode = this.extractCodeFromResponse(codeResponse);
         const sanitizedCode = this.sanitizeCode(generatedCode);
 
         return {
           detectedLanguage,
           generatedCode,
           sanitizedCode,
-          projectName,
+          projectName: appName,
         };
       }),
       catchError((error) => {
@@ -75,11 +77,13 @@ export class PromptProcessorService {
    * Process a modify command with current app code included in the prompt
    * @param modifyCommand - The user's modification instruction
    * @param currentAppCode - The current app's HTML/CSS/JS code
+   * @param currentAppName - The current app's name (preserved during modification)
    * @returns Observable with processed result
    */
   processModifyCommand(
     modifyCommand: string,
-    currentAppCode: string
+    currentAppCode: string,
+    currentAppName?: string
   ): Observable<ProcessedCommand> {
     if (!modifyCommand.trim()) {
       return throwError(() => new Error("Modify command cannot be empty"));
@@ -94,8 +98,9 @@ export class PromptProcessorService {
     // Detect language of the modify command
     const detectedLanguage = this.detectLanguage(modifyCommand);
 
-    // Generate project name from modify command (fallback to current app name)
-    const projectName = this.generateProjectName(modifyCommand);
+    // Use existing app name or generate fallback name (do NOT generate new AI name)
+    const projectName =
+      currentAppName || this.generateProjectName(modifyCommand);
 
     // Minify the current app code to reduce token usage
     const minifiedCode = this.codeMinifierService.minifyHtml(currentAppCode);

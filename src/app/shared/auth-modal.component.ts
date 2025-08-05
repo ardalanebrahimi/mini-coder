@@ -845,8 +845,8 @@ export class AuthModalComponent implements OnInit {
     this.error = "";
 
     // Temporarily hide the modal to prevent z-index conflicts with OAuth popup
-    const originalIsOpen = this.isOpen;
-    this.isOpen = false;
+    // const originalIsOpen = this.isOpen;
+    // this.isOpen = false;
 
     this.authService.googleSignIn().subscribe({
       next: (response) => {
@@ -857,7 +857,7 @@ export class AuthModalComponent implements OnInit {
       error: (error) => {
         this.isLoading = false;
         // Restore modal visibility on error
-        this.isOpen = originalIsOpen;
+        // this.isOpen = originalIsOpen;
         this.error =
           error.message || "Google sign-in failed. Please try again.";
       },

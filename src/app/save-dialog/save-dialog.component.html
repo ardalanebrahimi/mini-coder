@@ -10,6 +10,21 @@
       }}
     </h3>
 
+    <!-- App Status Info -->
+    <div class="app-status" *ngIf="isAppSaved()">
+      <div class="status-badge saved">
+        <span class="emoji">💾</span>
+        <span>App is saved</span>
+        <span class="app-name" *ngIf="getCurrentAppName()"
+          >"{{ getCurrentAppName() }}"</span
+        >
+      </div>
+      <div class="status-badge published" *ngIf="isAppPublished()">
+        <span class="emoji">🌐</span>
+        <span>Already published to App Store</span>
+      </div>
+    </div>
+
     <div class="modal-body">
       <label for="projectName">{{ t("projectName") }}</label>
       <input
@@ -20,6 +35,7 @@
         placeholder="Enter project name"
         maxlength="50"
         (keyup.enter)="onEnterKey()"
+        [readonly]="isAppSaved() && getCurrentAppName()"
       />
 
       <!-- Error message -->
@@ -54,7 +70,7 @@
         {{ t("cancel") }}
       </button>
 
-      <!-- Save Button (adapts based on mode) -->
+      <!-- Save Button (adapts based on mode and app status) -->
       <button
         class="btn-appstore"
         [ngClass]="
@@ -63,7 +79,11 @@
         (click)="
           currentSaveMode === 'toolbox' ? saveToToolbox() : addToAppStore()
         "
-        [disabled]="!projectName.trim() || isPublishing"
+        [disabled]="
+          !projectName.trim() ||
+          isPublishing ||
+          (currentSaveMode === 'appstore' && isAppPublished())
+        "
       >
         <span class="emoji" *ngIf="!isPublishing">{{
           currentSaveMode === "toolbox" ? "💾" : "🏪"
@@ -72,10 +92,16 @@
         {{
           isPublishing
             ? currentSaveMode === "toolbox"
-              ? "Saving..."
+              ? isAppSaved()
+                ? "Updating..."
+                : "Saving..."
               : "Publishing..."
             : currentSaveMode === "toolbox"
-            ? "Save to Toolbox"
+            ? isAppSaved()
+              ? "Update in Toolbox"
+              : "Save to Toolbox"
+            : isAppPublished()
+            ? "Already Published"
             : t("addToAppStore")
         }}
       </button>

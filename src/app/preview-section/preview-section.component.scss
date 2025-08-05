@@ -42,10 +42,33 @@
 .preview-actions {
   display: flex;
   gap: 1rem;
+  align-items: center;
 
   @media (max-width: 768px) {
     width: 100%;
     justify-content: center;
+  }
+}
+
+.app-status-info {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    &.saved {
+      background: #e8f5e8;
+      border: 1px solid #4caf50;
+      color: #2e7d32;
+    }
   }
 }
 

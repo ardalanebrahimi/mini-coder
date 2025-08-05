@@ -1,6 +1,41 @@
 // Import shared modal styles
 @import "../shared/modal-styles.scss";
 
+// App status badges
+.app-status {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  &.saved {
+    background: #e8f5e8;
+    border: 1px solid #4caf50;
+    color: #2e7d32;
+  }
+
+  &.published {
+    background: #e3f2fd;
+    border: 1px solid #2196f3;
+    color: #1565c0;
+  }
+
+  .app-name {
+    font-weight: 600;
+    color: inherit;
+  }
+}
+
 // Save dialog specific styles
 .project-name-input {
   width: 100%;
@@ -15,6 +50,18 @@
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  &[readonly] {
+    background: #f5f5f5;
+    color: #666;
+    cursor: not-allowed;
+    border-color: #ddd;
+
+    &:focus {
+      border-color: #ddd;
+      box-shadow: none;
+    }
   }
 }
 

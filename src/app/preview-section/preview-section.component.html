@@ -1,29 +1,51 @@
 <!-- Preview Section -->
 <div
   class="preview-section"
-  [class.has-popup-actions]="isPopupMode && !isReadOnly && showToolboxActions"
+  [class.has-popup-actions]="
+    isPopupMode && !isAppReadOnly() && showToolboxActions
+  "
   *ngIf="previewData.currentApp"
 >
   <div class="preview-header" *ngIf="!isPopupMode">
     <h3>
       <span class="emoji">📱</span>
       {{ t("livePreview") }}
-      <span *ngIf="isReadOnly" class="read-only-badge">{{
+      <span *ngIf="isAppReadOnly()" class="read-only-badge">{{
         t("readOnly")
       }}</span>
     </h3>
-    <div class="preview-actions" *ngIf="!isReadOnly && showToolboxActions">
+    <div class="preview-actions" *ngIf="!isAppReadOnly() && showToolboxActions">
+      <!-- App Status Info -->
+      <div class="app-status-info" *ngIf="isAppSaved()">
+        <span class="status-badge saved">
+          <span class="emoji">💾</span>
+          <span>Saved</span>
+        </span>
+      </div>
+
       <button class="action-btn modify" (click)="onModifyClick()">
         <span class="emoji">🔧</span>
         {{ t("modifyApp") }}
       </button>
-      <button class="action-btn save-toolbox" (click)="onSaveToToolboxClick()">
+      <button
+        class="action-btn save-toolbox"
+        (click)="onSaveToToolboxClick()"
+        [title]="isAppSaved() ? 'Update app in toolbox' : 'Save app to toolbox'"
+      >
         <span class="emoji">🧰</span>
-        {{ t("saveToToolbox") }}
+        {{ isAppSaved() ? "Update in Toolbox" : t("saveToToolbox") }}
       </button>
-      <button class="action-btn save-appstore" (click)="onAddToAppStoreClick()">
+      <button
+        class="action-btn save-appstore"
+        (click)="onAddToAppStoreClick()"
+        [title]="
+          isAppSaved()
+            ? 'Publish saved app to App Store'
+            : 'Save and publish to App Store'
+        "
+      >
         <span class="emoji">🏪</span>
-        {{ t("addToAppStore") }}
+        {{ isAppSaved() ? "Publish to App Store" : t("addToAppStore") }}
       </button>
       <button class="action-btn popup" (click)="onOpenInPopup()">
         <span class="emoji">🖥️</span>
@@ -52,7 +74,7 @@
   <!-- Popup Mode Actions - Show action buttons when in popup mode -->
   <div
     class="popup-actions"
-    *ngIf="isPopupMode && !isReadOnly && showToolboxActions"
+    *ngIf="isPopupMode && !isAppReadOnly() && showToolboxActions"
   >
     <div class="action-buttons-row">
       <button
@@ -66,18 +88,20 @@
       <button
         class="action-btn save-toolbox"
         (click)="onSaveToToolboxClick()"
-        title="{{ t('saveToToolbox') }}"
+        [title]="isAppSaved() ? 'Update app in toolbox' : t('saveToToolbox')"
       >
         <span class="emoji">🧰</span>
-        {{ t("saveToToolbox") }}
+        {{ isAppSaved() ? "Update in Toolbox" : t("saveToToolbox") }}
       </button>
       <button
         class="action-btn save-appstore"
         (click)="onAddToAppStoreClick()"
-        title="{{ t('addToAppStore') }}"
+        [title]="
+          isAppSaved() ? 'Publish saved app to App Store' : t('addToAppStore')
+        "
       >
         <span class="emoji">🏪</span>
-        {{ t("addToAppStore") }}
+        {{ isAppSaved() ? "Publish to App Store" : t("addToAppStore") }}
       </button>
       <button
         class="action-btn share"

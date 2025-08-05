@@ -59,9 +59,19 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
       .subscribe((data) => {
         this.dialogData = data;
         this.currentSaveMode = data?.saveMode || "appstore"; // Set current save mode
-        // Pre-populate project name if available
-        if (data?.currentApp?.projectName) {
-          this.projectName = data.currentApp.projectName;
+
+        // Pre-populate project name based on app status
+        if (data?.currentApp) {
+          // If app has ID, try to get existing name first
+          if (data.currentApp.id) {
+            const existingProject = this.findExistingProject();
+            this.projectName = existingProject
+              ? existingProject.name
+              : data.currentApp.projectName || "";
+          } else {
+            // For new apps, use generated project name
+            this.projectName = data.currentApp.projectName || "";
+          }
         }
       });
   }
@@ -111,12 +121,22 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Check if a project with the same name and content already exists
+   * Check if a project already exists (by ID first, then by name and content)
    */
   private findExistingProject(): SavedProject | null {
     if (!this.dialogData?.currentApp) return null;
 
     const currentProjects = this.toolboxService.getSavedProjects();
+
+    // First check if the current app has an ID and matches an existing project
+    if (this.dialogData.currentApp.id) {
+      const projectById = currentProjects.find(
+        (project) => project.id === this.dialogData!.currentApp!.id
+      );
+      if (projectById) return projectById;
+    }
+
+    // Fallback: check by name and content for unsaved apps
     return (
       currentProjects.find(
         (project) =>
@@ -199,12 +219,32 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
 
     const isLoggedIn = this.authService.isLoggedIn();
 
-    // Check if project already exists
+    // Check if this is an update to an existing project
     const existingProject = this.findExistingProject();
     if (existingProject) {
-      // Update existing project instead of creating duplicate
+      // If the app already exists, update it instead of creating a duplicate
       this.updateExistingProject(existingProject, false); // false = not published
       return;
+    }
+
+    // For new apps or apps without IDs, check if user wants to create a new project
+    // with the same name (this handles cases where content changed significantly)
+    const projectWithSameName = this.toolboxService
+      .getSavedProjects()
+      .find((project) => project.name === this.projectName.trim());
+
+    if (projectWithSameName && !this.dialogData.currentApp.id) {
+      // Ask user if they want to overwrite or create a new version
+      const overwrite = confirm(
+        `A project named "${this.projectName.trim()}" already exists. Do you want to overwrite it?`
+      );
+
+      if (overwrite) {
+        this.updateExistingProject(projectWithSameName, false);
+        return;
+      } else {
+        // User chose not to overwrite, let generateUniqueProjectName handle it
+      }
     }
 
     // Log toolbox save attempt
@@ -239,6 +279,13 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
               next: (savedProject) => {
+                // Update the current app with the new ID so it's no longer "unsaved"
+                if (this.dialogData?.currentApp) {
+                  this.dialogData.currentApp.id = savedProject.id;
+                  // Also emit an event to notify the app component
+                  this.emitAppSavedEvent(savedProject);
+                }
+
                 this.toolboxService.addProject(savedProject);
 
                 this.publishSuccessMessage = `💾 "${uniqueName}" saved to your toolbox!`;
@@ -288,12 +335,17 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
 
     const isLoggedIn = this.authService.isLoggedIn();
 
-    // Check if project already exists
+    // Check if this app is already published or exists
     const existingProject = this.findExistingProject();
     if (existingProject) {
-      // Update existing project to be published
-      this.updateExistingProject(existingProject, true); // true = published
-      return;
+      if (existingProject.isPublished) {
+        this.errorMessage = `"${existingProject.name}" is already published to the App Store.`;
+        return;
+      } else {
+        // Update existing project to be published
+        this.updateExistingProject(existingProject, true); // true = published
+        return;
+      }
     }
 
     // Log app store publish attempt
@@ -338,6 +390,13 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
               next: (savedProject) => {
+                // Update the current app with the new ID and published status
+                if (this.dialogData?.currentApp) {
+                  this.dialogData.currentApp.id = savedProject.id;
+                  // Also emit an event to notify the app component
+                  this.emitAppSavedEvent(savedProject);
+                }
+
                 this.toolboxService.addProject(savedProject);
 
                 // Track successful publication
@@ -385,6 +444,33 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Check if the current app is already saved in the toolbox
+   */
+  public isAppSaved(): boolean {
+    return !!this.dialogData?.currentApp?.id;
+  }
+
+  /**
+   * Check if the current app is already published
+   */
+  public isAppPublished(): boolean {
+    if (!this.dialogData?.currentApp?.id) return false;
+
+    const existingProject = this.findExistingProject();
+    return existingProject ? existingProject.isPublished : false;
+  }
+
+  /**
+   * Get the current app's name if it exists
+   */
+  public getCurrentAppName(): string {
+    if (!this.dialogData?.currentApp?.id) return "";
+
+    const existingProject = this.findExistingProject();
+    return existingProject ? existingProject.name : "";
+  }
+
+  /**
    * Reset form state
    */
   private resetForm(): void {
@@ -414,6 +500,17 @@ export class SaveDialogComponent implements OnInit, OnDestroy {
       detail: {
         message: "Please log in or register to publish to the App Store.",
       },
+      bubbles: true,
+    });
+    document.dispatchEvent(event);
+  }
+
+  /**
+   * Emit event when app is saved to update the main app component
+   */
+  private emitAppSavedEvent(savedProject: SavedProject): void {
+    const event = new CustomEvent("appSaved", {
+      detail: { savedProject },
       bubbles: true,
     });
     document.dispatchEvent(event);

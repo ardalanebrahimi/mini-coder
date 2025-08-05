@@ -118,6 +118,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // Event listener functions for cleanup
   private saveSuccessListener?: (event: any) => void;
   private showAuthModalListener?: (event: any) => void;
+  private appSavedListener?: (event: any) => void;
 
   // Navigation state
   currentView: "app" | "store" = "app";
@@ -626,6 +627,18 @@ export class AppComponent implements OnInit, OnDestroy {
       this.showAuthModalWithMessage(event.detail.message);
     };
     document.addEventListener("showAuthModal", this.showAuthModalListener);
+
+    // Listen for app saved events from save dialog
+    this.appSavedListener = (event: any) => {
+      const savedProject = event.detail.savedProject;
+      // Update the current app with the saved project ID if it matches
+      if (this.currentApp && savedProject && !this.currentApp.id) {
+        this.currentApp.id = savedProject.id;
+        // Update preview service as well
+        this.updatePreviewService();
+      }
+    };
+    document.addEventListener("appSaved", this.appSavedListener);
 
     // Listen for build choice results
     this.buildChoiceDialogService.choice$
@@ -1331,6 +1344,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     if (this.showAuthModalListener) {
       document.removeEventListener("showAuthModal", this.showAuthModalListener);
+    }
+    if (this.appSavedListener) {
+      document.removeEventListener("appSaved", this.appSavedListener);
     }
   }
 }

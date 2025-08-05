@@ -189,6 +189,22 @@ export class PreviewSectionComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Check if the current app is saved
+   */
+  isAppSaved(): boolean {
+    return !!(this.previewData.currentApp && this.previewData.currentApp.id);
+  }
+
+  /**
+   * Check if the current app is read-only (from app store)
+   */
+  isAppReadOnly(): boolean {
+    return !!(
+      this.previewData.currentApp && this.previewData.currentApp.isReadOnly
+    );
+  }
+
+  /**
    * Handle star button click for app store preview
    */
   onStarProject(): void {

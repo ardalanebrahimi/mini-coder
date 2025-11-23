@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Observable, of, throwError, forkJoin } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { Observable, throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
@@ -8,7 +8,6 @@ import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { franc } from "franc-min";
 import { environment } from "../../environments/environment";
 import { CodeMinifierService } from "./code-minifier.service";
-import { AppNameGeneratorService } from "./app-name-generator.service";
 
 export interface ProcessedCommand {
   id?: number;
@@ -24,14 +23,13 @@ export interface ProcessedCommand {
   providedIn: "root",
 })
 export class PromptProcessorService {
-  private readonly openaiApiUrl = "https://api.openai.com/v1/chat/completions";
+  private readonly miniCoderApiUrl = `${environment.apiUrl}/ai/mini-coder`;
   private readonly supportedLanguages = ["en", "de"];
 
   constructor(
     private http: HttpClient,
     private sanitizer: DomSanitizer,
-    private codeMinifierService: CodeMinifierService,
-    private appNameGenerator: AppNameGeneratorService
+    private codeMinifierService: CodeMinifierService
   ) {}
 
   /**
@@ -47,30 +45,44 @@ export class PromptProcessorService {
     // Detect language using franc-min
     const detectedLanguage = this.detectLanguage(command);
 
-    // Create OpenAI prompt based on detected language
-    const prompt = this.createOpenAIPrompt(command, detectedLanguage);
-
-    // Call both OpenAI API for code generation and name generation in parallel
-    return forkJoin({
-      codeResponse: this.callOpenAI(prompt),
-      appName: this.appNameGenerator.generateAppName(command, detectedLanguage),
-    }).pipe(
-      map(({ codeResponse, appName }) => {
-        const generatedCode = this.extractCodeFromResponse(codeResponse);
-        const sanitizedCode = this.sanitizeCode(generatedCode);
-
-        return {
-          detectedLanguage,
-          generatedCode,
-          sanitizedCode,
-          projectName: appName,
-        };
-      }),
-      catchError((error) => {
-        console.error("Error processing command:", error);
-        return throwError(() => error);
+    // Call backend API (which handles OpenAI securely)
+    return this.http
+      .post<{
+        generatedCode: string;
+        projectName: string;
+        detectedLanguage: string;
+        tokensRemaining: number;
+        usage: any;
+      }>(`${this.miniCoderApiUrl}/generate`, {
+        command: command.trim(),
+        detectedLanguage,
       })
-    );
+      .pipe(
+        map((response) => {
+          const sanitizedCode = this.sanitizeCode(response.generatedCode);
+
+          return {
+            detectedLanguage: response.detectedLanguage,
+            generatedCode: response.generatedCode,
+            sanitizedCode,
+            projectName: response.projectName,
+          };
+        }),
+        catchError((error) => {
+          console.error("Error processing command:", error);
+
+          // Handle specific error codes
+          if (error.status === 403) {
+            return throwError(() => new Error("Out of tokens. Please purchase more tokens to continue."));
+          }
+
+          if (error.status === 401) {
+            return throwError(() => new Error("Authentication required. Please log in."));
+          }
+
+          return throwError(() => new Error(error.error?.error || "Failed to generate app. Please try again."));
+        })
+      );
   }
 
   /**
@@ -98,10 +110,6 @@ export class PromptProcessorService {
     // Detect language of the modify command
     const detectedLanguage = this.detectLanguage(modifyCommand);
 
-    // Use existing app name or generate fallback name (do NOT generate new AI name)
-    const projectName =
-      currentAppName || this.generateProjectName(modifyCommand);
-
     // Minify the current app code to reduce token usage
     const minifiedCode = this.codeMinifierService.minifyHtml(currentAppCode);
 
@@ -114,64 +122,47 @@ export class PromptProcessorService {
       `Code minification: ${sizeReduction} reduction (${currentAppCode.length} → ${minifiedCode.length} chars)`
     );
 
-    // Create specialized modify prompt
-    const prompt = this.createModifyPrompt(
-      modifyCommand,
-      minifiedCode,
-      detectedLanguage
-    );
-
-    // Call OpenAI API
-    return this.callOpenAI(prompt).pipe(
-      map((response) => {
-        const generatedCode = this.extractCodeFromResponse(response);
-        const sanitizedCode = this.sanitizeCode(generatedCode);
-
-        return {
-          userCommand: modifyCommand,
-          detectedLanguage,
-          generatedCode,
-          sanitizedCode,
-          projectName,
-        };
-      }),
-      catchError((error) => {
-        console.error("Error processing modify command:", error);
-        return throwError(() => error);
+    // Call backend API for modification
+    return this.http
+      .post<{
+        generatedCode: string;
+        projectName: string;
+        detectedLanguage: string;
+        tokensRemaining: number;
+        usage: any;
+      }>(`${this.miniCoderApiUrl}/modify`, {
+        command: modifyCommand.trim(),
+        currentAppCode: minifiedCode,
+        currentAppName,
+        detectedLanguage,
       })
-    );
-  }
+      .pipe(
+        map((response) => {
+          const sanitizedCode = this.sanitizeCode(response.generatedCode);
 
-  /**
-   * Create a specialized prompt for modifying existing app code
-   * @param modifyCommand - The user's modification instruction
-   * @param currentAppCode - The minified current app code
-   * @param language - Detected language
-   * @returns Formatted modify prompt for OpenAI
-   */
-  private createModifyPrompt(
-    modifyCommand: string,
-    currentAppCode: string,
-    language: string
-  ): string {
-    const langLabel = language === "de" ? "German" : "English";
+          return {
+            userCommand: modifyCommand,
+            detectedLanguage: response.detectedLanguage,
+            generatedCode: response.generatedCode,
+            sanitizedCode,
+            projectName: response.projectName,
+          };
+        }),
+        catchError((error) => {
+          console.error("Error processing modify command:", error);
 
-    return `You are an expert at updating kid-friendly web apps.
+          // Handle specific error codes
+          if (error.status === 403) {
+            return throwError(() => new Error("Out of tokens. Please purchase more tokens to continue."));
+          }
 
-Here is the current app code:
----
-${currentAppCode}
----
+          if (error.status === 401) {
+            return throwError(() => new Error("Authentication required. Please log in."));
+          }
 
-Modify this app as follows (command in ${langLabel}):
-${modifyCommand}
-
-Instructions:
-- Only reply with the complete, updated HTML code
-- Keep it colorful, safe, and fun for kids
-- Make sure all features work properly
-- Preserve the overall structure while implementing the requested changes
-- Use inline CSS and JavaScript as needed`;
+          return throwError(() => new Error(error.error?.error || "Failed to modify app. Please try again."));
+        })
+      );
   }
 
   /**
@@ -201,151 +192,6 @@ Instructions:
   }
 
   /**
-   * Generate a project name from the command
-   * @param command - User command
-   * @returns Sanitized project name
-   */
-  private generateProjectName(command: string): string {
-    // Extract meaningful words and create a project name
-    const words = command
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, "")
-      .split(/\s+/)
-      .filter((word) => word.length > 2)
-      .slice(0, 3);
-
-    return words.length > 0 ? words.join("-") : "mini-app";
-  }
-
-  /**
-   * Create OpenAI prompt based on command and language
-   * @param command - User command
-   * @param language - Detected language
-   * @returns Formatted prompt for OpenAI
-   */
-  private createOpenAIPrompt(command: string, language: string): string {
-    // Use a single prompt template and append the command with language info
-    const langLabel = language === "de" ? "German" : "English";
-    return (
-      environment.openAIFixInstructions +
-      "\n\ncommand in " +
-      langLabel +
-      ": " +
-      command
-    );
-  }
-
-  /**
-   * Call OpenAI API to generate code
-   * @param prompt - The prompt to send to OpenAI
-   * @returns Observable with OpenAI response
-   */
-  private callOpenAI(prompt: string): Observable<any> {
-    const headers = new HttpHeaders({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${environment.openaiApiKey}`,
-    });
-
-    const body = {
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: environment.systemPrompt,
-        },
-        {
-          role: "assistant",
-          content:
-            "Remember: Always reply with a single, complete HTML file. Make it colorful, safe, and fun for kids. All features must work.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      max_tokens: 3000,
-      temperature: 0.2,
-    };
-
-    return this.http.post(this.openaiApiUrl, body, { headers });
-  }
-
-  /**
-   * Extract code from OpenAI response
-   * @param response - OpenAI API response
-   * @returns Generated HTML code
-   */
-  private extractCodeFromResponse(response: any): string {
-    try {
-      const content = response.choices[0]?.message?.content;
-      if (!content) {
-        throw new Error("No content in response");
-      }
-
-      // Remove any markdown code blocks if present
-      let code = content.replace(/```html\n?/g, "").replace(/```\n?/g, "");
-
-      // Ensure we have a complete HTML document
-      if (!code.includes("<!DOCTYPE html>")) {
-        code = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App</title>
-    <style>
-        body { 
-            font-family: 'Comic Sans MS', cursive; 
-            margin: 0; 
-            padding: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 { color: #333; margin-bottom: 20px; }
-        button {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 18px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-        }
-        button:hover { background: #ff5252; transform: scale(1.05); }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Mini App</h1>
-        <p>Generated content:</p>
-        ${code}
-    </div>
-</body>
-</html>`;
-      }
-
-      return code;
-    } catch (error) {
-      console.error("Error extracting code from response:", error);
-      return this.getFallbackHTML();
-    }
-  }
-
-  /**
    * Sanitize HTML code for safe rendering
    * @param code - Raw HTML code
    * @returns Sanitized HTML
@@ -353,64 +199,5 @@ Instructions:
   private sanitizeCode(code: string): SafeHtml {
     // Use DomSanitizer to sanitize the HTML
     return this.sanitizer.bypassSecurityTrustHtml(code);
-  }
-
-  /**
-   * Get fallback HTML when generation fails
-   * @returns Basic HTML template
-   */
-  private getFallbackHTML(): string {
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App - Error</title>
-    <style>
-        body { 
-            font-family: 'Comic Sans MS', cursive; 
-            margin: 0; 
-            padding: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 { color: #333; margin-bottom: 20px; font-size: 2rem; }
-        .error { color: #ff6b6b; font-size: 1.2rem; margin: 20px 0; }
-        .suggestion { color: #666; font-size: 1rem; margin-top: 20px; }
-        button {
-            background: #4caf50;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 18px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-        }
-        button:hover { background: #45a049; transform: scale(1.05); }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Oops! 🤖</h1>
-        <p class="error">Something went wrong generating your app!</p>
-        <p class="suggestion">Try rephrasing your command or check your internet connection.</p>
-        <button onclick="window.parent.location.reload()">Try Again</button>
-    </div>
-</body>
-</html>`;
   }
 }

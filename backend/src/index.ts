@@ -16,6 +16,8 @@ import aiRoutes from "./routes/aiRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import starRoutes from "./routes/starRoutes";
 import analyticsRoutes from "./routes/analyticsRoutes";
+import miniCoderRoutes from "./routes/miniCoderRoutes";
+import gdprRoutes from "./routes/gdprRoutes";
 import { validateOpenAIConfig } from "./config/openai";
 
 dotenv.config();
@@ -71,7 +73,9 @@ app.use("/api/v1/prompts", promptRoutes);
 app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/stars", starRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/gdpr", gdprRoutes);
 app.use("/ai", aiRoutes);
+app.use("/ai/mini-coder", miniCoderRoutes);
 app.use("/admin", adminRoutes);
 
 // 404 handler

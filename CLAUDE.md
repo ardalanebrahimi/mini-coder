@@ -90,9 +90,11 @@ Most services expose RxJS Observables/Subjects for reactive state management. Co
 ### Important Technical Details
 
 **OpenAI Integration:**
-- API key stored in `environment.ts` (should be in backend for production)
-- System prompt creates kid-friendly, safe, self-contained HTML apps
-- Token limit: 3000 tokens per request
+- API key stored securely in backend `.env` file (NEVER in frontend)
+- System prompts loaded from environment variables (`SYSTEM_PROMPT`, `OPENAI_FIX_INSTRUCTIONS`)
+- All AI operations go through backend `/ai/mini-coder/*` endpoints
+- JWT authentication + token deduction required for all AI calls
+- Token costs: 2 tokens/generation, 1 token/transcription
 - Code minification used for modify operations to reduce token usage
 
 **Security:**
@@ -130,11 +132,17 @@ The app uses environment files:
 - `environment.prod.ts` - Production config
 - Templates: `environment.template.ts`, `environment.prod.template.ts`
 
-**Critical Environment Variables:**
+**Frontend Environment Variables:**
 - `apiUrl` - Backend API endpoint
-- `openaiApiKey` - OpenAI API key (security risk if in frontend)
 - `googleClientId` - Google OAuth client ID
-- `systemPrompt` & `openAIFixInstructions` - AI generation instructions
+
+**Backend Environment Variables (.env):**
+- `OPENAI_API_KEY` - OpenAI API key (REQUIRED)
+- `SYSTEM_PROMPT` - AI system prompt (REQUIRED, keep secret)
+- `OPENAI_FIX_INSTRUCTIONS` - Code generation instructions (REQUIRED, keep secret)
+- `DATABASE_URL` - PostgreSQL connection string
+- `JWT_SECRET` - JWT signing key
+- See `backend/.env.example` for complete list
 
 ## Testing Notes
 

@@ -4,3 +4,4 @@ node_modules
 /src/environments/environment.prod.ts
 dist
 minicoder-play-create-main/
+SETUP_PROMPTS.md

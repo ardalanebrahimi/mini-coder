@@ -35,8 +35,7 @@ export interface VoiceError {
   providedIn: "root",
 })
 export class WhisperVoiceService {
-  private readonly WHISPER_API_URL =
-    "https://api.openai.com/v1/audio/transcriptions";
+  private readonly WHISPER_API_URL = `${environment.apiUrl}/ai/mini-coder/transcribe`;
   private readonly MAX_RECORDING_TIME = 15000; // 15 seconds
   private readonly RECORDING_CHECK_INTERVAL = 100; // 100ms
 
@@ -385,31 +384,21 @@ export class WhisperVoiceService {
       formData.append("language", currentLang);
     }
 
-    // Optional: request timestamp granularities for confidence scoring
-    formData.append("response_format", "verbose_json");
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${environment.openaiApiKey}`,
-    });
-
     try {
       const response = await this.http
-        .post<any>(this.WHISPER_API_URL, formData, {
-          headers,
-        })
+        .post<any>(this.WHISPER_API_URL, formData)
         .pipe(timeout(30000), catchError(this.handleApiError.bind(this)))
         .toPromise();
 
-      if (!response || !response.text) {
+      if (!response || !response.transcription) {
         throw new Error("No transcription received from API");
       }
 
       return {
-        transcription: response.text.trim(),
-        confidence: response.confidence || 0.9, // Whisper doesn't always provide confidence
-        language: response.language || currentLang,
-        duration:
-          response.duration || this.stateSubject.value.recordingTime / 1000,
+        transcription: response.transcription.trim(),
+        confidence: 0.9, // Backend doesn't return confidence yet
+        language: currentLang,
+        duration: this.stateSubject.value.recordingTime / 1000,
       };
     } catch (error) {
       console.error("Whisper API error:", error);
